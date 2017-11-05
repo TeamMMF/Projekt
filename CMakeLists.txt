@@ -37,7 +37,7 @@ set(SOURCES "${PROJECT_SOURCE_DIR}/src")
 # The directory all libraries should be stored in
 set(LIBRARY_SOURCES_DIRECTORY "${PROJECT_SOURCE_DIR}/libraries")
 
-SET( CMAKE_CXX_FLAGS  "-Iinclude/ -std=c++11" )
+SET( CMAKE_CXX_FLAGS  "-std=c++11" )
 
 # my simple test library
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
@@ -52,6 +52,5 @@ target_link_libraries(sample Common)
 
 add_executable(vectors ${SOURCES}/vectorSample.cpp)
 
-# 
 add_executable(fastaSample ${SOURCES}/fastaSample.cpp)
 target_link_libraries(fastaSample bioparser)

@@ -1,0 +1,23 @@
+Upute
+
+'/' označava korijen projekta u kojem se nalazi glavni CMakeLists.txt file
+
+Skripte se pozivaju isključivo iz korijenskog direktorija.
+
+WINDOWS -> samo Powerhell (cmd ne radi dobro) ./scripts/imeskripte.bat
+LINUX -> terminal ./scripts/imeskripte.sh
+
+Pisanje i pokretanje programa:
+
+	- sve izvorne kodove dodavati u /src/
+	- za svaki program novi program, dodati sljedeću liniju u /CMakeLists.txt:
+		add_executable(ime_exe_datoteke ${SOURCES}/ime_datoteke_s_kodom)
+	- pokrenuti 'build' skriptu
+	- negdje u direktoriju /build/bin/ stvara se izvrsna datoteka prevedenog programa (ime joj je navedeno kao prvi parametar u add_executable())
+	- ta se izvršna datoteka može pokrenuti
+	- svaki put kada se mijenja izvorni kod ili CMakeLists.txt, ponovno se mora pozvati skripta 'make'
+
+Uključivanje biblioteka:
+
+	- vjerojatno će nam za sad trebati samo bioparser, primjer njegova korištenja možete vidjeti u /src
+	- u file se doda #include "bioparser/bioparser.hpp", a u CMakeLists.txt target_link_libraries(ime_exe_datoteke bioparser)
