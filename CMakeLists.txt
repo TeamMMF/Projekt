@@ -50,8 +50,6 @@ add_subdirectory(vendor/bioparser EXCLUDE_FROM_ALL)
 add_executable(sample ${SOURCES}/sample.cpp)
 target_link_libraries(sample Common)
 
-add_executable(fopenSample ${SOURCES}/fopenSample.cpp)
-
 add_executable(vectors ${SOURCES}/vectorSample.cpp)
 
 # 

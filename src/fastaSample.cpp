@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
 {
 	std::vector<std::unique_ptr<FASTASampleClas>> fasta_objects;
 
-	std::string project_root(project_root);
+	std::string project_root(PROJECT_ROOT);
 	auto fasta_reader = bioparser::createReader<FASTASampleClas, bioparser::FastaReader>(project_root+"src/resources/sample.fasta");
 	
 	fasta_reader->read_objects(fasta_objects, -1);
