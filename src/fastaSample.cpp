@@ -9,12 +9,14 @@
 #include <string.h>
 #include "bioparser/bioparser.hpp"
 
+using namespace std;
+
 // define a class for sequences in FASTA format
 class FASTASampleClas {
 
 	char * name;
 	char * data;
-	std::string test_string ="asdfasdfasfd";
+	string test_string ="asdfasdfasfd";
 
 	uint32_t name_length;
 	uint32_t data_length;
@@ -26,6 +28,7 @@ class FASTASampleClas {
             uint32_t name_length,
             const char* data,
             uint32_t data_length) {
+
         	   this->name_length = name_length;
         	   this->name =  new char[name_length];
         	   strncpy(this->name,name,name_length);
@@ -33,15 +36,14 @@ class FASTASampleClas {
         	   this->data_length = data_length;
         	   this->data=new char[data_length];
         	   strncpy(this->data,data,data_length);
-
-
         }
-        std::string get_description();
-        std::string get_test_string();
+
+        string get_description();
+        string get_test_string();
 };
 
-std::string FASTASampleClas :: get_description(){
-	std :: ostringstream oss;
+string FASTASampleClas :: get_description(){
+	ostringstream oss;
 	
 	oss << "Name: ";
 	for (int i = 0; i < name_length; ++i)
@@ -49,7 +51,7 @@ std::string FASTASampleClas :: get_description(){
 		oss << name[i];
 	}
 
-	oss << std::endl;
+	oss << endl;
 	oss << "Data: ";
 	for (int i = 0; i < data_length; ++i)
 	{
@@ -59,22 +61,22 @@ std::string FASTASampleClas :: get_description(){
 	return oss.str();
 }
 
-std::string FASTASampleClas :: get_test_string(){
+string FASTASampleClas :: get_test_string(){
 	return test_string;
 }
 
 int main(int argc, char const *argv[])
 {
-	std::vector<std::unique_ptr<FASTASampleClas>> fasta_objects;
+	vector<unique_ptr<FASTASampleClas>> fasta_objects;
 
-	std::string project_root(PROJECT_ROOT);
+	string project_root(PROJECT_ROOT);
 	auto fasta_reader = bioparser::createReader<FASTASampleClas, bioparser::FastaReader>(project_root+"src/resources/sample.fasta");
 	
 	fasta_reader->read_objects(fasta_objects, -1);
 
-	for (std::vector<std::unique_ptr<FASTASampleClas>>::iterator i = fasta_objects.begin(); i != fasta_objects.end(); ++i)
+	for (vector<unique_ptr<FASTASampleClas>>::iterator i = fasta_objects.begin(); i != fasta_objects.end(); ++i)
 	{
-		std::cout << (**i).get_description() << std::endl << std::endl;
+		cout << (**i).get_description() << endl << endl;
 	}
 
 	return 0;
