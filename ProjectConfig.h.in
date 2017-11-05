@@ -1,0 +1,3 @@
+// the configured options and settings for this project
+#define SequenceOverlaping_VERSION_MAJOR @SequenceOverlaping_VERSION_MAJOR@
+#define SequenceOverlaping_VERSION_MINOR @SequenceOverlaping_VERSION_MINOR@
