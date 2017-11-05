@@ -2,7 +2,21 @@ Upute
 
 '/' označava korijen projekta u kojem se nalazi glavni CMakeLists.txt file
 
-Skripte se pozivaju isključivo iz korijenskog direktorija.
+Napisao sam skripte koje olakšavaju korištenje CMakea.
+Za sada se moraju pozivati isključivo iz korijenskog direktorija projekta.
+
+SKRIPTA    |     ŠTO RADI
+--------------------------
+make       |   ponovno prevodi izvorne kodove, ovu uglavnom uvijek koristimo
+build      |   konfigurira projekt i poziva make,
+clean      |   izbriše cijeli build direktorij
+rebuild    |   poziva clean i zatim build
+
+Na početku rada pozivamo 'build'.
+Umjesto compilera pozivamo 'make'.
+'build' je kao jači 'make'.
+'rebuild' je clean slate.
+
 
 WINDOWS -> samo Powerhell (cmd ne radi dobro) ./scripts/imeskripte.bat
 LINUX -> terminal ./scripts/imeskripte.sh
@@ -15,7 +29,7 @@ Pisanje i pokretanje programa:
 	- pokrenuti 'build' skriptu
 	- negdje u direktoriju /build/bin/ stvara se izvrsna datoteka prevedenog programa (ime joj je navedeno kao prvi parametar u add_executable())
 	- ta se izvršna datoteka može pokrenuti
-	- svaki put kada se mijenja izvorni kod ili CMakeLists.txt, ponovno se mora pozvati skripta 'make'
+	- svaki put kada se mijenja izvorni kod ili CMakeLists.txt, ponovno se mora pozvati skripta 'make' (ovo nam je recimo compiler)
 
 Uključivanje biblioteka:
 
