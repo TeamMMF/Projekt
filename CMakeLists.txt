@@ -1,5 +1,5 @@
 # minimum CMake version required
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.2)
 
 # The project's name
 project (SequenceOverlaping)
@@ -24,26 +24,36 @@ configure_file (
  
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h
+
 include_directories("${PROJECT_BINARY_DIR}")
 
-# sets the output program where your program will be created
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
-
-# sets the top level directory of the build tree, separating CMake files from our code
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # The location of our source files
 set(SOURCES "${PROJECT_SOURCE_DIR}/src")
 
 # The directory all libraries should be stored in
-set(LIBRARIES "${PROJECT_SOURCE_DIR}/libraries")
+set(LIBRARY_SOURCES_DIRECTORY "${PROJECT_SOURCE_DIR}/libraries")
 
-include_directories("${LIBRARIES}/Common")
-add_subdirectory(${LIBRARIES}/Common)
+SET( CMAKE_CXX_FLAGS  "-Iinclude/ -std=c++11" )
 
-# sets the location of binary library files
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+# my simple test library
+include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
+add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Common)
  
+# including bioparser
+add_subdirectory(vendor/bioparser EXCLUDE_FROM_ALL)
+
 # add the executable
 add_executable(sample ${SOURCES}/sample.cpp)
 target_link_libraries(sample Common)
+
+add_executable(fopenSample ${SOURCES}/fopenSample.cpp)
+
+add_executable(vectors ${SOURCES}/vectorSample.cpp)
+
+# 
+add_executable(fastaSample ${SOURCES}/fastaSample.cpp)
+target_link_libraries(fastaSample bioparser)
