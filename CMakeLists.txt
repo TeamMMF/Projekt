@@ -20,6 +20,7 @@ configure_file (
 # PROJECT_NAME - the name of the project ste by the project() command 
 # PROJECT_SOURCE_DIR - the full path to the project source directory root
 # Set the output program where your program will be created
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
@@ -32,6 +33,8 @@ set(LIBRARY_SOURCES_DIRECTORY "${PROJECT_SOURCE_DIR}/libraries")
 
 set( CMAKE_CXX_FLAGS  "-std=c++11" )
 
+
+##################### BEGIN GOOGLETEST #######################
 # Download and unpack googletest at configure time
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
@@ -63,6 +66,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
+##################### END GOOGLETEST #######################
+
 
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
