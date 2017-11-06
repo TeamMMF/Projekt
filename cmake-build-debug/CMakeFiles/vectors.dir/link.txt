@@ -1,1 +1,0 @@
-/usr/bin/c++  -std=c++11 -g  -rdynamic CMakeFiles/vectors.dir/src/vectorSample.cpp.o  -o bin/vectors 

@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../lib/libCommond.a  CMakeFiles/Common.dir/complement.cpp.o
-/usr/bin/ranlib ../../lib/libCommond.a
