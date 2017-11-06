@@ -44,9 +44,10 @@ SET( CMAKE_CXX_FLAGS  "-std=c++11" )
 # my simple test library
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Common)
+add_subdirectory(testing)
  
 # including bioparser
-add_subdirectory(vendor/bioparser EXCLUDE_FROM_ALL)
+add_subdirectory(libraries/bioparser EXCLUDE_FROM_ALL)
 
 # add the executable
 add_executable(sample ${SOURCES}/sample.cpp)

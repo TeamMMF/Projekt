@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++11 -g  -rdynamic CMakeFiles/runBasicTests.dir/check_complements.cpp.o  -o ../../bin/runBasicTests ../../lib/libgtest_maind.a ../../lib/libCommond.a ../../lib/libgtestd.a -pthread 

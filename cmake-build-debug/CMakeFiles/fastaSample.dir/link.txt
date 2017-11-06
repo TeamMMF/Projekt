@@ -1,0 +1,1 @@
+/usr/bin/c++  -std=c++11 -g  -rdynamic CMakeFiles/fastaSample.dir/src/fastaSample.cpp.o  -o bin/fastaSample 
