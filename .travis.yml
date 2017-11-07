@@ -21,6 +21,18 @@ install:
     - sudo apt-get install --allow-unauthenticated -qq clang-3.4
     - export CXX="clang++-3.4"
 
+sudo: required
 script:
-    - scripts/rebuild.sh
-    - build/bin/runBasicTests
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+  - gcc --version
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - g++-5
