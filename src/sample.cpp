@@ -1,7 +1,7 @@
 #include "ProjectConfig.h"
 
-#include<stdio.h>
-#include "Common.h"
+#include <cstdio>
+#include "Common.hpp"
 
 
 int main(int argc, char const *argv[])

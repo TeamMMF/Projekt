@@ -3,26 +3,31 @@
 //
 
 #include "gtest/gtest.h"
-#include "Common.h"
+#include "Common.hpp"
 
 namespace {
 
-    TEST(CommonTest, TestGuanine) {
+    TEST(ComplementTest, TestGuanine) {
         EXPECT_EQ('G', complement('C'));
 
     }
 
-    TEST(CommonTest, TestCitosine) {
+    TEST(ComplementTest, TestCytosine) {
         EXPECT_EQ('C', complement('G'));
     }
 
-    TEST(CommonTest, TestAdenin) {
+    TEST(ComplementTest, TestAdenine) {
         EXPECT_EQ('A', complement('T'));
 
     }
 
-    TEST(CommonTest, TestTimine) {
+    TEST(ComplementTest, TestThymine) {
         EXPECT_EQ('T', complement('A'));
+
+    }
+
+    TEST(ComplementTest, TestInvalid) {
+        EXPECT_ANY_THROW({complement('D');});
 
     }
 }
