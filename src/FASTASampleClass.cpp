@@ -31,11 +31,11 @@ public:
         strncpy(this->data, data, data_length);
     }
 
-    std::__cxx11::string get_description();
-    std::__cxx11::string get_data();
+    std::string get_description();
+    std::string get_data();
 };
 
-std::__cxx11::string FASTASampleClass::get_description() {
+std::string FASTASampleClass::get_description() {
     std::ostringstream oss;
 
     oss << "Name: ";
@@ -52,7 +52,7 @@ std::__cxx11::string FASTASampleClass::get_description() {
     return oss.str();
 }
 
-std::__cxx11::string FASTASampleClass::get_data() {
+std::string FASTASampleClass::get_data() {
     std::ostringstream oss;
 
     for (int i = 0; i < data_length; ++i) {
