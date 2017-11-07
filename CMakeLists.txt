@@ -31,6 +31,7 @@ set(SOURCES "${PROJECT_SOURCE_DIR}/src")
 # The directory all libraries should be stored in
 set(LIBRARY_SOURCES_DIRECTORY "${PROJECT_SOURCE_DIR}/libraries")
 
+message("${CMAKE_CXX_FLAGS}")
 set( CMAKE_CXX_FLAGS  "-std=c++11" )
 
 
