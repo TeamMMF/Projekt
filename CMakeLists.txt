@@ -85,3 +85,6 @@ add_executable(vectors ${SOURCES}/vectorSample.cpp)
 
 add_executable(fastaSample ${SOURCES}/fastaSample.cpp )
 target_link_libraries(fastaSample bioparser)
+
+add_executable(kmer_finder ${SOURCES}/kmer_finder.cpp)
+target_link_libraries(kmer_finder bioparser)

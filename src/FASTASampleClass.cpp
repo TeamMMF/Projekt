@@ -32,6 +32,7 @@ public:
     }
 
     std::__cxx11::string get_description();
+    std::__cxx11::string get_data();
 };
 
 std::__cxx11::string FASTASampleClass::get_description() {
@@ -50,3 +51,13 @@ std::__cxx11::string FASTASampleClass::get_description() {
 
     return oss.str();
 }
+
+std::__cxx11::string FASTASampleClass::get_data() {
+    std::ostringstream oss;
+
+    for (int i = 0; i < data_length; ++i) {
+        oss << data[i];
+    }
+
+    return oss.str();
+};
