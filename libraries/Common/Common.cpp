@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_set>
+#include <iostream>
 #include "Common.hpp"
 
 
@@ -200,12 +201,13 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
             if(u < v && u == m) {
                 if(minimizers.empty()){
                     minimizers.push_back(make_tuple(m, i+j, 0));
-
                 }
+
                 else {
-                    tuple<uint64_t , int, int> last = minimizers.back();
-                    if (get<0>(last) != m && get<1>(last) != i + j)
-                        minimizers.push_back(make_tuple(m, i+j, 0));
+                    tuple<uint64_t, int, int> last = minimizers.back();
+                    if (get<0>(last) != m && get<1>(last) != i + j) {
+                        minimizers.push_back(make_tuple(m, i + j, 0));
+                    }
                 }
 
             }
@@ -213,17 +215,19 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
                 if(minimizers.empty()){
                     minimizers.push_back(make_tuple(m, i+j, 1));
                 }
+
                 else {
                     tuple<uint64_t, int, int> last = minimizers.back();
-                    if (get<0>(last) != m && get<1>(last) != i + j)
+                    if (get<0>(last) != m && get<1>(last) != i + j) {
                         minimizers.push_back(make_tuple(m, i + j, 1));
+                    }
                 }
             }
         }
         int next_end = i + w;
         if(next_end < size){
             hash_buffer[next_end] = minimizer_hash(kmers[next_end]);
-            hash_buffer[next_end] = minimizer_hash(find_reverse_complement(kmers[next_end]));
+            r_hash_buffer[next_end] = minimizer_hash(find_reverse_complement(kmers[next_end]));
         }
     }
 

@@ -10,6 +10,7 @@
 #include <unordered_set>
 #include <memory>
 #include <chrono>
+#include <iomanip>
 
 #include "FASTASampleClass.cpp"
 #include "bioparser/bioparser.hpp"
@@ -35,7 +36,7 @@ int main(int argc, char const *argv[]) {
         //vector<triplet> vector = find_minimizers(4, 3, "ACGACTGGTCAGAGT");
 
         chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-        vector<triplet> vector = find_minimizers(5, 15, (*fasta_object).get_data());
+        vector<triplet> vector1 = find_minimizers(5, 15, (*fasta_object).get_data());
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
         /*for (auto &i : vector) {
             triplet t = static_cast<tuple<string, int, string> &&>(i);
@@ -46,9 +47,10 @@ int main(int argc, char const *argv[]) {
         chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
         auto vector2 = find_minimizers2(5, 15, (*fasta_object).get_data());
         chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
+        cout << vector2.size() << endl;
         for (auto &i : vector2) {
             //triple t = static_cast<tuple<uint64_t , int, int> &&>(i);
-            cout << get<0>(i) << " " << get<1>(i) << " " << get<2>(i) << endl;
+            std::cout <<setw(10) << std::get<0>(i) << " " << setw(offset_width)<< std::get<1>(i) << " " << std::get<2>(i) << endl;
         }
 
         auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();

@@ -22,3 +22,6 @@ vector<triplet> find_minimizers(int w, int k, string s);
 vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s);
 
 size_t find_hash_value(char c);
+
+const int hash_width = 20;
+const int offset_width = 4;
