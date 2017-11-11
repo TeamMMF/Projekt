@@ -61,6 +61,8 @@ uint64_t minimizer_hash(string s) {
         hash += find_hash_value(nucleotides[i]) * pow(4, k - i - 1);
     }
 
+    delete(nucleotides);
+
     return hash;
 }
 
@@ -161,6 +163,9 @@ std::vector<triplet> find_minimizers(int w, int k, string s) {
         }
         minimizers.emplace_back(make_tuple("asfda", minJ, min.second));
     }
+
+    delete(hashed_kmers);
+
     return minimizers;
 }
 
@@ -230,6 +235,9 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
             r_hash_buffer[next_end] = minimizer_hash(find_reverse_complement(kmers[next_end]));
         }
     }
+
+    delete(hash_buffer);
+    delete(r_hash_buffer);
 
     return minimizers;
 }
