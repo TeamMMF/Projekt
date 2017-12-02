@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
@@ -23,5 +24,11 @@ vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s);
 
 size_t find_hash_value(char c);
 
+std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> indexSequence(vector<string> sequences, int w, int k);
+
 const int hash_width = 20;
 const int offset_width = 4;
+
+typedef tuple<uint64_t, tuple<string, int, int>> index;
+
+std::vector<index> indexTable(vector<string> sequences, int w, int k);

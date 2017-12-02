@@ -12,6 +12,7 @@
 #include <chrono>
 #include <iomanip>
 
+
 #include "FASTASampleClass.cpp"
 #include "bioparser/bioparser.hpp"
 #include "Common.hpp"
@@ -48,9 +49,32 @@ int main(int argc, char const *argv[]) {
         auto vector2 = find_minimizers2(5, 15, (*fasta_object).get_data());
         chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
         cout << vector2.size() << endl;
+        uint64_t  maks1 = 0;
         for (auto &i : vector2) {
-            //triple t = static_cast<tuple<uint64_t , int, int> &&>(i);
+            maks1 = maks1 < get<0>(i) ? get<0>(i) : maks1;
             std::cout <<setw(10) << std::get<0>(i) << " " << setw(offset_width)<< std::get<1>(i) << " " << std::get<2>(i) << endl;
+        }
+
+        vector<string> v;
+        string s = (*fasta_object).get_data();
+        v.push_back(s);
+
+        cout << v[0] << endl;
+        unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> multiset = indexSequence(v, 5, 15);
+
+        uint64_t  maks2 = 0;
+       for (auto &i : multiset) {
+           maks2 = maks2 < get<0>(i) ? get<0>(i) : maks2;
+            std::cout <<setw(10) << i.first << " " << setw(offset_width)<< std::get<0>(i.second) << " " << setw(offset_width) << std::get<1>(i.second) << " " << std::get<2>(i.second) << endl;
+        }
+
+
+        vector<index> ind = indexTable(v, 5, 15);
+
+        uint64_t  maks3 = 0;
+        for (auto &i : ind) {
+            maks3 = maks3 < get<0>(i) ? get<0>(i) : maks3;
+            std::cout <<setw(10) << std::get<0>(i) << " " << setw(offset_width)<< std::get<0>(std::get<1>(i)) << " " << setw(offset_width) << std::get<1>(std::get<1>(i)) << " " << std::get<2>(std::get<1>(i)) << endl;
         }
 
         auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();
@@ -58,6 +82,12 @@ int main(int argc, char const *argv[]) {
 
         cout << duration1 << endl;
         cout << duration2 << endl;
+
+        cout << "MAKSIMUMI" << endl;
+        cout << maks1 << endl;
+        cout << maks2 << endl;
+        cout << maks3 << endl;
+
         break;
     }
 

@@ -4,7 +4,11 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_set>
+#include <unordered_map>
 #include <iostream>
+#include <functional>
+#include <iomanip>
+#include <algorithm>
 #include "Common.hpp"
 
 
@@ -67,7 +71,6 @@ uint64_t minimizer_hash(string s) {
 }
 
 //Thomas Wang's integer hash function
-
 uint64_t invertible_minimizer_hash(uint64_t x){
     uint64_t  key = x;
 
@@ -241,3 +244,40 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
 
     return minimizers;
 }
+
+size_t no_hash(uint64_t x){
+    return  x;
+}
+
+
+std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> indexSequence(vector<string> sequences, int w, int k){
+    unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> indexTable(1000, no_hash);
+
+    int counter = 1;
+    for(string seq : sequences){
+        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k , seq);
+        for(tuple<uint64_t, int, int> m : minimizers){
+            indexTable.emplace(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+        }
+        counter++;
+    }
+
+    return indexTable;
+}
+
+std::vector<index> indexTable(vector<string> sequences, int w, int k){
+    vector<index> table;
+
+    int counter = 1;
+    for(string seq : sequences){
+        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k , seq);
+        for(tuple<uint64_t, int, int> m : minimizers){
+            table.emplace_back(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+        }
+        counter++;
+    }
+
+    std::sort(table.begin(), table.end());
+    return table;
+}
+
