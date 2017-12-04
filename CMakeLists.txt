@@ -71,8 +71,10 @@ endif()
 
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
+include_directories("${LIBRARY_SOURCES_DIRECTORY}/Dynamic")
 add_subdirectory(testing)
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Common)
+add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Dynamic)
 
 # including bioparser
 add_subdirectory(libraries/bioparser EXCLUDE_FROM_ALL)
@@ -89,3 +91,6 @@ target_link_libraries(fastaSample bioparser)
 add_executable(kmer_finder ${SOURCES}/kmerFinderSample.cpp)
 target_link_libraries(kmer_finder Common)
 target_link_libraries(kmer_finder bioparser)
+
+add_executable(dynamicSample ${SOURCES}/dynamicSample.cpp)
+target_link_libraries(dynamicSample Dynamic)
