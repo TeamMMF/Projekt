@@ -2,13 +2,11 @@
 #include <vector>
 #include <tuple>
 #include <algorithm>
-#include <cmath>
 #include <unordered_set>
 #include <unordered_map>
 #include <iostream>
 #include <functional>
 #include <iomanip>
-#include <algorithm>
 #include "Common.hpp"
 
 
@@ -43,7 +41,9 @@ string find_reverse_complement(string s){
     }
     reverse_complement[length] = '\0';
 
-    return  string(reverse_complement);
+    string ret_val = string(reverse_complement);
+    delete(reverse_complement);
+    return ret_val;
 }
 
 vector<string> find_kmer(int k, string s) {
