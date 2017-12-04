@@ -27,7 +27,7 @@ size_t find_hash_value(char c);
 std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> indexSequence(vector<string> sequences, int w, int k);
 
 const int hash_width = 20;
-const int offset_width = 4;
+const int offset_width = 6;
 
 typedef tuple<uint64_t, tuple<string, int, int>> index;
 

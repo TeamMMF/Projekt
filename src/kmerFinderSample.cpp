@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <unordered_set>
+#include <unordered_map>
 #include <memory>
 #include <chrono>
 #include <iomanip>
@@ -26,7 +26,7 @@ int main(int argc, char const *argv[]) {
 
     vector<unique_ptr<FASTASampleClass>> fasta_objects;
     auto fasta_reader = bioparser::createReader<FASTASampleClass, bioparser::FastaReader>(
-            project_root + "src/resources/sample.fasta");
+            project_root + "src/resources/lambda_reads.fasta");
 
     fasta_reader->read_objects(fasta_objects, static_cast<uint64_t>(-1));
 
@@ -56,19 +56,36 @@ int main(int argc, char const *argv[]) {
         }
 
         vector<string> v;
+        for(auto &f : fasta_objects){
+            string s = (*f).get_data();
+            v.push_back(s);
+        }
+
+        /*
+        vector<string> v;
         string s = (*fasta_object).get_data();
         v.push_back(s);
+        */
 
-        cout << v[0] << endl;
         unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> multiset = indexSequence(v, 5, 15);
 
         uint64_t  maks2 = 0;
-       for (auto &i : multiset) {
+       /*
+        for (auto &i : multiset) {
            maks2 = maks2 < get<0>(i) ? get<0>(i) : maks2;
             std::cout <<setw(10) << i.first << " " << setw(offset_width)<< std::get<0>(i.second) << " " << setw(offset_width) << std::get<1>(i.second) << " " << std::get<2>(i.second) << endl;
         }
+        */
+        cout << "FIND ELEMENT" << endl;
+        int size = multiset.count(8263671LL);
+        chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
+        auto tuples = multiset.equal_range(8263671LL);
+        for(auto it = tuples.first; it != tuples.second; ++it){
+            cout << get<0>(it->second) << "\t" << get<1>(it->second) << "\t" << get<2>(it->second) << endl;
+        }
+        chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
 
-
+        /*
         vector<index> ind = indexTable(v, 5, 15);
 
         uint64_t  maks3 = 0;
@@ -76,17 +93,20 @@ int main(int argc, char const *argv[]) {
             maks3 = maks3 < get<0>(i) ? get<0>(i) : maks3;
             std::cout <<setw(10) << std::get<0>(i) << " " << setw(offset_width)<< std::get<0>(std::get<1>(i)) << " " << setw(offset_width) << std::get<1>(std::get<1>(i)) << " " << std::get<2>(std::get<1>(i)) << endl;
         }
+         */
 
         auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();
         auto duration2 = chrono::duration_cast<chrono::microseconds>( t4 - t3 ).count();
+        auto duration3 = chrono::duration_cast<chrono::microseconds>( t6 - t5 ).count();
 
-        cout << duration1 << endl;
-        cout << duration2 << endl;
+        cout << "DUR1 " << duration1 << endl;
+        cout << "DUR2 " << duration2 << endl;
+        cout << "DUR3 " << duration3 << endl;
 
         cout << "MAKSIMUMI" << endl;
         cout << maks1 << endl;
         cout << maks2 << endl;
-        cout << maks3 << endl;
+        //cout << maks3 << endl;
 
         break;
     }
