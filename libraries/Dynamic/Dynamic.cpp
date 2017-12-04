@@ -18,7 +18,7 @@ void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
 
     memset(matrix, 0, r*c);
 
-    print_matrix(matrix, r, c);
+    //print_matrix(matrix, r, c);
 
     for(int i = 1; i < r; i++){
         for(int j = 1; j < c; j++){
@@ -36,15 +36,74 @@ void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
                 matrix[i*r + j] = left;
             }
         }
-        print_matrix(matrix, r, c);
+        //print_matrix(matrix, r, c);
     }
 
-    print_matrix(matrix, r, c);
+    print_matrix(s1, s2, matrix, r, c);
     delete(matrix);
 }
 
-void print_matrix(uint8_t *matrix, int r, int c){
+void LCS_k(const char* s1, const char* s2, int s1_l, int s2_l, int k){
+    int r = s1_l + 1;
+    int c = s2_l + 1;
+
+    uint8_t *matrix = new uint8_t[r*c];
+
+    memset(matrix, 0, r*c);
+
+    //print_matrix(matrix, r, c);
+
+    for(int i = 1; i < r; i++){
+        for(int j = 1; j < c; j++){
+            if(check_k_substring_match(s1, s2, i, j, k)){
+                matrix[i*r + j] = matrix[(i-k)*r + (j-k)] + k;
+                continue;
+            }
+
+            uint8_t left = matrix[(i-1)*r + j];
+            uint8_t up = matrix[i*r + (j-1)];
+            if(left < up){
+                matrix[i*r + j] = up;
+            }
+            else{
+                matrix[i*r + j] = left;
+            }
+        }
+        //print_matrix(matrix, r, c);
+    }
+
+    print_matrix(s1, s2, matrix, r, c);
+    delete(matrix);
+}
+
+bool check_k_substring_match(const char* s1, const char* s2, int i, int j, int k){
+    if(i < k || j < k) {
+        return false;
+    }
+
+    for(int l = 0; l < k; l++){
+        if(s1[i - l - 1] != s2[j - l - 1]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void print_matrix(const char *s1, const char *s2, uint8_t *matrix, int r, int c){
+    cout << "     ";
+    for(int i = 0; i < r - 1; i++){
+        cout << setw(4) << s1[i];
+    }
+    cout << endl;
+
     for(int i = 0; i < r; i++){
+        if(i > 0){
+            cout << s2[i - 1];
+        }
+        else {
+            cout << " ";
+        }
         for(int j = 0; j < c; j++){
             cout << setw(4) << +matrix[i*r + j];
         }
