@@ -7,6 +7,7 @@
 #include <iostream>
 #include <functional>
 #include <iomanip>
+#include <math.h>
 #include "Common.hpp"
 
 
@@ -265,8 +266,8 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint6
     return indexTable;
 }
 
-std::vector<index> indexTable(vector<string> sequences, int w, int k){
-    vector<index> table;
+std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
+    vector<hashMinPair> table;
 
     int counter = 1;
     for(string seq : sequences){
