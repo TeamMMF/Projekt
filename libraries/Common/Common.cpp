@@ -43,7 +43,6 @@ string find_reverse_complement(string s){
     reverse_complement[length] = '\0';
 
     string ret_val = string(reverse_complement);
-    delete(reverse_complement);
     return ret_val;
 }
 
@@ -66,7 +65,7 @@ uint64_t minimizer_hash(string s) {
         hash += find_hash_value(nucleotides[i]) * pow(4, k - i - 1);
     }
 
-    delete(nucleotides);
+    delete [] nucleotides;
 
     return hash;
 }
@@ -168,7 +167,7 @@ std::vector<triplet> find_minimizers(int w, int k, string s) {
         minimizers.emplace_back(make_tuple("asfda", minJ, min.second));
     }
 
-    delete(hashed_kmers);
+    delete [] hashed_kmers;
 
     return minimizers;
 }
@@ -240,8 +239,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
         }
     }
 
-    delete(hash_buffer);
-    delete(r_hash_buffer);
+    delete[] hash_buffer;
+    delete[] r_hash_buffer;
 
     return minimizers;
 }
