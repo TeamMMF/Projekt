@@ -1,0 +1,8 @@
+//
+// Created by filip on 05.12.17..
+//
+
+#ifndef SEQUENCEOVERLAPING_PAF_H
+#define SEQUENCEOVERLAPING_PAF_H
+
+#endif //SEQUENCEOVERLAPING_PAF_H

@@ -33,3 +33,6 @@ const int offset_width = 6;
 typedef tuple<uint64_t, tuple<string, int, int>> hashMinPair;
 
 std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k);
+typedef tuple<uint64_t, int, int, int> minimizer_hit;
+
+bool hit_comparator(const minimizer_hit a,const minimizer_hit b);

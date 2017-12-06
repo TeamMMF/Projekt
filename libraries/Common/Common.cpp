@@ -7,7 +7,6 @@
 #include <iostream>
 #include <functional>
 #include <iomanip>
-#include <math.h>
 #include "Common.hpp"
 
 
@@ -264,6 +263,24 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint6
     return indexTable;
 }
 
+bool hit_comparator(const minimizer_hit a,
+                    const minimizer_hit b){
+    if(get<0>(a) < get<0>(b)) return true;
+    if(get<0>(a) > get<0>(b)) return false;
+
+    if(get<1>(a) < get<1>(b)) return true;
+    if(get<1>(a) > get<1>(b)) return false;
+
+    if(get<2>(a) < get<2>(b)) return true;
+    if(get<2>(a) > get<2>(b)) return false;
+
+    if(get<3>(a) < get<3>(b)) return true;
+    if(get<3>(a) > get<3>(b)) return false;
+
+    return true;
+}
+
+
 std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
     vector<hashMinPair> table;
 
@@ -278,5 +295,49 @@ std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
 
     std::sort(table.begin(), table.end());
     return table;
+}
+
+
+void map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
+         string query_sequence,
+         int w,
+         int k,
+         int epsilon){
+
+
+    vector<minimizer_hit> hits;
+    auto minimizers = find_minimizers2(w, k, query_sequence);
+
+
+    for(auto minimizer : minimizers) {
+        uint64_t h = get<0>(minimizer);
+        int i_q = get<1>(minimizer);
+        int r_q = get<2>(minimizer);
+        auto tirs = lookup_table.equal_range(h);
+
+        for (auto it = tirs.first; it != tirs.second; ++it) {
+            auto tir = it->second;
+            int i2 = get<1>(tir);
+            int r2 = get<2>(tir);
+            int same_strand = r_q == r2 ? 0 : 1;
+
+            minimizer_hit hit = make_tuple(h, 0, i_q - i2, i2);
+        }
+    }
+
+    sort(hits.begin(),hits.end(),hit_comparator);
+
+    int b = 1;
+    for(int e = 1, limit = hits.size(); e<limit; e++) {
+        uint64_t t1 = get<0>(hits[e - 1]);
+        uint64_t t2 = get<0>(hits[e]);
+        int r1 = get<1>(hits[e - 1]);
+        int r2 = get<1>(hits[e]);
+        int diff1 = get<2>(hits[e - 1]);
+        int diff2 = get<2>(hits[e]);
+        if (r1 != r2 || t1 != t2 || diff2 - diff1 >= epsilon) {
+            //todo
+    }
+
 }
 

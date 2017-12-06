@@ -30,4 +30,27 @@ namespace {
         EXPECT_ANY_THROW({complement('D');});
 
     }
+
+    TEST(HitSortTest, TestSort) {
+        cout << "tu";
+       vector<minimizer_hit> vec;
+        vec.push_back(make_tuple(0,0,1,0));
+        vec.push_back(make_tuple(0,0,1,3));
+        vec.push_back(make_tuple(2,1,2,5));
+        vec.push_back(make_tuple(0,0,1,1));
+        vec.push_back(make_tuple(0,0,1,4));
+        vec.push_back(make_tuple(3,0,5,2));
+        vec.push_back(make_tuple(0,3,1,0));
+        vec.push_back(make_tuple(7,1,5,4));
+        vec.push_back(make_tuple(3,1,5,4));
+        vec.push_back(make_tuple(0,0,1,2));
+        vec.push_back(make_tuple(0,0,0,1));
+        vec.push_back(make_tuple(6,0,4,5));
+        vec.push_back(make_tuple(0,1,0,10));
+        vec.push_back(make_tuple(3,0,1,5));
+        sort(vec.begin(),vec.end(),hit_comparator);
+        for(auto t : vec){
+            printf("(%d,%d,%d,%d)\n",get<0>(t), get<1>(t), get<2>(t), get<3>(t));
+        }
+    }
 }
