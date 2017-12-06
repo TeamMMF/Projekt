@@ -179,7 +179,7 @@ vector<matchPair> generate_match_pairs(string s1, string s2, int k){
 
         for(auto it = column_hits.first; it != column_hits.second; ++it){
             match_points.emplace_back(i, it->second , true);
-            match_points.emplace_back(i + k - 1, it->second + k - 1, false);
+            match_points.emplace_back(i + k, it->second + k, false);
         }
 
     }
@@ -207,15 +207,116 @@ bool matchPair_comparator(const matchPair a, const matchPair b){
     return true;
 }
 
-int LCS_kpp(string s1, string s2, int k){
-    uint8_t *max_col_dp = new uint8_t[s2.size()];
+uint8_t max_vector(vector<uint8_t> vector){
+    uint8_t max = vector[0];
+    for(int i = 1, len = vector.size(); i < len; i++){
+        uint8_t tmp = vector[i];
+        if(tmp > max){
+            max = tmp;
+        }
+    }
+
+    return max;
+}
+
+
+size_t tuple_hash(std::tuple<int, int, bool> x){
+    std::hash<int> int_hash;
+    std::hash<bool> bool_hash;
+    return (int_hash(std::get<0>(x)) ^ int_hash(std::get<1>(x)) + 13 * bool_hash(std::get<2>(x)));
+}
+
+uint8_t LCS_kpp(string s1, string s2, int k){
+    vector<uint8_t> max_col_dp(s2.size() + 1);
+
 
     vector<matchPair> match_pairs = generate_match_pairs(s1, s2, k);
 
+    unordered_map<matchPair, int, function<size_t(matchPair)>>  ordering(match_pairs.size() / 2, tuple_hash);
+
+    vector<uint8_t> dp(match_pairs.size()/2);
+
+    int start_counter = 0;
+    int n = 0;
     for(matchPair mp : match_pairs){
 
+        if(get<2>(mp)) {             //match pair is start
+            ordering.emplace(mp, start_counter);
+            dp[start_counter] = k + max_between_indexes(max_col_dp, 0, get<1>(mp));
+            start_counter++;
+        }
+
+
+        else {
+            int n_pred = -1;
+            int n_mp = ordering.find(make_tuple(get<0>(mp) - k, get<1>(mp) - k, true))->second;
+            for(int m = n - 1; m >= 0; m--){
+                matchPair pred_candidate = match_pairs[m];
+
+                bool precedence = false;
+                if(!get<2>(pred_candidate)){
+                    precedence = false;
+                }
+
+                int p_diff = (get<0>(mp) - k) - (get<1>(mp) - k);
+                int g_diff = get<0>(pred_candidate) - get<1>(pred_candidate);
+                int i_diff = (get<0>(mp) - k) - get<0>(pred_candidate);
+
+                precedence = (p_diff == g_diff) && (i_diff == 1);
+
+                if(precedence){
+                    /*if((get<0>(mp) - get<0>(pred_candidate) == k) && (get<1>(mp) - get<1>(pred_candidate) == k)){
+                        break;
+                    }*/
+                    if(!get<2>(pred_candidate)){
+                        n_pred = ordering.find(make_tuple(get<0>(pred_candidate) - k, get<1>(pred_candidate) - k, true))->second;
+                    }
+                    else {
+                        n_pred = ordering.find(pred_candidate)->second;
+                    }
+
+                    break;
+                }
+
+            }
+
+            if(n_pred != -1){
+                dp[n_mp] = max(dp[n_mp], (uint8_t ) (dp[n_pred] + 1));
+            }
+
+            max_col_dp[get<1>(mp)] = max(max_col_dp[get<1>(mp)], dp[n_mp]);
+        }
+
+        n++;
     }
 
-    delete[] max_col_dp;
-    return 0;
+    return max_vector(dp);
 }
+
+bool check_precedence(matchPair p, matchPair g){
+    if(!get<2>(p)){
+        return false;
+    }
+
+    int p_diff = get<0>(p) - get<1>(p);
+    int g_diff = get<0>(g) - get<1>(g);
+    int i_diff = get<0>(p) - get<0>(g);
+
+    return (p_diff == g_diff) && (i_diff == 1);
+}
+
+uint8_t max_between_indexes(vector<uint8_t> array, int start, int end){ // both inclusive
+    int max = 0;
+    int test;
+
+    for(int i = start; i <= end; i++){
+        test = array[i];
+        if(max < test){
+            max = test;
+        }
+    }
+
+    return max;
+}
+
+
