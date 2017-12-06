@@ -50,7 +50,12 @@ namespace {
         vec.push_back(make_tuple(3,0,1,5));
         sort(vec.begin(),vec.end(),hit_comparator);
         for(auto t : vec){
-            printf("(%d,%d,%d,%d)\n",get<0>(t), get<1>(t), get<2>(t), get<3>(t));
+            printf("(%d,%d,%d,%d)\n",
+                   (int) get<0>(t),
+                   (int) get<1>(t),
+                   (int) get<2>(t),
+                   (int) get<3>(t)
+            );
         }
     }
 }

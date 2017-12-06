@@ -7,6 +7,7 @@
 #include <iostream>
 #include <functional>
 #include <iomanip>
+#include <cmath>
 #include "Common.hpp"
 
 
@@ -337,7 +338,8 @@ void map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, functi
         int diff2 = get<2>(hits[e]);
         if (r1 != r2 || t1 != t2 || diff2 - diff1 >= epsilon) {
             //todo
-    }
+        }
 
+    }
 }
 
