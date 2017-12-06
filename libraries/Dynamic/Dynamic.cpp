@@ -198,11 +198,3 @@ bool matchPair_comparator(const matchPair a, const matchPair b){
 
     return true;
 }
-
-void efficient_LCS_kpp(string s1, string s2, int k){
-    uint8_t *max_col_dp = new uint8_t[s2.length()];
-
-
-    delete[] max_col_dp;
-
-}
