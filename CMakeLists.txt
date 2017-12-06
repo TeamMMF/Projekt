@@ -84,6 +84,7 @@ add_subdirectory(testing)
 # including bioparser
 add_subdirectory(libraries/bioparser EXCLUDE_FROM_ALL)
 
+
 # add the executable
 add_executable(sample ${SOURCES}/sample.cpp)
 target_link_libraries(sample Common)
@@ -102,4 +103,12 @@ target_link_libraries(dynamicSample Common)
 target_link_libraries(dynamicSample Dynamic)
 
 add_executable(lcskppSample ${SOURCES}/lcskppSample.cpp)
+target_link_libraries(lcskppSample Dynamic)
+target_link_libraries(lcskppSample bioparser)
 target_link_libraries(lcskppSample lcskpp)
+
+add_executable(lcskppSampleMinimizers ${SOURCES}/lcskppMinimizersForMathces.cpp)
+target_link_libraries(lcskppSampleMinimizers Common)
+target_link_libraries(lcskppSampleMinimizers Dynamic)
+target_link_libraries(lcskppSampleMinimizers bioparser)
+target_link_libraries(lcskppSampleMinimizers lcskpp)
