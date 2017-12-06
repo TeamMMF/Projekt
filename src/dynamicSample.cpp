@@ -25,6 +25,7 @@ int main(){
     std::cout << unsigned(LCS_kpp("ATCTAG", "ATCTAG", 3)) << std::endl;
 
     std::cout << unsigned(LCS_kpp("ATCTTTTAG", "ATCGGGTAG", 3)) << std::endl;
+    std::cout << unsigned(LCS_kpp("ATCTTGGGGTTAG", "ATCGGGGGGGTAG", 3)) << std::endl;
 
     check_precedence(std::make_tuple(1,1,true), std::make_tuple(2,2,true));
     /*

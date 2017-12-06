@@ -185,9 +185,9 @@ vector<matchPair> generate_match_pairs(string s1, string s2, int k){
     }
 
     sort(match_points.begin(), match_points.end(), matchPair_comparator);
-    for(auto mp : match_points){
-        cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ", start = "<< get<2>(mp) << ")" << endl;
-    }
+    //for(auto mp : match_points){
+    //    cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ", start = "<< get<2>(mp) << ")" << endl;
+    //}
 
     return match_points;
 }
@@ -281,7 +281,7 @@ uint64_t LCS_kpp(string s1, string s2, int k){
             }
 
             if(n_pred != -1){
-                dp[n_mp] = max(dp[n_mp], (uint8_t ) (dp[n_pred] + 1));
+                dp[n_mp] = max(dp[n_mp], dp[n_pred] + 1);
             }
 
             max_col_dp[get<1>(mp)] = max(max_col_dp[get<1>(mp)], dp[n_mp]);
@@ -290,7 +290,7 @@ uint64_t LCS_kpp(string s1, string s2, int k){
         n++;
     }
 
-    return max_between_indexes(dp, 0, dp.size());
+    return max_between_indexes(dp, 0, dp.size() - 1);
 }
 
 bool check_precedence(matchPair p, matchPair g){
@@ -305,9 +305,9 @@ bool check_precedence(matchPair p, matchPair g){
     return (p_diff == g_diff) && (i_diff == 1);
 }
 
-uint64_t max_between_indexes(vector<uint8_t> array, int start, int end){ // both inclusive
-    int max = 0;
-    int test;
+uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // both inclusive
+    uint64_t max = 0;
+    uint64_t test;
 
     for(int i = start; i <= end; i++){
         test = array[i];
