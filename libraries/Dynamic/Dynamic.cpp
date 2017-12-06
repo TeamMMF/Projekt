@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <cstring>
 #include <algorithm>
-#include "Common.hpp"
 #include "Dynamic.h"
 
 using namespace std;
@@ -19,7 +18,6 @@ void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
     uint8_t *matrix = new uint8_t[r*c];
 
     memset(matrix, 0, r*c);
-    char a = complement('A');
 
     //print_matrix(matrix, r, c);
 
