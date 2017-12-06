@@ -24,10 +24,10 @@ std::vector<matchPair> generate_match_pairs(std::string s1, std::string s2, int 
 
 bool matchPair_comparator(const matchPair a, const matchPair b);
 
-uint8_t max_between_indexes(std::vector<uint8_t> array, int start, int end);
+uint64_t max_between_indexes(std::vector<uint64_t> array, int start, int end);
 
 bool check_precedence(matchPair p, matchPair g);
 
-uint8_t LCS_kpp(std::string s1, std::string s2, int k);
+uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 
 size_t tuple_hash(std::tuple<int, int, bool> x);

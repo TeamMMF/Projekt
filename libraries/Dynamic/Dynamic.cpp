@@ -226,15 +226,15 @@ size_t tuple_hash(std::tuple<int, int, bool> x){
     return (int_hash(std::get<0>(x)) ^ int_hash(std::get<1>(x)) + 13 * bool_hash(std::get<2>(x)));
 }
 
-uint8_t LCS_kpp(string s1, string s2, int k){
-    vector<uint8_t> max_col_dp(s2.size() + 1);
+uint64_t LCS_kpp(string s1, string s2, int k){
+    vector<uint64_t> max_col_dp(s2.size() + 1);
 
 
     vector<matchPair> match_pairs = generate_match_pairs(s1, s2, k);
 
     unordered_map<matchPair, int, function<size_t(matchPair)>>  ordering(match_pairs.size() / 2, tuple_hash);
 
-    vector<uint8_t> dp(match_pairs.size()/2);
+    vector<uint64_t> dp(match_pairs.size()/2);
 
     int start_counter = 0;
     int n = 0;
@@ -290,7 +290,7 @@ uint8_t LCS_kpp(string s1, string s2, int k){
         n++;
     }
 
-    return max_vector(dp);
+    return max_between_indexes(dp, 0, dp.size());
 }
 
 bool check_precedence(matchPair p, matchPair g){
@@ -305,7 +305,7 @@ bool check_precedence(matchPair p, matchPair g){
     return (p_diff == g_diff) && (i_diff == 1);
 }
 
-uint8_t max_between_indexes(vector<uint8_t> array, int start, int end){ // both inclusive
+uint64_t max_between_indexes(vector<uint8_t> array, int start, int end){ // both inclusive
     int max = 0;
     int test;
 
