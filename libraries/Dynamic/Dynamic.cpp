@@ -47,7 +47,7 @@ void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
 
     string s = traceback_LCS(matrix, r, c, s1);
     cout << "LCS: " << s << endl;
-    delete(matrix);
+    delete[] matrix;
 }
 
 string traceback_LCS(uint8_t *matrix, int r, int c, const char* s1){
@@ -119,7 +119,7 @@ void LCS_k(const char* s1, const char* s2, int s1_l, int s2_l, int k){
     }
 
     print_matrix(s1, s2, matrix, r, c);
-    delete(matrix);
+    delete[] matrix;
 }
 
 bool check_k_substring_match(const char* s1, const char* s2, int i, int j, int k){
@@ -158,7 +158,11 @@ void print_matrix(const char *s1, const char *s2, uint8_t *matrix, int r, int c)
     cout << endl;
 }
 
-void generate_match_pairs(string s1, string s2, int k){
+uint64_t computeJustMin(string s){
+    return minimizer_hash(s);
+}
+
+vector<matchPair> generate_match_pairs(string s1, string s2, int k){
 
     unordered_multimap<uint64_t, int> kmer_hash;
     for(int i = 0, len = s2.length() - k ; i <= len; i++){
@@ -166,22 +170,26 @@ void generate_match_pairs(string s1, string s2, int k){
 
     }
 
-    vector<tuple<int,int>> match_points;
+    vector<matchPair> match_points;
+
 
     for(int i = 0, len = s1.length() - k; i <= len; i++){
-        string sub = s2.substr(i, k);
+        string sub = s1.substr(i, k);
         auto column_hits = kmer_hash.equal_range(minimizer_hash(sub));
+
         for(auto it = column_hits.first; it != column_hits.second; ++it){
-            match_points.emplace_back(i, it->second, true);
-            match_points.emplace_back(i+k, it->second + k, false);
+            match_points.emplace_back(i, it->second , true);
+            match_points.emplace_back(i + k - 1, it->second + k - 1, false);
         }
+
     }
 
-
-    sort(match_points.begin(), match_points.end(), matchPoint_comparator);
+    sort(match_points.begin(), match_points.end(), matchPair_comparator);
     for(auto mp : match_points){
-        cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ")" << endl;
+        cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ", start = "<< get<2>(mp) << ")" << endl;
     }
+
+    return match_points;
 }
 
 bool matchPair_comparator(const matchPair a, const matchPair b){
@@ -197,4 +205,17 @@ bool matchPair_comparator(const matchPair a, const matchPair b){
     if(!get<2>(a) && !get<2>(b)) return true;
 
     return true;
+}
+
+int LCS_kpp(string s1, string s2, int k){
+    uint8_t *max_col_dp = new uint8_t[s2.size()];
+
+    vector<matchPair> match_pairs = generate_match_pairs(s1, s2, k);
+
+    for(matchPair mp : match_pairs){
+
+    }
+
+    delete[] max_col_dp;
+    return 0;
 }
