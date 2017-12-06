@@ -7,7 +7,10 @@
 #include <iomanip>
 #include <cstring>
 #include <algorithm>
+#include <vector>
+#include <unordered_map>
 #include "Dynamic.h"
+#include "Common.hpp"
 
 using namespace std;
 
@@ -98,20 +101,21 @@ void LCS_k(const char* s1, const char* s2, int s1_l, int s2_l, int k){
     for(int i = 1; i < r; i++){
         for(int j = 1; j < c; j++){
             if(check_k_substring_match(s1, s2, i, j, k)){
-                matrix[i*r + j] = matrix[(i-k)*r + (j-k)] + k;
+                matrix[i*c + j] = matrix[(i-k)*c + (j-k)] + k;
+                cout << "MATCH PAIR (" << i << ", " << j << ")" << endl;
                 continue;
             }
 
-            uint8_t left = matrix[(i-1)*r + j];
-            uint8_t up = matrix[i*r + (j-1)];
+            uint8_t left = matrix[i*c + (j-1)];
+            uint8_t up = matrix[(i-1)*c + j];
             if(left < up){
-                matrix[i*r + j] = up;
+                matrix[i*c + j] = up;
             }
             else{
-                matrix[i*r + j] = left;
+                matrix[i*c+ j] = left;
             }
         }
-        //print_matrix(matrix, r, c);
+        //print_matrix(s1, s2, matrix, r, c);
     }
 
     print_matrix(s1, s2, matrix, r, c);
@@ -134,7 +138,7 @@ bool check_k_substring_match(const char* s1, const char* s2, int i, int j, int k
 
 void print_matrix(const char *s1, const char *s2, uint8_t *matrix, int r, int c){
     cout << "     ";
-    for(int i = 0; i < r - 1; i++){
+    for(int i = 0; i < c - 1; i++){
         cout << setw(4) << s2[i];
     }
     cout << endl;
@@ -147,9 +151,58 @@ void print_matrix(const char *s1, const char *s2, uint8_t *matrix, int r, int c)
             cout << " ";
         }
         for(int j = 0; j < c; j++){
-            cout << setw(4) << +matrix[i*r + j];
+            cout << setw(4) << +matrix[i*c + j];
         }
         cout << endl;
     }
     cout << endl;
+}
+
+void generate_match_pairs(string s1, string s2, int k){
+
+    unordered_multimap<uint64_t, int> kmer_hash;
+    for(int i = 0, len = s2.length() - k ; i <= len; i++){
+        kmer_hash.emplace(minimizer_hash(s2.substr(i, k)), i);
+
+    }
+
+    vector<tuple<int,int>> match_points;
+
+    for(int i = 0, len = s1.length() - k; i <= len; i++){
+        string sub = s2.substr(i, k);
+        auto column_hits = kmer_hash.equal_range(minimizer_hash(sub));
+        for(auto it = column_hits.first; it != column_hits.second; ++it){
+            match_points.emplace_back(i, it->second, true);
+            match_points.emplace_back(i+k, it->second + k, false);
+        }
+    }
+
+
+    sort(match_points.begin(), match_points.end(), matchPoint_comparator);
+    for(auto mp : match_points){
+        cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ")" << endl;
+    }
+}
+
+bool matchPair_comparator(const matchPair a, const matchPair b){
+    if(get<0>(a) < get<0>(b)) return true;
+    if(get<0>(a) > get<0>(b)) return false;
+
+    if(get<1>(a) < get<1>(b)) return true;
+    if(get<1>(a) > get<1>(b)) return false;
+
+    if( get<2>(a) &&  get<2>(b)) return true;
+    if( get<2>(a) && !get<2>(b)) return false;
+    if(!get<2>(a) &&  get<2>(b)) return true;
+    if(!get<2>(a) && !get<2>(b)) return true;
+
+    return true;
+}
+
+void efficient_LCS_kpp(string s1, string s2, int k){
+    uint8_t *max_col_dp = new uint8_t[s2.length()];
+
+
+    delete[] max_col_dp;
+
 }

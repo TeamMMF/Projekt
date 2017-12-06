@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include <tuple>
 #include <string>
 #include "stdint.h"
 
@@ -15,3 +16,9 @@ bool check_k_substring_match(const char* s1, const char* s2, int i, int j, int k
 void LCS_k(const char* s1, const char* s2, int s1_l, int s2_l, int k);
 
 std::string traceback_LCS(uint8_t *matrix, int r, int c, const char* s1);
+
+typedef std::tuple<int, int, bool> matchPair;
+
+void generate_match_pairs(std::string s1, std::string s2, int k);
+
+bool matchPoint_comparator(const matchPair a, const matchPair b);

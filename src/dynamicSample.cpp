@@ -9,5 +9,9 @@ int main(){
     LCS("XMJYAUZ", "MZJAWXU", 7, 7);
     LCS_k("aaaaaaaa", "aaaaaaaa", 8, 8, 2);
     LCS_k("aabbccdd", "bbaaddcc", 8, 8, 2);
+    LCS_k("ATTAT", "CTATAGAGTA", 5, 10, 2);
+    LCS_k("ATTATG", "CTATAGAGTA", 6, 10, 2);
+
+    generate_match_pairs("aabbccdd", "bbaaddcc", 2);
     return 0;
 }
