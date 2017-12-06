@@ -21,4 +21,4 @@ typedef std::tuple<int, int, bool> matchPair;
 
 void generate_match_pairs(std::string s1, std::string s2, int k);
 
-bool matchPoint_comparator(const matchPair a, const matchPair b);
+bool matchPair_comparator(const matchPair a, const matchPair b);
