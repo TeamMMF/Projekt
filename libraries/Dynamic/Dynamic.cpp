@@ -162,7 +162,7 @@ uint64_t computeJustMin(string s){
     return minimizer_hash(s);
 }
 
-void generate_match_pairs(string s1, string s2, int k){
+vector<matchPair> generate_match_pairs(string s1, string s2, int k){
 
     unordered_multimap<uint64_t, int> kmer_hash;
     for(int i = 0, len = s2.length() - k ; i <= len; i++){
@@ -178,18 +178,18 @@ void generate_match_pairs(string s1, string s2, int k){
         auto column_hits = kmer_hash.equal_range(minimizer_hash(sub));
 
         for(auto it = column_hits.first; it != column_hits.second; ++it){
-            match_points.emplace_back(i + 1, it->second + 1, true);
-            match_points.emplace_back(i+k, it->second + k, false);
+            match_points.emplace_back(i, it->second , true);
+            match_points.emplace_back(i + k - 1, it->second + k - 1, false);
         }
 
     }
-
 
     sort(match_points.begin(), match_points.end(), matchPair_comparator);
     for(auto mp : match_points){
         cout << "(" << get<0>(mp) << ", " << get<1>(mp) << ", start = "<< get<2>(mp) << ")" << endl;
     }
 
+    return match_points;
 }
 
 bool matchPair_comparator(const matchPair a, const matchPair b){
@@ -205,4 +205,17 @@ bool matchPair_comparator(const matchPair a, const matchPair b){
     if(!get<2>(a) && !get<2>(b)) return true;
 
     return true;
+}
+
+int LCS_kpp(string s1, string s2, int k){
+    uint8_t *max_col_dp = new uint8_t[s2.size()];
+
+    vector<matchPair> match_pairs = generate_match_pairs(s1, s2, k);
+
+    for(matchPair mp : match_pairs){
+
+    }
+
+    delete[] max_col_dp;
+    return 0;
 }
