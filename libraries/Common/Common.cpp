@@ -187,8 +187,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
     uint64_t* r_hash_buffer = new uint64_t[size];
 
     for(int i = 0; i < w; i++){
-        hash_buffer[i] = minimizer_hash(kmers[i]);
-        r_hash_buffer[i] = minimizer_hash(find_reverse_complement(kmers[i]));
+        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(kmers[i]));
+        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[i])));
     }
 
     for(int i = 0; i <= outer_loop_length; i++){
@@ -235,8 +235,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
         }
         int next_end = i + w;
         if(next_end < size){
-            hash_buffer[next_end] = minimizer_hash(kmers[next_end]);
-            r_hash_buffer[next_end] = minimizer_hash(find_reverse_complement(kmers[next_end]));
+            hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(kmers[next_end]));
+            r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[next_end])));
         }
     }
 
