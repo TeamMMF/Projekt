@@ -30,6 +30,11 @@ int main(int argc, char const *argv[]) {
 
     fasta_reader->read_objects(fasta_objects, static_cast<uint64_t>(-1));
 
+    vector<unique_ptr<FASTASampleClass>> fasta_objects2;
+    auto fasta_reader2 = bioparser::createReader<FASTASampleClass, bioparser::FastaReader>(
+            project_root + "src/resources/lambda_reference.fasta");
+
+    fasta_reader2->read_objects(fasta_objects2, static_cast<uint64_t>(-1));
 
     for (auto &fasta_object : fasta_objects) {
 
@@ -108,8 +113,18 @@ int main(int argc, char const *argv[]) {
         cout << maks2 << endl;
         //cout << maks3 << endl;
 
-        break;
 
+
+       vector<string> ref;
+       string s = (*(fasta_objects2[0])).get_data();
+       ref.push_back(s);
+
+
+        for(string s : v) {
+            map_minimizers(indexSequence(ref, 5, 15), s , 5, 15, 500);
+        }
+
+        break;
     }
 
     return 0;

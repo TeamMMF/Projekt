@@ -327,7 +327,12 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             int r2 = get<2>(tir);
             int same_strand = r_q == r2 ? 0 : 1;
 
-            hits.emplace_back(make_tuple(t, r_q, i_q - i2, i2));
+            if(r_q == 0) {
+                hits.emplace_back(make_tuple(t, 0, i_q - i2, i2));
+            }
+            else {
+                hits.emplace_back(make_tuple(t, 1, i_q + i2, i2));
+            }
 
         }
     }
@@ -375,6 +380,13 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             info.emplace_back(mi);
 
             b = e + 1;
+
+            cout << mi.target_min_index << " , "
+                 << mi.target_max_index << " , "
+                 << mi.reverse << " , "
+                 << mi.query_min_index << " , "
+                 << mi.query_max_index << endl;
+
         }
 
     }
