@@ -22,7 +22,7 @@ int main(){
     std::cout<< "new pairs" << std::endl;
     generate_match_pairs("TATGATA", "TATGATA", 3);
     std::cout << unsigned(LCS_kpp("TATGATA", "TATGATA", 3)) << std::endl;
-    std::cout << unsigned(LCS_kpp("ATCTAG", "ATCTAG", 3)) << std::endl;
+    std::cout << unsigned(LCS_kpp("ATCTA", "ATCTAG", 3)) << std::endl;
 
     std::cout << unsigned(LCS_kpp("ATCTTTTAG", "ATCGGGTAG", 3)) << std::endl;
     std::cout << unsigned(LCS_kpp("ATCTTGGGGTTAG", "ATCGGGGGGGTAG", 3)) << std::endl;
