@@ -158,10 +158,6 @@ void print_matrix(const char *s1, const char *s2, uint8_t *matrix, int r, int c)
     cout << endl;
 }
 
-uint64_t computeJustMin(string s){
-    return minimizer_hash(s);
-}
-
 vector<matchPair> generate_match_pairs(string s1, string s2, int k){
 
     unordered_multimap<uint64_t, int> kmer_hash;

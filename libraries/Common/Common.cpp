@@ -187,8 +187,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
     uint64_t* r_hash_buffer = new uint64_t[size];
 
     for(int i = 0; i < w; i++){
-        hash_buffer[i] = minimizer_hash(kmers[i]);
-        r_hash_buffer[i] = minimizer_hash(find_reverse_complement(kmers[i]));
+        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(kmers[i]));
+        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[i])));
     }
 
     for(int i = 0; i <= outer_loop_length; i++){
@@ -235,8 +235,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
         }
         int next_end = i + w;
         if(next_end < size){
-            hash_buffer[next_end] = minimizer_hash(kmers[next_end]);
-            r_hash_buffer[next_end] = minimizer_hash(find_reverse_complement(kmers[next_end]));
+            hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(kmers[next_end]));
+            r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[next_end])));
         }
     }
 
@@ -327,7 +327,12 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             int r2 = get<2>(tir);
             int same_strand = r_q == r2 ? 0 : 1;
 
-            hits.emplace_back(make_tuple(t, r_q, i_q - i2, i2));
+            if(r_q == 0) {
+                hits.emplace_back(make_tuple(t, 0, i_q - i2, i2));
+            }
+            else {
+                hits.emplace_back(make_tuple(t, 1, i_q + i2, i2));
+            }
 
         }
     }
@@ -375,6 +380,13 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             info.emplace_back(mi);
 
             b = e + 1;
+
+            cout << mi.target_min_index << " , "
+                 << mi.target_max_index << " , "
+                 << mi.reverse << " , "
+                 << mi.query_min_index << " , "
+                 << mi.query_max_index << endl;
+
         }
 
     }
