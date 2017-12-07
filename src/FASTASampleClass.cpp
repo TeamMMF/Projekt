@@ -33,6 +33,18 @@ public:
 
     std::string get_description();
     std::string get_data();
+    std::string get_name();
+
+};
+
+std::string FASTASampleClass::get_name() {
+    std::ostringstream oss;
+
+    for (int i = 0; i < name_length; ++i) {
+        oss << name[i];
+    }
+
+    return oss.str();
 };
 
 std::string FASTASampleClass::get_description() {
