@@ -369,7 +369,9 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
                 }
 
             }
-
+            if(max_i - min_i <100){
+                continue;
+            }
             mapInfo mi;
             mi.query_min_index = min_i;
             mi.query_max_index = max_i;
