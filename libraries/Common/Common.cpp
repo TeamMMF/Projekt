@@ -8,6 +8,8 @@
 #include <functional>
 #include <iomanip>
 #include <cmath>
+#include <climits>
+#include <malloc.h>
 #include "Common.hpp"
 
 
@@ -299,7 +301,9 @@ std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
 }
 
 
-void map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
+
+
+vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
          string query_sequence,
          int w,
          int k,
@@ -318,28 +322,63 @@ void map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, functi
 
         for (auto it = tirs.first; it != tirs.second; ++it) {
             auto tir = it->second;
+            string t = get<0>(tir);
             int i2 = get<1>(tir);
             int r2 = get<2>(tir);
             int same_strand = r_q == r2 ? 0 : 1;
 
-            minimizer_hit hit = make_tuple(h, 0, i_q - i2, i2);
+            hits.emplace_back(make_tuple(t, r_q, i_q - i2, i2));
+
         }
     }
 
     sort(hits.begin(),hits.end(),hit_comparator);
 
+    vector<mapInfo> info;
+
     int b = 1;
     for(int e = 1, limit = hits.size(); e<limit; e++) {
-        uint64_t t1 = get<0>(hits[e - 1]);
-        uint64_t t2 = get<0>(hits[e]);
+        string t1 = get<0>(hits[e - 1]);
+        string t2 = get<0>(hits[e]);
         int r1 = get<1>(hits[e - 1]);
         int r2 = get<1>(hits[e]);
         int diff1 = get<2>(hits[e - 1]);
         int diff2 = get<2>(hits[e]);
         if (r1 != r2 || t1 != t2 || diff2 - diff1 >= epsilon) {
-            //todo
+
+            int min_i_prime = INT_MAX;
+            int max_i_prime = 0;
+            int min_i = INT_MAX;
+            int max_i = 0;
+            for(int i = b; i <= e; i++){
+                int i_prime_tmp = get<3>(hits[i]);
+                int i_tmp = get<1>(hits[i]) ? get<2>(hits[i]) - i_prime_tmp : get<2>(hits[i]) + i_prime_tmp;
+                if(i_prime_tmp < min_i_prime){
+                    min_i_prime = i_prime_tmp;
+                    min_i = i_tmp;
+                }
+
+                if(i_prime_tmp > max_i_prime){
+                    max_i_prime = i_prime_tmp;
+                    max_i = i_tmp;
+                }
+
+            }
+
+            mapInfo mi;
+            mi.query_min_index = min_i;
+            mi.query_max_index = max_i;
+            mi.reverse = r1 != 0 ? true : false;
+            mi.target_min_index = min_i_prime;
+            mi.target_max_index = max_i_prime;
+
+            info.emplace_back(mi);
+
+            b = e + 1;
         }
 
     }
+
+    return info;
 }
 

@@ -6,7 +6,6 @@
 typedef PAF_data struct{
     char* qs_name;
     int qs_length;
-    int qs_length;
     int q_start;
     int q_end;
     char strand;
