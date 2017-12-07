@@ -109,6 +109,7 @@ int main(int argc, char const *argv[]) {
         //cout << maks3 << endl;
 
         break;
+
     }
 
     return 0;
