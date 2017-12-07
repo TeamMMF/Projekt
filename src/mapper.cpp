@@ -112,19 +112,21 @@ int main(int argc, char const *argv[]) {
     }
 
     for (auto &seq : read_sequences) {
-        vector<mapInfo> map_info = map_minimizers(indexSequence(box, w, k), seq, k, w, eps);
-        // int target_len= box[0].size();
-        // int len = seq.size();
+        vector<mapInfo> map_info = map_minimizers(indexSequence(box, w, k), seq, w, k, eps);
+
+        int target_len= box[0].size();
+        int len = seq.size();
         for (auto &mapinf : map_info) {
-            // int position = min(mapinf.target_min_index-len/2, 0);
-            // int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1);
-            // uint64_t simmilarity = LCS_kpp(seq,box[0].substr(position,sustr_len),k);
-            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\n",
+            int position = max(mapinf.target_min_index-len/2, 0);
+            int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1 - position);
+            uint64_t simmilarity = LCS_kpp(seq,box[0].substr(position,sustr_len),k);
+            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\t%d\n",
                     mapinf.query_min_index,
                     mapinf.query_max_index,
                     mapinf.target_min_index,
                     mapinf.target_max_index,
-                    mapinf.reverse);
+                    mapinf.reverse,
+                    simmilarity);
         }
     }
 

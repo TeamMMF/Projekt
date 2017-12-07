@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <cmath>
 #include <climits>
-#include <malloc.h>
+
 #include "Common.hpp"
 
 
@@ -187,8 +187,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
     uint64_t* r_hash_buffer = new uint64_t[size];
 
     for(int i = 0; i < w; i++){
-        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(kmers[i]));
-        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[i])));
+        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(kmers[i]));                                //HASH
+        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[i])));     //HASH
     }
 
     for(int i = 0; i <= outer_loop_length; i++){
@@ -235,8 +235,8 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
         }
         int next_end = i + w;
         if(next_end < size){
-            hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(kmers[next_end]));
-            r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[next_end])));
+            hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(kmers[next_end]));          //HASH
+            r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[next_end])));   //HASH
         }
     }
 
@@ -383,12 +383,13 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
 
             b = e + 1;
 
+            /*
             cout << mi.target_min_index << " , "
                  << mi.target_max_index << " , "
                  << mi.reverse << " , "
                  << mi.query_min_index << " , "
                  << mi.query_max_index << endl;
-
+            */
         }
 
     }
