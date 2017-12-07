@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <memory>
 #include "Common.hpp"
+#include "Dynamic.h"
 #include "FASTASampleClass.cpp"
 #include "lcskpp.h"
 #include "bioparser/bioparser.hpp"
@@ -30,8 +31,8 @@ int main(int argc, char const *argv[]){
             vector<pair<int,int>> rec;
             lcskpp_sparse_fast(fasta_reads[i]->get_data(),fasta_reads[j] -> get_data(), k, &length, &rec);
 
-            printf("Length: %d\n",length);
-
+            uint64_t result = LCS_kpp(fasta_reads[i]->get_data(),fasta_reads[j] -> get_data(),k);
+            printf("Pavetic: %ld Mate: %d\n",length,result);
             printf("Indices:");
             for(int k = 0, limit = rec.size(); k<limit; k++){
                 printf(" (%d, %d)",rec[k].first, rec[k].second);
