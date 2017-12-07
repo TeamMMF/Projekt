@@ -226,58 +226,67 @@ size_t tuple_hash(std::tuple<int, int, bool> x){
     return (int_hash(std::get<0>(x)) ^ int_hash(std::get<1>(x)) + 13 * bool_hash(std::get<2>(x)));
 }
 
+
 uint64_t LCS_kpp(string s1, string s2, int k){
     vector<uint64_t> max_col_dp(s2.size() + 1);
 
-
     vector<matchPair> match_pairs = generate_match_pairs(s1, s2, k);
 
-    unordered_map<matchPair, int, function<size_t(matchPair)>>  ordering(match_pairs.size() / 2, tuple_hash);
+    unordered_map<matchPair, int, function<size_t(matchPair)>>  ordering(match_pairs.size() / 2, tuple_hash); // codes matchPair to index in vector
+    unordered_map<int, int> row_to_vector_position(match_pairs.size()/2); // binds row in "matrix" to first matchPair position in match_pairs vector
 
     vector<uint64_t> dp(match_pairs.size()/2);
 
-    int start_counter = 0;
-    int n = 0;
+    int start_counter = 0;   //counts number of start events
+    int n = 0;              //keeps track of position within match_pairs vector
     for(matchPair mp : match_pairs){
 
         if(get<2>(mp)) {             //match pair is start
             ordering.emplace(mp, start_counter);
-            dp[start_counter] = k + max_between_indexes(max_col_dp, 0, get<1>(mp));
+            dp[start_counter] = k + max_between_indexes(max_col_dp, 0, get<1>(mp));     //line 6 in pseudocode
             start_counter++;
+
+            auto t = row_to_vector_position.find(get<0>(mp));   //adds another entry to row_to_vector_position if one does not exist already
+            if(t == row_to_vector_position.end()){
+                row_to_vector_position.emplace(get<0>(mp), n);
+            }
         }
 
 
         else {
             int n_pred = -1;
-            int n_mp = ordering.find(make_tuple(get<0>(mp) - k, get<1>(mp) - k, true))->second;
-            for(int m = n - 1; m >= 0; m--){
-                matchPair pred_candidate = match_pairs[m];
+            int n_mp = ordering.find(make_tuple(get<0>(mp) - k, get<1>(mp) - k, true))->second;  //find the index of the current start matchPoint in the dp vector
+            auto m_it = row_to_vector_position.find(get<0>(mp) - k - 1);
+            if(m_it != row_to_vector_position.end()) {                      //if there exists a start in that row
 
-                bool precedence = false;
-                if(!get<2>(pred_candidate)){
-                    precedence = false;
-                }
+                int m = m_it->second;
 
-                int p_diff = (get<0>(mp) - k) - (get<1>(mp) - k);
-                int g_diff = get<0>(pred_candidate) - get<1>(pred_candidate);
-                int i_diff = (get<0>(mp) - k) - get<0>(pred_candidate);
+                for (; m != n; m++) {
+                    matchPair pred_candidate = match_pairs[m];
 
-                precedence = (p_diff == g_diff) && (i_diff == 1);
-
-                if(precedence){
-                    /*if((get<0>(mp) - get<0>(pred_candidate) == k) && (get<1>(mp) - get<1>(pred_candidate) == k)){
+                    bool precedence = false;
+                    if (!get<2>(pred_candidate)) {                              //if event is not start continue
+                        continue;
+                    }
+                    else if(get<0>(pred_candidate) > (get<0>(mp) - k + 1)){     //if event has gone to the next row
                         break;
-                    }*/
-                    if(!get<2>(pred_candidate)){
-                        n_pred = ordering.find(make_tuple(get<0>(pred_candidate) - k, get<1>(pred_candidate) - k, true))->second;
-                    }
-                    else {
-                        n_pred = ordering.find(pred_candidate)->second;
                     }
 
-                    break;
+                    int p_diff = (get<0>(mp) - k) - (get<1>(mp) - k);               //calculates if mp continues the other event
+                    int g_diff = get<0>(pred_candidate) - get<1>(pred_candidate);
+                    int i_diff = (get<0>(mp) - k) - get<0>(pred_candidate);
+
+                    precedence = (p_diff == g_diff) && (i_diff == 1);
+
+                    if (precedence) {                                               //if the event continues
+                        /*if((get<0>(mp) - get<0>(pred_candidate) == k) && (get<1>(mp) - get<1>(pred_candidate) == k)){
+                            break;
+                        }*/
+                        n_pred = ordering.find(pred_candidate)->second;      //find the index of the matchPoint which mp continues
+                        break;
+                    }
+
                 }
-
             }
 
             if(n_pred != -1){
@@ -292,7 +301,6 @@ uint64_t LCS_kpp(string s1, string s2, int k){
 
     return max_between_indexes(dp, 0, dp.size() - 1);
 }
-
 bool check_precedence(matchPair p, matchPair g){
     if(!get<2>(p)){
         return false;
