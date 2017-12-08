@@ -113,7 +113,7 @@ int main(int argc, char const *argv[]) {
 
 
     for (int i=0, limit = read_sequences.size();i<limit; i++) {
-        vector<mapInfo> map_info = map_minimizers(indexSequence(box, w, k), read_sequences[i], w,k, eps);
+        vector<mapInfo> map_info = map_minimizers(indexSequences(box, w, k), read_sequences[i], w,k, eps);
 
         fprintf(stdout,"Sequence %s overlapping with sequence %s:\n",
                 fasta_reads[i]->get_name().c_str(),

@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]) {
         v.push_back(s);
         */
 
-        unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> multiset = indexSequence(v, 5, 15);
+        unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> multiset = indexSequences(v, 5, 15);
 
         uint64_t  maks2 = 0;
        /*
@@ -121,7 +121,7 @@ int main(int argc, char const *argv[]) {
 
 
         for(string s : v) {
-            map_minimizers(indexSequence(ref, 5, 15), s , 5, 15, 500);
+            map_minimizers(indexSequences(ref, 5, 15), s , 5, 15, 500);
         }
 
         break;

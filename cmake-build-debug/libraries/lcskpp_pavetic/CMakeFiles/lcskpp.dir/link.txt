@@ -1,2 +1,0 @@
-C:\MinGW\bin\ar.exe qc ..\..\lib\liblcskppd.a  CMakeFiles/lcskpp.dir/lcskpp.cpp.obj
-C:\MinGW\bin\ranlib.exe ..\..\lib\liblcskppd.a

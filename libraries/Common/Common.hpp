@@ -25,7 +25,7 @@ vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s);
 
 size_t find_hash_value(char c);
 
-std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> indexSequence(vector<string> sequences, int w, int k);
+std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> indexSequences(vector<string> sequences, int w, int k);
 
 const int hash_width = 20;
 const int offset_width = 6;

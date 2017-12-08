@@ -3,6 +3,8 @@
 //
 
 #include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
 #include <tuple>
 #include <string>
 #include <vector>
@@ -31,3 +33,5 @@ bool check_precedence(matchPair p, matchPair g);
 uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 
 size_t tuple_hash(std::tuple<int, int, bool> x);
+
+int lis(int *a, int N);
