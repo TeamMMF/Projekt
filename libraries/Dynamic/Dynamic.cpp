@@ -324,10 +324,6 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 }
 
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 int lis( int* a, int N ) {
   int *best, i, j, max = INT_MIN;
 
