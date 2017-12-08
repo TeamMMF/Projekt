@@ -70,7 +70,6 @@ endif()
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/CustomTypes")
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/CustomTypes)
 
-
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/Common")
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Common)
@@ -100,6 +99,7 @@ target_link_libraries(fastaSample bioparser)
 add_executable(kmer_finder ${SOURCES}/kmerFinderSample.cpp)
 target_link_libraries(kmer_finder Common)
 target_link_libraries(kmer_finder bioparser)
+target_link_libraries(kmer_finder CustomTypes)
 
 add_executable(dynamicSample ${SOURCES}/dynamicSample.cpp)
 target_link_libraries(dynamicSample Common)
@@ -124,3 +124,8 @@ target_link_libraries(mapper lcskpp)
 
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
+
+add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
+target_link_libraries(optimizationTest Common)
+target_link_libraries(optimizationTest bioparser)
+target_link_libraries(optimizationTest CustomTypes)

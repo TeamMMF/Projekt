@@ -3,21 +3,6 @@
 //
 
 
-typedef PAF_data struct{
-    char* qs_name;
-    int qs_length;
-    int q_start;
-    int q_end;
-    char strand;
-    char* ts_name;
-    int ts_length;
-    int target_start;
-    int target_end;
-    int residue;
-    int alignment_block_end;
-    int mapping_quality;
-};
-
 public int write_paf_to_file(char *output_file, PAF_data *data, int size){
     FILE *file = fopen(output_file, "w+");
     for (int i = 0; i < size; ++i) {
