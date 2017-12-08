@@ -9,8 +9,10 @@
 #include <iomanip>
 #include <cmath>
 #include <climits>
+#include <CustomTypes.h>
 
 #include "Common.hpp"
+#include "CustomTypes.h"
 
 
 using namespace std;
@@ -264,15 +266,18 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint6
     return indexTable;
 }
 
+std::unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> indexSequence(string sequence, int w, int k) {
 
-std::unordered_multimap<uint64_t, tuple<int, int>, function<size_t(uint64_t)>> indexSequence(string sequence, int w, int k) {
+    unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> indexTable(1000, no_hash);
 
-    unordered_multimap<uint64_t, tuple<int, int>, function<size_t(uint64_t)>> indexTable(1000, no_hash);
+    vector<minimizer> minimizers = find_minimizers2(w, k, sequence);
 
-    vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k, sequence);
-    for (tuple<uint64_t, int, int> m : minimizers) {
-        indexTable.emplace(get<0>(m),
-                           make_tuple(get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+    for (minimizer m : minimizers) {
+        hashEntry *entry;
+        entry->index = m.index;
+        entry->rev = m.rev;
+
+        indexTable.emplace(m.hash, entry); //TESTIRATI S insertom!
     }
 
     return  indexTable;

@@ -1,0 +1,48 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../libraries/CustomTypes/CustomTypes.h
+
+C:/Faks/5. semestar/Projekt iz programske potpore/Projekt/libraries/Common/Common.cpp
+string
+-
+vector
+-
+tuple
+-
+algorithm
+-
+unordered_set
+-
+unordered_map
+-
+iostream
+-
+functional
+-
+iomanip
+-
+cmath
+-
+climits
+-
+Common.hpp
+C:/Faks/5. semestar/Projekt iz programske potpore/Projekt/libraries/Common/Common.hpp
+CustomTypes.h
+C:/Faks/5. semestar/Projekt iz programske potpore/Projekt/libraries/Common/CustomTypes.h
+
+C:/Faks/5. semestar/Projekt iz programske potpore/Projekt/libraries/Common/Common.hpp
+vector
+-
+string
+-
+functional
+-
+unordered_map
+-
+

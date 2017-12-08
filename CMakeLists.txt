@@ -67,6 +67,8 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 ##################### END GOOGLETEST #######################
+include_directories("${LIBRARY_SOURCES_DIRECTORY}/CustomTypes")
+add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/CustomTypes)
 
 
 include_directories("${PROJECT_BINARY_DIR}")
@@ -79,8 +81,6 @@ add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Dynamic)
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/lcskpp_pavetic")
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/lcskpp_pavetic)
 
-include_directories("${LIBRARY_SOURCES_DIRECTORY}/CustomTypes")
-add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/CustomTypes)
 
 add_subdirectory(testing)
 
