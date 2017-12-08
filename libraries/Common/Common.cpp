@@ -30,7 +30,7 @@ char complement(char c) {
     }
 }
 
-string find_reverse_complement(string s){
+string find_reverse_complement(string s) {
     const unsigned long length = s.length();
 
     string reversed(s);
@@ -39,7 +39,7 @@ string find_reverse_complement(string s){
     const char *nucleotides = reversed.c_str();
     char *reverse_complement = new char[length + 1];        //MEM
 
-    for(int i = 0; i < length; i++){
+    for (int i = 0; i < length; i++) {
         reverse_complement[i] = complement(nucleotides[i]);
     }
     reverse_complement[length] = '\0';
@@ -60,10 +60,10 @@ vector<string> find_kmer(int k, string s) {
 uint64_t minimizer_hash(string s) {
 
     uint64_t hash = 0;
-    const char* nucleotides = s.c_str();
+    const char *nucleotides = s.c_str();
     const unsigned long k = s.length();
 
-    for(int i = 0; i < k; i++){
+    for (int i = 0; i < k; i++) {
         hash += find_hash_value(nucleotides[i]) * pow(4, k - i - 1);
     }
 
@@ -72,8 +72,8 @@ uint64_t minimizer_hash(string s) {
 }
 
 //Thomas Wang's integer hash function
-uint64_t invertible_minimizer_hash(uint64_t x){
-    uint64_t  key = x;
+uint64_t invertible_minimizer_hash(uint64_t x) {
+    uint64_t key = x;
 
     key = (~key) + (key << 21); // key = (key << 21) - key - 1;
     key = key ^ (key >> 24);
@@ -85,43 +85,43 @@ uint64_t invertible_minimizer_hash(uint64_t x){
     return key;
 }
 
-uint64_t invertible_minimizer_hash_inverse(uint64_t key){
+uint64_t invertible_minimizer_hash_inverse(uint64_t key) {
     uint64_t tmp;
 
     // Invert key = key + (key << 31)
-    tmp = key-(key<<31);
-    key = key-(tmp<<31);
+    tmp = key - (key << 31);
+    key = key - (tmp << 31);
 
     // Invert key = key ^ (key >> 28)
-    tmp = key^key>>28;
-    key = key^tmp>>28;
+    tmp = key ^ key >> 28;
+    key = key ^ tmp >> 28;
 
     // Invert key *= 21
     key *= 14933078535860113213u;
 
     // Invert key = key ^ (key >> 14)
-    tmp = key^key>>14;
-    tmp = key^tmp>>14;
-    tmp = key^tmp>>14;
-    key = key^tmp>>14;
+    tmp = key ^ key >> 14;
+    tmp = key ^ tmp >> 14;
+    tmp = key ^ tmp >> 14;
+    key = key ^ tmp >> 14;
 
     // Invert key *= 265
     key *= 15244667743933553977u;
 
     // Invert key = key ^ (key >> 24)
-    tmp = key^key>>24;
-    key = key^tmp>>24;
+    tmp = key ^ key >> 24;
+    key = key ^ tmp >> 24;
 
     // Invert key = (~key) + (key << 21)
     tmp = ~key;
-    tmp = ~(key-(tmp<<21));
-    tmp = ~(key-(tmp<<21));
-    key = ~(key-(tmp<<21));
+    tmp = ~(key - (tmp << 21));
+    tmp = ~(key - (tmp << 21));
+    key = ~(key - (tmp << 21));
 
     return key;
 }
 
-size_t find_hash_value(char c){
+size_t find_hash_value(char c) {
     switch (c) {
         case 'A':
             return 0;
@@ -174,7 +174,7 @@ std::vector<triplet> find_minimizers(int w, int k, string s) {
 }
 
 
-std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
+std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s) {
 
     vector<string> kmers = find_kmer(k, s);
 
@@ -183,49 +183,44 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
 
     vector<tuple<uint64_t, int, int>> minimizers;
     minimizers.reserve(outer_loop_length + 1);
-    uint64_t* hash_buffer = new uint64_t[size];
-    uint64_t* r_hash_buffer = new uint64_t[size];
+    uint64_t *hash_buffer = new uint64_t[size];
+    uint64_t *r_hash_buffer = new uint64_t[size];
 
-    for(int i = 0; i < w; i++){
+    for (int i = 0; i < w; i++) {
         hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(kmers[i]));                                //HASH
         r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[i])));     //HASH
     }
 
-    for(int i = 0; i <= outer_loop_length; i++){
+    for (int i = 0; i <= outer_loop_length; i++) {
         uint64_t m = UINT64_MAX;
 
-        for(int j = 0; j < w ; j++){
-            uint64_t u = hash_buffer[i+j];
-            uint64_t v = r_hash_buffer[i+j];
-            if(u == v){
+        for (int j = 0; j < w; j++) {
+            uint64_t u = hash_buffer[i + j];
+            uint64_t v = r_hash_buffer[i + j];
+            if (u == v) {
                 continue;
             }
-            m = min(m, min(u,v));
+            m = min(m, min(u, v));
         }
 
-        for(int j = 0; j < w; j++){
-            uint64_t u = hash_buffer[i+j];
-            uint64_t v = r_hash_buffer[i+j];
+        for (int j = 0; j < w; j++) {
+            uint64_t u = hash_buffer[i + j];
+            uint64_t v = r_hash_buffer[i + j];
 
-            if(u < v && u == m) {
-                if(minimizers.empty()){
-                    minimizers.push_back(make_tuple(m, i+j, 0));
-                }
-
-                else {
+            if (u < v && u == m) {
+                if (minimizers.empty()) {
+                    minimizers.push_back(make_tuple(m, i + j, 0));
+                } else {
                     tuple<uint64_t, int, int> last = minimizers.back();
                     if (get<0>(last) != m && get<1>(last) != i + j) {
                         minimizers.push_back(make_tuple(m, i + j, 0));
                     }
                 }
 
-            }
-            else if(v < u && v == m){
-                if(minimizers.empty()){
-                    minimizers.push_back(make_tuple(m, i+j, 1));
-                }
-
-                else {
+            } else if (v < u && v == m) {
+                if (minimizers.empty()) {
+                    minimizers.push_back(make_tuple(m, i + j, 1));
+                } else {
                     tuple<uint64_t, int, int> last = minimizers.back();
                     if (get<0>(last) != m && get<1>(last) != i + j) {
                         minimizers.push_back(make_tuple(m, i + j, 1));
@@ -234,9 +229,10 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
             }
         }
         int next_end = i + w;
-        if(next_end < size){
+        if (next_end < size) {
             hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(kmers[next_end]));          //HASH
-            r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash(find_reverse_complement(kmers[next_end])));   //HASH
+            r_hash_buffer[next_end] = invertible_minimizer_hash(
+                    minimizer_hash(find_reverse_complement(kmers[next_end])));   //HASH
         }
     }
 
@@ -246,19 +242,21 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s){
     return minimizers;
 }
 
-size_t no_hash(uint64_t x){
-    return  x;
+size_t no_hash(uint64_t x) {
+    return x;
 }
 
 
-std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> indexSequence(vector<string> sequences, int w, int k){
+std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> indexSequences(vector<string> sequences, int w, int k) {
+
     unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> indexTable(1000, no_hash);
 
     int counter = 1;
-    for(string seq : sequences){
-        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k , seq);
-        for(tuple<uint64_t, int, int> m : minimizers){
-            indexTable.emplace(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+    for (string seq : sequences) {
+        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k, seq);
+        for (tuple<uint64_t, int, int> m : minimizers) {
+            indexTable.emplace(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m),
+                                                     get<2>(m))); //TESTIRATI S insertom!
         }
         counter++;
     }
@@ -266,32 +264,47 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint6
     return indexTable;
 }
 
+
+std::unordered_multimap<uint64_t, tuple<int, int>, function<size_t(uint64_t)>> indexSequence(string sequence, int w, int k) {
+
+    unordered_multimap<uint64_t, tuple<int, int>, function<size_t(uint64_t)>> indexTable(1000, no_hash);
+
+    vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k, sequence);
+    for (tuple<uint64_t, int, int> m : minimizers) {
+        indexTable.emplace(get<0>(m),
+                           make_tuple(get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+    }
+
+    return  indexTable;
+}
+
 bool hit_comparator(const minimizer_hit a,
-                    const minimizer_hit b){
-    if(get<0>(a) < get<0>(b)) return true;
-    if(get<0>(a) > get<0>(b)) return false;
+                    const minimizer_hit b) {
+    if (get<0>(a) < get<0>(b)) return true;
+    if (get<0>(a) > get<0>(b)) return false;
 
-    if(get<1>(a) < get<1>(b)) return true;
-    if(get<1>(a) > get<1>(b)) return false;
+    if (get<1>(a) < get<1>(b)) return true;
+    if (get<1>(a) > get<1>(b)) return false;
 
-    if(get<2>(a) < get<2>(b)) return true;
-    if(get<2>(a) > get<2>(b)) return false;
+    if (get<2>(a) < get<2>(b)) return true;
+    if (get<2>(a) > get<2>(b)) return false;
 
-    if(get<3>(a) < get<3>(b)) return true;
-    if(get<3>(a) > get<3>(b)) return false;
+    if (get<3>(a) < get<3>(b)) return true;
+    if (get<3>(a) > get<3>(b)) return false;
 
     return true;
 }
 
 
-std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
+std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k) {
     vector<hashMinPair> table;
 
     int counter = 1;
-    for(string seq : sequences){
-        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k , seq);
-        for(tuple<uint64_t, int, int> m : minimizers){
-            table.emplace_back(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m), get<2>(m))); //TESTIRATI S insertom!
+    for (string seq : sequences) {
+        vector<tuple<uint64_t, int, int>> minimizers = find_minimizers2(w, k, seq);
+        for (tuple<uint64_t, int, int> m : minimizers) {
+            table.emplace_back(get<0>(m), make_tuple("seq" + std::to_string(counter), get<1>(m),
+                                                     get<2>(m))); //TESTIRATI S insertom!
         }
         counter++;
     }
@@ -301,20 +314,19 @@ std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k){
 }
 
 
-
-
-vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
-         string query_sequence,
-         int w,
-         int k,
-         int epsilon){
+vector<mapInfo>
+map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
+               string query_sequence,
+               int w,
+               int k,
+               int epsilon) {
 
 
     vector<minimizer_hit> hits;
     auto minimizers = find_minimizers2(w, k, query_sequence);
 
 
-    for(auto minimizer : minimizers) {
+    for (auto minimizer : minimizers) {
         uint64_t h = get<0>(minimizer);
         int i_q = get<1>(minimizer);
         int r_q = get<2>(minimizer);
@@ -327,22 +339,21 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             int r2 = get<2>(tir);
             int same_strand = r_q == r2 ? 0 : 1;
 
-            if(r_q == 0) {
+            if (r_q == 0) {
                 hits.emplace_back(make_tuple(t, 0, i_q - i2, i2));
-            }
-            else {
+            } else {
                 hits.emplace_back(make_tuple(t, 1, i_q + i2, i2));
             }
 
         }
     }
 
-    sort(hits.begin(),hits.end(),hit_comparator);
+    sort(hits.begin(), hits.end(), hit_comparator);
 
     vector<mapInfo> info;
 
     int b = 1;
-    for(int e = 1, limit = hits.size(); e<limit; e++) {
+    for (int e = 1, limit = hits.size(); e < limit; e++) {
         string t1 = get<0>(hits[e - 1]);
         string t2 = get<0>(hits[e]);
         int r1 = get<1>(hits[e - 1]);
@@ -355,21 +366,21 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
             int max_i_prime = 0;
             int min_i = INT_MAX;
             int max_i = 0;
-            for(int i = b; i <= e; i++){
+            for (int i = b; i <= e; i++) {
                 int i_prime_tmp = get<3>(hits[i]);
                 int i_tmp = get<1>(hits[i]) ? get<2>(hits[i]) - i_prime_tmp : get<2>(hits[i]) + i_prime_tmp;
-                if(i_prime_tmp < min_i_prime){
+                if (i_prime_tmp < min_i_prime) {
                     min_i_prime = i_prime_tmp;
                     min_i = i_tmp;
                 }
 
-                if(i_prime_tmp > max_i_prime){
+                if (i_prime_tmp > max_i_prime) {
                     max_i_prime = i_prime_tmp;
                     max_i = i_tmp;
                 }
 
             }
-            if(max_i - min_i <100){
+            if (max_i - min_i < 100) {
                 continue;
             }
             mapInfo mi;
