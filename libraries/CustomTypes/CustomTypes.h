@@ -2,14 +2,17 @@
 // Created by matep on 08/12/2017.
 //
 
+
+#include <cstdint>
+
 typedef struct {
     uint64_t hash;
-    uint16_t index;
+    uint32_t index;
     bool rev;
 } minimizer;
 
 typedef struct {
-    uint16_t index;
+    uint32_t index;
     bool rev;
 } hashEntry;
 

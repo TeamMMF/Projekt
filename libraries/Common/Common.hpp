@@ -10,8 +10,6 @@ typedef tuple<string, int, string> triplet;
 
 typedef tuple<uint64_t, int, int> triple;
 
-char complement(char c);
-
 std::vector<std::string> find_kmer(int k, std::string s);
 
 uint64_t minimizer_hash(string s);
@@ -52,11 +50,11 @@ vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, i
 
 
 char complement(char c);
-char* find_reverse_complement(const char *seq, uint16_t seq_l);
-void find_kmers(const char *seq, uint16_t k, char **kmers, uint16_t kmers_l);
-void find_kmers(const char *seq, uint16_t k, char ***kmers, uint16_t kmers_l);
-char** find_kmers(const char *seq, uint16_t k, uint16_t kmers_l); //OVU KORISTITI
-uint64_t minimizer_hash3(const char* seq, uint16_t seq_l);
+void find_reverse_complement(const char *seq, uint32_t seq_l, char** rev_comp);
+void destroy_reverse_complement(char** rev_comp);
+void find_kmers(const char *seq, uint32_t k, char ***kmers, uint32_t kmers_l);
+void destroy_kmers(char*** kmers, uint32_t kmers_l);
+uint64_t minimizer_hash3(const char* seq, uint32_t seq_l);
 uint64_t invertible_minimizer_hash(uint64_t x);
 uint64_t invertible_minimizer_hash_inverse(uint64_t x);
-void find_minimizers3(const char *seq, uint16_t seq_l, uint16_t w, uint16_t k, minimizer* minimizers, uint16_t min_l);
+void find_minimizers3(const char *seq, uint32_t seq_l, uint32_t w, uint32_t k, minimizer** minimizers, uint32_t min_l_pred, uint32_t* min_l_real);

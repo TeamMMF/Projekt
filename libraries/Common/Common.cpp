@@ -224,6 +224,10 @@ std::vector<tuple<uint64_t, int, int>> find_minimizers2(int w, int k, string s) 
         }
     }
 
+//    for(int i = 0; i < size; i++){
+//        printf("%2d h=%22llu, hr = %22llu\n", i, hash_buffer[i], r_hash_buffer[i]);
+//    }
+
     delete[] hash_buffer;
     delete[] r_hash_buffer;
 
@@ -379,7 +383,7 @@ map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<si
             mapInfo mi;
             mi.query_min_index = min_i;
             mi.query_max_index = max_i;
-            mi.reverse = r1 != 0 ? true : false;
+            mi.reverse = r1 != 0;
             mi.target_min_index = min_i_prime;
             mi.target_max_index = max_i_prime;
 
@@ -401,8 +405,10 @@ map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<si
     return info;
 }
 
+/************************************************* NON STL C++ CODE ********************************************************/
+
 /**
- * Gives the complement base
+ * Returns the complement base
  * @param c
  * @return
  */
@@ -426,89 +432,78 @@ char complement(char c)
  * Calculates the reverse complement od the given char array.
  * CALL FREE ON RETURNED POINTER
  * @param seq
- * @param seq_l
+ * @param seq_l - length without null terminator
  * @param rev_comp
  * @return
  */
-char* find_reverse_complement(const char *seq, uint16_t seq_l) {
+void find_reverse_complement(const char *seq, uint32_t seq_l, char** rev_comp)
+{
+    *rev_comp = (char*) malloc((seq_l + 1)* sizeof(char));
 
-    char* rev_comp = (char*) malloc(seq_l + 1);
     uint16_t counter = 0;
     for (int i = seq_l - 1; i >= 0; i--) {
-        rev_comp[counter++] = complement(seq[i]);
+        (*rev_comp)[counter++] = complement(seq[i]);
     }
-
-    rev_comp[seq_l] = '\0';
-    return rev_comp;
-}
-
-/*
- * Predati mallocirane kmers!
- * Freeati u pocetnoj funkciji
- * PROVJERA seq_l - k + 1 > 0
- */
-void find_kmers(const char *seq, uint16_t k, char **kmers, uint16_t kmers_l)
-{
-
-    for(int i = 0; i < kmers_l; i++){
-        kmers[i] = (char *) malloc(k+1);
-        if(kmers[i] == NULL){
-            exit(1);
-        }
-        strncpy(kmers[i], &seq[i], k);
-        kmers[i][k] = '\0';
-    }
+    (*rev_comp)[seq_l] = '\0';
 
     return;
 }
-
-void find_kmers(const char *seq, uint16_t k, char ***kmers, uint16_t kmers_l)
+/**
+ * Frees the malloc for the reverse_complement
+ * @param rev_comp
+ */
+void destroy_reverse_complement(char** rev_comp)
 {
+    free(*rev_comp);
+}
 
-    *kmers = (char**) malloc(kmers_l);
+/**
+ * Finds all kmers of the given sequnce
+ * CALL DESTROY_KMERS
+ * CHECK BEFORE CALLING THATH seq_l -k + 1 > 0
+ * @param seq
+ * @param k
+ * @param kmers
+ * @param kmers_l
+ */
+void find_kmers(const char *seq, uint32_t k, char ***kmers, uint32_t kmers_l)
+{
+    *kmers = (char**) malloc(kmers_l*sizeof(char*));
     for(int i = 0; i < kmers_l; i++){
-        (*kmers)[i] = (char *) malloc(k+1);
-        if((*kmers)[i] == NULL){
+        (*kmers)[i] = (char *) malloc((k+1)*sizeof(char));
+        if((*kmers)[i] == nullptr){
             exit(1);
         }
         strncpy((*kmers)[i], &(seq[i]), k);
         (*kmers)[i][k] = '\0';
-        printf("%s %d\n", (*kmers)[i], &(*kmers)[i]);
+        //printf("%s %p\n", (*kmers)[i], &(*kmers)[i]);
     }
 
     return;
 }
 
 /**
- * Finds all kmers of the given sequence
- * CALL FREE ON RETURNED POINTER
- * CHECK BEFORE CALLING THAT seq_l - k + 1 > 0
- * @param seq
- * @param k
+ * Frees all the memory that was given to the given kmer array
+ * @param kmers
  * @param kmers_l
- * @return
  */
-char** find_kmers
-        (const char *seq,
-         uint16_t k,
-         uint16_t kmers_l)
+void destroy_kmers(char*** kmers, uint32_t kmers_l)
 {
-
-    char** kmers = (char**) malloc(kmers_l);
     for(int i = 0; i < kmers_l; i++){
-        kmers[i] = (char *) malloc(k+1);
-        if(kmers[i] == NULL){
-            exit(1);
-        }
-        strncpy(kmers[i], &seq[i], k);
-        kmers[i][k] = '\0';
+        //printf("Oslobadam: %p\n", &(*kmers)[i]);
+        free((*kmers)[i]);
     }
-
-    return kmers;
+    free(*kmers);
 }
 
-uint64_t minimizer_hash3(const char* seq, uint16_t seq_l) {
-
+/**
+ * Calculates hash value of given char array
+ * @param seq
+ * @param seq_l
+ * @return
+ */
+uint64_t minimizer_hash3(const char* seq, uint32_t seq_l)
+{
     uint64_t hash = 0;
 
     for (int i = 0; i < seq_l; i++) {
@@ -526,16 +521,20 @@ uint64_t minimizer_hash3(const char* seq, uint16_t seq_l) {
 
 void find_minimizers3
         (const char *seq,
-         uint16_t seq_l,
-         uint16_t w,
-         uint16_t k,
-         minimizer* minimizers,
-         uint16_t min_l)
+         uint32_t seq_l,
+         uint32_t w,
+         uint32_t k,
+         minimizer** minimizers,
+         uint32_t min_l_pred,
+         uint32_t* min_l_real
+        )
 {
+    *minimizers = (minimizer*) malloc(min_l_pred * sizeof(minimizer));
+    *min_l_real = 0;
 
-    const uint16_t kmers_l = seq_l - k + 1;
+    const uint32_t kmers_l = seq_l - k + 1;
     char **kmers = (char **) malloc(kmers_l);
-    find_kmers(seq, k, kmers, kmers_l);
+    find_kmers(seq, k, &kmers, kmers_l);
     //const uint16_t min_l = seq_l - w - k + 2;
 
     uint64_t *hash_buffer = new uint64_t[kmers_l];
@@ -543,64 +542,166 @@ void find_minimizers3
 
     for (int i = 0; i < w; i++) {
         hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(kmers[i], k));
-        char* rev_comp = find_reverse_complement(kmers[i],k);
+        char* rev_comp;
+        find_reverse_complement(kmers[i],k, &rev_comp);
         r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(rev_comp,k));   //HASH
-        free(rev_comp);
+        destroy_reverse_complement(&rev_comp);
     }
 
-    uint16_t min_position = 0; //poistion where minimizer should be constructed next
-    for (int i = 0; i < min_l; i++) {
-        uint64_t m = UINT64_MAX;  //van petlje init?
+    uint16_t min_position = 0; //position where minimizer should be constructed next
+    uint64_t last_min_hash = UINT64_MAX;
+    int64_t last_min_position = -1;
 
-        for (int j = 0; j < w; j++) {
-            uint64_t u = hash_buffer[i + j];
-            uint64_t v = r_hash_buffer[i + j];
-            if (u == v) {
+    for (uint32_t i = 0; i < min_l_pred; i++) {
+        uint64_t u;
+        uint64_t v;
+
+        if(last_min_position != -1 && last_min_position >= i && last_min_position < i + w){
+            u = hash_buffer[i + w - 1];
+            v = r_hash_buffer[i + w - 1];
+
+            if(u == v){
                 continue;
             }
-            m = min(m, min(u, v));
+
+            else if(u < v && u <= last_min_hash){
+                (*minimizers)[min_position++] = (minimizer) {u, (uint32_t)(i + w - 1), false};
+                last_min_position = i + w - 1;
+                last_min_hash = u;
+            }
+
+            else if(u > v && v <= last_min_hash) {
+                (*minimizers)[min_position++] = (minimizer) {v, (uint32_t)(i + w - 1), true};
+                last_min_position = i + w - 1;
+                last_min_hash = v;
+            }
         }
+        else {
+            uint64_t m = UINT64_MAX;  //van petlje init?
 
-        for (uint16_t j = 0; j < w; j++) {
-            uint64_t u = hash_buffer[i + j];
-            uint64_t v = r_hash_buffer[i + j];
+            uint32_t *min_positions = new uint32_t[w];
+            bool *min_rev = new bool[w];
+            uint16_t min_pos_size = 0;
+            for (int j = 0; j < w; j++) {
+                u = hash_buffer[i + j];
+                v = r_hash_buffer[i + j];
 
-            if (u < v && u == m) {
-                if (min_position == 0) {
-                    minimizers[min_position++] = (minimizer) {m, i + j, false};
-                } else {
-                    minimizer last = minimizers[min_position - 1];
-                    if(last.hash != m && last.index != (i + j)){
-                        minimizers[min_position++] = (minimizer) {m, i + j, false};
-                    }
+                if(u == v){
+                    continue;
                 }
 
-            } else if (v < u && v == m) {
-                if (min_position == 0) {
-                    minimizers[min_position++] = (minimizer) {m, i + j, true};
-                } else {
-                    minimizer last = minimizers[min_position - 1];
-                    if(last.hash != m && last.index != (i + j)){
-                        minimizers[min_position++] = (minimizer) {m, i + j, true};
+                if(u < m || v <  m){
+                    min_pos_size = 0;
+
+                    if(u < v){
+                        min_positions[min_pos_size] = i + j;
+                        min_rev[min_pos_size] = false;
+                        m = u;
+
+                    } else {
+                        min_positions[min_pos_size] = i + j;
+                        min_rev[min_pos_size] = true;
+                        m = v;
+                    }
+
+                    min_pos_size++;
+                }
+
+                else if(u == m){
+                    min_positions[min_pos_size] = i + j;
+                    min_rev[min_pos_size++] = false;
+                }
+
+                else if(v == m){
+                    min_positions[min_pos_size] = i + j;
+                    min_rev[min_pos_size++] = true;
+                }
+            }
+
+            last_min_hash = m;
+            last_min_position = min_positions[min_pos_size - 1];
+
+            for(uint32_t j = 0; j < min_pos_size; j++){
+                (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(min_positions[j]), min_rev[j]};
+            }
+
+            /*
+            for (uint32_t j = 0; j < w; j++) {
+                u = hash_buffer[i + j];
+                v = r_hash_buffer[i + j];
+
+                if (u < v && u == m) {
+                    if (min_position == 0) {
+                        (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
+
+                    } else {
+                        uint32_t n = min_position - 1;
+                        while(n >= 0){
+                            minimizer last = (*minimizers)[min_position - 1];
+                            if(last.hash != m){
+                                (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
+                            }
+                            else if(last.index == (i+j) && !last.index){
+                                break;
+                            }
+                        }
+                        if(last.index != m){
+                            (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
+                        }
+                        else if(last.index != (i + j)){
+                            for(uint16_t n = min_position - 1; n >= 0; n--){
+                                minimizer before = (*minimizers)[n];
+                                if(before.hash != m || (before.index == (i+j))) {
+                                    (*minimizers)[min_position++] = (minimizer) {m, (uint32_t) (i + j), false};
+                                }
+                                else if( before.index == (i+j) && !before.rev){
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                } else if (v < u && v == m) {
+                    if (min_position == 0) {
+                        (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), true};
+                    } else {
+                        minimizer last = (*minimizers)[min_position - 1];
+                        if(last.index != (i + j)){
+                            (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), true};
+                        }
                     }
                 }
             }
+            */
+
+            delete[] min_positions;
+            delete[] min_rev;
         }
+
         int next_end = i + w;
-        if (next_end < min_l) {
+        if (next_end < kmers_l) {
             hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash3(kmers[next_end],k));//HASH
-            char*rev_comp = find_reverse_complement(kmers[next_end],k);
+            char*rev_comp;
+            find_reverse_complement(kmers[next_end], k, &rev_comp);
             r_hash_buffer[next_end] = invertible_minimizer_hash(minimizer_hash3(rev_comp,k));   //HASH
-            free(rev_comp);
+            //printf("%d %s %llu, %s %llu\n",next_end, kmers[next_end], invertible_minimizer_hash(minimizer_hash3(kmers[next_end],k)),
+            //                             rev_comp, invertible_minimizer_hash(minimizer_hash3(rev_comp,k)));
+            destroy_reverse_complement(&rev_comp);
         }
     }
+
+    *min_l_real = min_position;
+//    for(int i = 0; i < kmers_l; i++){
+//        printf("%2d h=%22llu, hr = %22llu\n", i, hash_buffer[i], r_hash_buffer[i]);
+//    }
+//    for(int i = 0; i < *min_l_real; i++){
+//        printf("(%lld, %d, %s)\n", (*minimizers)[i].hash, (*minimizers)[i].index, (*minimizers)[i].rev ? "true" : "false");
+//    }
+//
+//    printf("\n\n");
 
     //FREE BLOK
-    for(int i = 0; i < kmers_l; i++){
-        free(kmers[i]);
-    }
-    free(kmers);
-
+    destroy_kmers(&kmers, kmers_l);
     delete[] hash_buffer;
     delete[] r_hash_buffer;
     //
@@ -609,3 +710,51 @@ void find_minimizers3
 }
 
 
+
+/**
+ * Finds all kmers of the given sequence
+ * CALL FREE ON RETURNED POINTER
+ * CHECK BEFORE CALLING THAT seq_l - k + 1 > 0
+ * @param seq
+ * @param k
+ * @param kmers_l
+ * @return
+ */
+/*char** find_kmers
+        (const char *seq,
+         uint16_t k,
+         uint16_t kmers_l)
+{
+
+    char** kmers = (char**) malloc(kmers_l* sizeof(char*));
+    for(int i = 0; i < kmers_l; i++){
+        kmers[i] = (char *) malloc(k+1);
+        if(kmers[i] == NULL){
+            exit(1);
+        }
+        strncpy(kmers[i], &seq[i], k);
+        kmers[i][k] = '\0';
+    }
+
+    return kmers;
+}*/
+
+/*
+ * Predati mallocirane kmers!
+ * Freeati u pocetnoj funkciji
+ * PROVJERA seq_l - k + 1 > 0
+ *//*
+void find_kmers(const char *seq, uint16_t k, char **kmers, uint16_t kmers_l)
+{
+
+    for(int i = 0; i < kmers_l; i++){
+        kmers[i] = (char *) malloc(k+1);
+        if(kmers[i] == NULL){
+            exit(1);
+        }
+        strncpy(kmers[i], &seq[i], k);
+        kmers[i][k] = '\0';
+    }
+
+    return;
+}*/
