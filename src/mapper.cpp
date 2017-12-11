@@ -102,6 +102,7 @@ int main(int argc, char const *argv[]) {
     fasta_reader2->read_objects(fasta_reference, static_cast<uint64_t>(-1));
 
     vector<string> target_sequences;
+    //target seqs se ne koristi?
     read_sequences.reserve(fasta_reference.size());
     vector<string> box;
     box.reserve(fasta_reference.size());
@@ -112,8 +113,23 @@ int main(int argc, char const *argv[]) {
     }
 
 
+    unordered_multimap<uint64_t,
+            unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>,
+            function<size_t(uint64_t)>> bigHash;
+
+    for (int i=0, limit = read_sequences.size();i<limit; i++){
+        string sequence = read_sequences[i];
+        //hash tablica jedne sekvence
+        unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> sequence_map = indexSequence(sequence, w, k);
+
+        std::size_t sequenceHash = std::hash<std::string>{}(sequence);
+        bigHash.emplace(sequenceHash, sequence_map);
+    }
+
+
+    auto indexed = indexSequences(box, w, k);
     for (int i=0, limit = read_sequences.size();i<limit; i++) {
-        vector<mapInfo> map_info = map_minimizers(indexSequences(box, w, k), read_sequences[i], w,k, eps);
+        vector<mapInfo> map_info = map_minimizers(indexed, read_sequences[i], w,k, eps);
 
         fprintf(stdout,"Sequence %s overlapping with sequence %s:\n",
                 fasta_reads[i]->get_name().c_str(),
@@ -122,6 +138,7 @@ int main(int argc, char const *argv[]) {
 
         int target_len= box[0].size();
         int len = read_sequences[i].size();
+
         for (auto &mapinf : map_info) {
             int position = max(mapinf.target_min_index-len/2, 0);
             int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1-position);

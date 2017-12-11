@@ -10,6 +10,7 @@
 #include <cmath>
 #include <climits>
 #include <cstring>
+#include <CustomTypes.h>
 
 #include "Common.hpp"
 
@@ -259,19 +260,25 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint6
 
 std::unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> indexSequence(string sequence, int w, int k) {
 
+    //no hash??
     unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> indexTable(1000, no_hash);
 
-    /*
-    vector<minimizer> minimizers = find_minimizers2(w, k, sequence);
+    minimizer** minimizers;
+    uint32_t  min_l_real, min_l_pred;
 
-    for (minimizer m : minimizers) {
+    //sto je min_l_pred?
+    find_minimizers3(sequence.c_str(), sequence.length(), w, k, minimizers, min_l_pred, &min_l_real);
+
+    for (int i = 0; i < min_l_real; i++) {
+        minimizer *m = minimizers[i];
+
         hashEntry *entry;
-        entry->index = m.index;
-        entry->rev = m.rev;
+        entry->index = m->index;
+        entry->rev = m-> rev;
 
-        indexTable.emplace(m.hash, entry); //TESTIRATI S insertom!
+        indexTable.emplace(m->hash, entry);
     }
-    */
+
     return  indexTable;
 }
 
@@ -311,8 +318,7 @@ std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k) {
 }
 
 
-vector<mapInfo>
-map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
+vector<mapInfo>  map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
                string query_sequence,
                int w,
                int k,

@@ -22,7 +22,7 @@ size_t find_hash_value(char c);
 
 std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint64_t)>> indexSequences(vector<string> sequences, int w, int k);
 
-std::unordered_multimap<uint64_t, hashEntry, function<size_t( uint64_t)>> indexSequence(string sequences, int w, int k);
+std::unordered_multimap<uint64_t, hashEntry, function<size_t( uint64_t)>> indexSequence(string sequence, int w, int k);
 
 const int hash_width = 20;
 
