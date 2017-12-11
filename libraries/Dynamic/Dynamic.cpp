@@ -1,16 +1,15 @@
 //
 // Created by matep on 03/12/2017.
 //
-
-#include <string>
+#include "Dynamic.h"
+#include "Common.hpp"
 #include <iostream>
 #include <iomanip>
 #include <cstring>
 #include <algorithm>
-#include <vector>
 #include <unordered_map>
-#include "Dynamic.h"
-#include "Common.hpp"
+#include <climits>
+
 
 using namespace std;
 

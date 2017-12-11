@@ -2,7 +2,8 @@
 // Created by matep on 08/12/2017.
 //
 
-
+#ifndef CustomTypes
+#define CustomTypes
 #include <cstdint>
 
 typedef struct {
@@ -37,3 +38,4 @@ typedef struct{
     int alignment_block_end;
     int mapping_quality;
 } PAF_data;
+#endif

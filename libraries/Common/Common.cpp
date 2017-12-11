@@ -1,18 +1,14 @@
-#include <string>
-#include <vector>
+
+
+#include "Common.hpp"
 #include <tuple>
 #include <algorithm>
 #include <unordered_set>
-#include <unordered_map>
 #include <iostream>
-#include <functional>
 #include <iomanip>
 #include <cmath>
 #include <climits>
 #include <cstring>
-#include <CustomTypes.h>
-
-#include "Common.hpp"
 
 
 using namespace std;
@@ -276,7 +272,8 @@ std::unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> indexSe
         entry->index = m->index;
         entry->rev = m-> rev;
 
-        indexTable.emplace(m->hash, entry);
+        //todo napraviti ovo bez errora
+        // indexTable.emplace(m->hash, entry);
     }
 
     return  indexTable;

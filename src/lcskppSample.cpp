@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]){
             lcskpp_sparse_fast(fasta_reads[i]->get_data(),fasta_reads[j] -> get_data(), k, &length, &rec);
 
             uint64_t result = LCS_kpp(fasta_reads[i]->get_data(),fasta_reads[j] -> get_data(),k);
-            printf("Pavetic: %ld Mate: %d\n",length,result);
+            printf("Pavetic: %d Mate: %ld\n",length,result);
             printf("Indices:");
             for(int k = 0, limit = rec.size(); k<limit; k++){
                 printf(" (%d, %d)",rec[k].first, rec[k].second);

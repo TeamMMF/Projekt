@@ -1,14 +1,12 @@
 //
 // Created by matep on 03/12/2017.
 //
-
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
+#ifndef Dynamic
+#define Dynamic
 #include <tuple>
 #include <string>
 #include <vector>
-#include "stdint.h"
+#include <cstdint>
 
 void LCS(const char *s1, const char *s2, int s1_l, int s2_l);
 
@@ -35,3 +33,5 @@ uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 size_t tuple_hash(std::tuple<int, int, bool> x);
 
 int lis(int *a, int N);
+
+#endif

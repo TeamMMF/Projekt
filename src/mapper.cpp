@@ -5,7 +5,6 @@
 #include "Common.hpp"
 #include "Dynamic.h"
 #include <iostream>
-#include <cstdio>
 #include "FASTASampleClass.cpp"
 #include "bioparser/bioparser.hpp"
 
@@ -143,7 +142,7 @@ int main(int argc, char const *argv[]) {
             int position = max(mapinf.target_min_index-len/2, 0);
             int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1-position);
             uint64_t simmilarity = LCS_kpp(read_sequences[i],box[0].substr(position,sustr_len),k);
-            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\t%d\n",
+            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\t%ld\n",
                     mapinf.query_min_index,
                     mapinf.query_max_index,
                     mapinf.target_min_index,
