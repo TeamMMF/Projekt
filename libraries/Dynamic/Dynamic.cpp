@@ -323,6 +323,11 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 }
 
 
+int compare_with_lis(unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>* map_first,
+                     unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>* map_second){
+
+}
+
 int lis( int* a, int N ) {
   int *best, i, j, max = INT_MIN;
 

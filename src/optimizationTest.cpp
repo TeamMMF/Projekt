@@ -29,15 +29,15 @@ int main(){
 
     destroy_reverse_complement(&rev_comp);
 
-    printf("%lld\n", minimizer_hash(s));
-    printf("%lld\n", minimizer_hash3(s.c_str(), s.length()));
+    printf("%ld\n", minimizer_hash(s));
+    printf("%ld\n", minimizer_hash3(s.c_str(), s.length()));
 
     uint16_t w = 5;
     minimizer *minimizers;
     uint32_t actual_length;
     find_minimizers3(s.c_str(),(uint16_t) s.length(), w, k, &minimizers, s.length() - k - w + 2, &actual_length);
     for(int i = 0; i < actual_length; i++){
-        printf("(%lld, %d, %s)\n", minimizers[i].hash, minimizers[i].index, minimizers[i].rev ? "true" : "false");
+        printf("(%ld, %d, %s)\n", minimizers[i].hash, minimizers[i].index, minimizers[i].rev ? "true" : "false");
     }
     printf("\n\n");
     vector<tuple<uint64_t, int, int>> minis = find_minimizers2(w, k, s);
@@ -46,13 +46,13 @@ int main(){
     char k11[] = {'C', 'G', 'G'};
     char k12[] = {'G', 'G', 'T'};
     char k13[] = {'G', 'T', 'T'};
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
     printf("\n");
     for(auto m : minis){
-        printf("(%lld, %d, %s)\n", get<0>(m), get<1>(m), get<2>(m) != 0 ? "true" : "false");
+        printf("(%ld, %d, %s)\n", get<0>(m), get<1>(m), get<2>(m) != 0 ? "true" : "false");
     }
 
     uint64_t stl_time = 0;
@@ -71,6 +71,6 @@ int main(){
     }
     //stl_time /= 1000;
     //c_time /= 1000;
-    printf("STL time: %llu\n", stl_time);
-    printf("C   time: %llu\n", c_time);
+    printf("STL time: %lu\n", stl_time);
+    printf("C   time: %lu\n", c_time);
 }

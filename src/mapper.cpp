@@ -3,9 +3,9 @@
 //
 #include "ProjectConfig.h"
 #include "Common.hpp"
+#include "FASTARead.h"
 #include "Dynamic.h"
 #include <iostream>
-#include "FASTASampleClass.cpp"
 #include "bioparser/bioparser.hpp"
 
 #define WINDOW_DEFAULT 5
@@ -85,97 +85,28 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    vector<unique_ptr<FASTASampleClass>> fasta_reads;
-    auto fasta_reader1 = bioparser::createReader<FASTASampleClass, bioparser::FastaReader>(read_file_path);
+    // čita datoteku i sprema svako očitanje u poseban objekt razreda FASTARead
+    vector<unique_ptr<FASTARead>> fasta_reads;
+    auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
     fasta_reader1->read_objects(fasta_reads, static_cast<uint64_t>(-1));
+    long number_of_reads = fasta_reads.size();
 
-    vector<string> read_sequences;
-    read_sequences.reserve(fasta_reads.size());
 
-    for (auto &fasta_read : fasta_reads) {
-        read_sequences.push_back(fasta_read->get_data());
+    //inicijaliziraj polje koje mapira indeks sekvence -> mapa minimizera
+    auto minimizer_hash_to_index = (unordered_multimap<uint64_t, int, function<size_t(uint64_t)>>*)
+                    malloc(sizeof(unordered_multimap<uint64_t, int, function<size_t(uint64_t)>>*)*fasta_reads.size());
+
+    // napuni polje mapa minimizera tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
+    for (int i=0; i<number_of_reads; i++){
+        const char* sequence = fasta_reads[i]->get_data();
+        indexSequence(sequence, w, k);
     }
 
-    vector<unique_ptr<FASTASampleClass>> fasta_reference;
-    auto fasta_reader2 = bioparser::createReader<FASTASampleClass, bioparser::FastaReader>(reference_file_path);
-    fasta_reader2->read_objects(fasta_reference, static_cast<uint64_t>(-1));
-
-    vector<string> target_sequences;
-    //target seqs se ne koristi?
-    read_sequences.reserve(fasta_reference.size());
-    vector<string> box;
-    box.reserve(fasta_reference.size());
-
-    for (auto &fasta_ref : fasta_reference) {
-        box.push_back(fasta_ref->get_data());
-        target_sequences.push_back(fasta_ref->get_data());
-    }
-
-
-    unordered_multimap<uint64_t,
-            unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>,
-            function<size_t(uint64_t)>> bigHash;
-
-    for (int i=0, limit = read_sequences.size();i<limit; i++){
-        string sequence = read_sequences[i];
-        //hash tablica jedne sekvence
-        unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>> sequence_map = indexSequence(sequence, w, k);
-
-        std::size_t sequenceHash = std::hash<std::string>{}(sequence);
-        bigHash.emplace(sequenceHash, sequence_map);
-    }
-
-
-    auto indexed = indexSequences(box, w, k);
-    for (int i=0, limit = read_sequences.size();i<limit; i++) {
-        vector<mapInfo> map_info = map_minimizers(indexed, read_sequences[i], w,k, eps);
-
-        fprintf(stdout,"Sequence %s overlapping with sequence %s:\n",
-                fasta_reads[i]->get_name().c_str(),
-                fasta_reference[0]->get_name().c_str());
-        fprintf(stdout,"--------------------------------\n");
-
-        int target_len= box[0].size();
-        int len = read_sequences[i].size();
-
-        for (auto &mapinf : map_info) {
-            int position = max(mapinf.target_min_index-len/2, 0);
-            int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1-position);
-            uint64_t simmilarity = LCS_kpp(read_sequences[i],box[0].substr(position,sustr_len),k);
-            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\t%ld\n",
-                    mapinf.query_min_index,
-                    mapinf.query_max_index,
-                    mapinf.target_min_index,
-                    mapinf.target_max_index,
-                    mapinf.reverse,
-                    simmilarity);
-        }
-
-        fprintf(stdout,"\n");
-    }
-
-    /*
-    for (auto &seq : read_sequences) {
-        vector<mapInfo> map_info = map_minimizers(indexSequence(box, w, k), seq, w, k, eps);
-
-
-        int target_len= box[0].size();
-        int len = seq.size();
-        for (auto &mapinf : map_info) {
-            int position = max(mapinf.target_min_index-len/2, 0);
-            int sustr_len = min(mapinf.target_max_index - mapinf.target_min_index +len/2 ,target_len-1 - position);
-            uint64_t simmilarity = LCS_kpp(seq,box[0].substr(position,sustr_len),k);
-            fprintf(stdout, "%d\t%d\t%d\t%d\t%d\t%d\n",
-                    mapinf.query_min_index,
-                    mapinf.query_max_index,
-                    mapinf.target_min_index,
-                    mapinf.target_max_index,
-                    mapinf.reverse,
-                    simmilarity);
+    for(int i = 0; i < number_of_reads; i++){
+        for (int j = i+1; j < number_of_reads; ++j) {
+            //todo obraditi svaki par sekvenci i ispisati slicnosti
         }
     }
 
-     */
     return 0;
 }
-

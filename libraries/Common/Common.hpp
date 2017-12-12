@@ -28,6 +28,18 @@ std::unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t( uint
 
 std::unordered_multimap<uint64_t, hashEntry, function<size_t( uint64_t)>> indexSequence(string sequence, int w, int k);
 
+/*
+ * sequence - sekvenca za koju trazimo minimizere
+ * w, k -klasika
+ * hash_to_index_map_addr - adresa na koju se treba staviti mapa hashMinimizera -> index
+ * ordered_minimizers_addr - adresa na koju se treba staviti sortirano polje parova (minimizer_index, minimizer_hash)
+ */
+void process_sequence(char* sequence,
+                      int w,
+                      int k,
+                      std::unordered_multimap<uint64_t, int, function<size_t( uint64_t)>> *hash_to_index_map_addr,
+                      minimizer* ordered_minimizers_addr);
+
 const int hash_width = 20;
 
 const int offset_width = 6;
@@ -38,15 +50,6 @@ std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k);
 typedef tuple<string, int, int, int> minimizer_hit;
 
 bool hit_comparator(const minimizer_hit a,const minimizer_hit b);
-
-typedef struct {
-    int target_min_index;
-    int target_max_index;
-    int query_min_index;
-    int query_max_index;
-    //string query_name;
-    bool reverse;
-} mapInfo;
 
 vector<mapInfo> map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table, string query_sequence, int w, int k, int epsilon);
 

@@ -13,9 +13,19 @@ typedef struct {
 } minimizer;
 
 typedef struct {
+    int target_min_index;
+    int target_max_index;
+    int query_min_index;
+    int query_max_index;
+    //string query_name;
+    bool reverse;
+} mapInfo;
+
+typedef struct {
     uint32_t index;
     bool rev;
 } hashEntry;
+
 
 typedef struct {
     uint64_t hash;

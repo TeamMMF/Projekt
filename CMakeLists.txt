@@ -80,6 +80,9 @@ add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/Dynamic)
 include_directories("${LIBRARY_SOURCES_DIRECTORY}/lcskpp_pavetic")
 add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/lcskpp_pavetic)
 
+include_directories("${LIBRARY_SOURCES_DIRECTORY}/FASTARead")
+add_subdirectory(${LIBRARY_SOURCES_DIRECTORY}/FASTARead)
+
 
 add_subdirectory(testing)
 
@@ -121,6 +124,7 @@ target_link_libraries(mapper Common)
 target_link_libraries(mapper Dynamic)
 target_link_libraries(mapper bioparser)
 target_link_libraries(mapper lcskpp)
+target_link_libraries(mapper FASTARead)
 
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
