@@ -9,7 +9,7 @@
 #include <chrono>
 #include "bioparser/bioparser.hpp"
 
-#define WINDOW_DEFAULT 5
+#define WINDOW_DEFAULT 10
 #define KMER_DEFAULT 15
 
 
@@ -86,11 +86,24 @@ int main(int argc, char const *argv[]) {
     for(int i = 0; i < number_of_reads; i++){
         report_status("Comparing sequences",i, number_of_reads);
         for (int j = i+1; j < number_of_reads; ++j) {
-            int lis_result = compare_with_lis(mins_in_order[i],
+            int lis_same_strand = compare_with_lis(mins_in_order[i],
                                               mins_number[i],
                                               min_hash_to_index.find(j)->second,
-                                              mins_in_order[j]);
-            if(!lis_threshold(lis_result,mins_number[i],
+                                              mins_in_order[j],true);
+            int lis_diff_strand = compare_with_lis(mins_in_order[i],
+                                                   mins_number[i],
+                                                   min_hash_to_index.find(j)->second,
+                                                   mins_in_order[j],false);
+            int lis_final;
+            char strand;
+            if(lis_diff_strand > lis_same_strand){
+                lis_final = lis_diff_strand;
+                strand ='-';
+            } else {
+                lis_final = lis_same_strand;
+                strand = '+';
+            }
+            if(!lis_threshold(lis_final,mins_number[i],
                                           mins_number[j])){
                 continue;
             }
@@ -99,7 +112,7 @@ int main(int argc, char const *argv[]) {
                     fasta_reads[i] -> get_data_length(),
                     0,
                     0,
-                    '+',
+                    strand,
                     fasta_reads[j] -> get_name(),
                     fasta_reads[j] ->get_data_length()
             );
@@ -120,6 +133,5 @@ void report_status(const char* operation, int curr, long total) {
 }
 
 bool lis_threshold(int result, int l1, int l2) {
-    double middle = (l1 + l2)/2.;
-    return result/middle > 0.0027;
+    return result > 4;
 }

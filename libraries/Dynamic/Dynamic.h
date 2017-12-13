@@ -34,12 +34,12 @@ uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 
 size_t tuple_hash(std::tuple<int, int, bool> x);
 
-int lis(int *a, int N);
-int lis_2(std::vector<int> &v);
+int lis(std::vector<int> &v);
 
 int compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
                      std::unordered_multimap<uint64_t, int> &seq2_hash_to_index,
-                     minimizer* seq2_mins_sorted);
+                     minimizer* seq2_mins_sorted,
+                     bool same_strand);
 
 #endif

@@ -12,6 +12,8 @@
 #include <CustomTypes.h>
 
 
+int lds(vector<int> vector);
+
 using namespace std;
 
 void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
@@ -329,7 +331,7 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 int compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
                      unordered_multimap<uint64_t, int> &seq2_hash_to_index,
-                     minimizer* seq2_mins_sorted){
+                     minimizer* seq2_mins_sorted, bool same_strand){
     vector<int> lis_arr;
 
     for(int i = 0; i < seq1_mins_size; i++){
@@ -340,8 +342,9 @@ int compare_with_lis(minimizer* seq1_mins_sorted,
         int final = range.first->second;
         for (auto it = range.first; it != range.second; ++it) {
             int cur_diff = it->second - seq1_mins_sorted -> index;
-            if(/*seq2_mins_sorted[it -> second].rev == seq1_mins_sorted[i].rev
-               && */cur_diff < min_diff){
+            if((seq2_mins_sorted[it -> second].rev == seq1_mins_sorted[i].rev && same_strand
+                || seq2_mins_sorted[it -> second].rev != seq1_mins_sorted[i].rev && !same_strand)
+               && cur_diff < min_diff){
                 final = it -> second;
                 min_diff = cur_diff;
             }
@@ -351,7 +354,10 @@ int compare_with_lis(minimizer* seq1_mins_sorted,
         }
     }
 
-    return lis_2(lis_arr);
+    if(!same_strand)
+        reverse(lis_arr.begin(),lis_arr.end());
+
+    return lis(lis_arr);
 
 }
 
@@ -369,7 +375,7 @@ int cell_index(std::vector<int> &v, int l, int r, int key) {
     return r;
 }
 
-int lis_2(std::vector<int> &v) {
+int lis(std::vector<int> &v) {
     int v_size = v.size();
     if (v_size == 0)
         return 0;
@@ -395,42 +401,3 @@ int lis_2(std::vector<int> &v) {
     return length;
 }
 
-
-int lis( int* a, int N ) {
-  int *best, i, j, max = INT_MIN;
-
-  best = (int*) malloc ( sizeof( int ) * N );
-  for ( i = 0; i < N; i++ ) best[i] = 1;
- 
-  // best is an array initialized to all 1s becasue thats the shortest possible answer,
-  // which would happen when all numbers in the array are always decreasing. We will use
-  // this array to keep track of the best answer for up to each position as we traverse 
-  // through the array below.
-
-  // travese from 2nd element till the end
-  // this is the right boundary for each iteration
-    for ( i = 1; i < N; i++ )
-
-      // traverse from 1st element until i'th element
-      for ( j = 0; j < i; j++ )
-      {
-          // if:
-          // a[j] is less than a[i] (number to the left of a[j])
-          //     and
-          // this increases the best count for that element
-          if ( a[i] > a[j] && best[i] < best[j] + 1 )
-          {
-            // make a record of this
-            best[i] = best[j] + 1;
-
-            // if this best is greater than max, make a record of that
-            if(max < best[i])
-                  max = best[i];
-           }         
-       }
-    // free
-    free( best );
-
-   // return
-   return max;
-}
