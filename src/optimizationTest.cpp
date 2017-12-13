@@ -31,16 +31,16 @@ int main(){
 
     destroy_reverse_complement(&rev_comp);
 
-    printf("%lu\n", minimizer_hash(s));
-    printf("%lu\n", minimizer_hash3(s.c_str(), s.length()));
+    printf("%llu\n", minimizer_hash(s));
+    printf("%llu\n", minimizer_hash3(s.c_str(), s.length()));
 
     uint16_t w = 5;
     minimizer *minimizers;
     uint32_t actual_length;
     find_minimizers3(s.c_str(),(uint16_t) s.length(), w, k, &minimizers, s.length() - k - w + 2, &actual_length);
-    for(int i = 0; i < actual_length; i++){
-        printf("(%lu, %d, %s)\n", minimizers[i].hash, minimizers[i].index, minimizers[i].rev ? "true" : "false");
-    }
+    //for(int i = 0; i < actual_length; i++){
+    //    printf("(%lu, %d, %s)\n", minimizers[i].hash, minimizers[i].index, minimizers[i].rev ? "true" : "false");
+    //}
     printf("\n\n");
     vector<tuple<uint64_t, int, int>> minis = find_minimizers2(w, k, s);
     printf("\n\n");
@@ -48,10 +48,10 @@ int main(){
     char k11[] = {'C', 'G', 'G'};
     char k12[] = {'G', 'G', 'T'};
     char k13[] = {'G', 'T', 'T'};
-    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
-    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
-    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
-    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
+    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
+    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
+    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
+    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
     printf("\n");
     //for(auto m : minis){
     //    printf("(%ld, %d, %s)\n", get<0>(m), get<1>(m), get<2>(m) != 0 ? "true" : "false");
@@ -59,25 +59,36 @@ int main(){
 
     uint64_t stl_time = 0;
     uint64_t c_time = 0;
+    uint64_t c_red_time = 0;
 
-    /*
+
     for(int i = 0; i < 100000; i++){
+        minimizer* minimizer1;
+        minimizer* minimizer2;
         chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
         find_minimizers2(w,k,s);
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
-        find_minimizers3(s.c_str(),(uint16_t) s.length(), w, k, &minimizers, s.length() - k - w + 2, &actual_length);
+        find_minimizers3(s.c_str(),(uint16_t) s.length(), w, k, &minimizer1, s.length() - k - w + 2, &actual_length);
         chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
+        find_minimizers4(s.c_str(),(uint16_t) s.length(), w, k, &minimizer2, s.length() - k - w + 2, &actual_length);
+        chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
         auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();
         auto duration2 = chrono::duration_cast<chrono::microseconds>( t3 - t2 ).count();
+        auto duration3 = chrono::duration_cast<chrono::microseconds>( t4 - t3 ).count();
         stl_time += duration1;
         c_time += duration2;
+        c_red_time += duration3;
+        free(minimizer1);
+        free(minimizer2);
     }
+
     //stl_time /= 1000;
     //c_time /= 1000;
-    printf("STL time: %lu\n", stl_time);
-    printf("C   time: %lu\n", c_time);
-    */
+    printf("STL  time: %llu\n", stl_time);
+    printf("C    time: %llu\n", c_time);
+    printf("Cred time: %llu\n", c_red_time);
 
+    /*
     std::unordered_multimap<uint64_t, int> hash_to_index_map_addr;
     minimizer* ordered_minimizers_addr;
     uint32_t ordered_minimizers_addr_l;
@@ -103,6 +114,27 @@ int main(){
     }
 
     printf("%ld", hash_to_index_map_addr.size());
+     */
+
+    free(minimizers);
+    minimizer* minimizer1;
+    minimizer* minimizer2;
+    uint32_t minimizer1_length;
+    uint32_t minimizer2_length;
+
+    find_minimizers3(s.c_str(),(uint16_t) s.length(), w, k, &minimizer1, s.length() - k - w + 2, &minimizer1_length);
+    find_minimizers4(s.c_str(),(uint16_t) s.length(), w, k, &minimizer2, s.length() - k - w + 2, &minimizer2_length);
+    printf("%u, %u\n" ,minimizer1_length, minimizer2_length);
+    for(int i = 0; i < minimizer1_length; i++){
+        minimizer tmp1 = minimizer1[i];
+        minimizer tmp2 = minimizer2[i];
+        bool condition = tmp1.hash == tmp2.hash && tmp1.index == tmp2.index && tmp1.rev == tmp2.rev;
+        printf("(%llu, %d, %s), (%llu, %d, %s) ==> %s\n", tmp1.hash, tmp1.index, tmp1.rev ? "True" : "False", tmp2.hash, tmp2.index, tmp2.rev ? "True" : "False", condition ? "TRUE" : "FALSE");
+
+    }
+
+
+
 }
 
 

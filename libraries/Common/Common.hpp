@@ -64,8 +64,10 @@ void destroy_reverse_complement(char** rev_comp);
 void find_kmers(const char *seq, uint32_t k, char ***kmers, uint32_t kmers_l);
 void destroy_kmers(char*** kmers, uint32_t kmers_l);
 uint64_t minimizer_hash3(const char* seq, uint32_t seq_l);
+uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l);
 uint64_t invertible_minimizer_hash(uint64_t x);
 uint64_t invertible_minimizer_hash_inverse(uint64_t x);
 void find_minimizers3(const char *seq, uint32_t seq_l, uint32_t w, uint32_t k, minimizer** minimizers, uint32_t min_l_pred, uint32_t* min_l_real);
+void find_minimizers4(const char *seq, uint32_t seq_l, uint32_t w, uint32_t k, minimizer** minimizers, uint32_t min_l_pred, uint32_t* min_l_real);
 
 #endif
