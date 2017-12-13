@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include "CustomTypes.h"
+#include <unordered_map>
 
 void LCS(const char *s1, const char *s2, int s1_l, int s2_l);
 
@@ -33,5 +35,10 @@ uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 size_t tuple_hash(std::tuple<int, int, bool> x);
 
 int lis(int *a, int N);
+
+int compare_with_lis(minimizer* seq1_mins_sorted,
+                     int seq1_mins_size,
+                     std::unordered_multimap<uint64_t, int>* seq2_hash_to_index,
+                     minimizer* seq2_mins_sorted);
 
 #endif

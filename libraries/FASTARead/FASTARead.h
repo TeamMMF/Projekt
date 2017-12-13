@@ -37,6 +37,8 @@ public:
     int getThis();
     const char *get_data();
     const char *get_name();
+    int get_data_length();
+
 
 
 };

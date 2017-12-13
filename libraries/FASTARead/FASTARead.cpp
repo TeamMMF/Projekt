@@ -11,3 +11,7 @@ const char* FASTARead::get_name(){
 const char* FASTARead::get_data(){
     return data;
 };
+
+int FASTARead::get_data_length(){
+    return data_length;
+}

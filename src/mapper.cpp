@@ -19,20 +19,20 @@ void show_usage(string arg) {
             SequenceOverlaping_VERSION_MAJOR,
             SequenceOverlaping_VERSION_MINOR
     );
-    fprintf(stdout, "Usage: %s <option(s)> <readfile> <referencefile>\n", arg.c_str());
+    fprintf(stdout, "Usage: %s <option(s)> <readfile>\n", arg.c_str());
     fprintf(stdout, "Available options are:\n");
     fprintf(stdout, "-h, --help\t\t\tshow usage instructions.\n");
     fprintf(stdout, "-w, --window\t\t\tspecify the window size, default is %d\n", WINDOW_DEFAULT);
     fprintf(stdout, "-k, --kmer\t\t\tspecify the k-mer size, default is %d\n", KMER_DEFAULT);
-    fprintf(stdout, "-e, --kmer\t\t\tspecify the epsilon value, default is %d\n", EPSILON_DEFAULT);
+   // fprintf(stdout, "-e, --kmer\t\t\tspecify the epsilon value, default is %d\n", EPSILON_DEFAULT);
 
 }
 
 int main(int argc, char const *argv[]) {
 
-    int k = KMER_DEFAULT;
-    int w = WINDOW_DEFAULT;
-    int eps = EPSILON_DEFAULT;
+    uint32_t k = KMER_DEFAULT;
+    uint32_t w = WINDOW_DEFAULT;
+    uint32_t eps = EPSILON_DEFAULT;
 
     string read_file_path;
     string reference_file_path;
@@ -69,10 +69,8 @@ int main(int argc, char const *argv[]) {
                 }
                 eps = atoi(argv[++i]);
 
-            } else if (i + 2 == argc) {
-                read_file_path = argv[i];
             } else if (i + 1 == argc) {
-                reference_file_path = argv[i];
+                read_file_path = argv[i];
             } else {
                 show_usage(argv[0]);
                 return 1;
@@ -92,19 +90,33 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
 
 
-    //inicijaliziraj polje koje mapira indeks sekvence -> mapa minimizera
-    auto minimizer_hash_to_index = (unordered_multimap<uint64_t, int, function<size_t(uint64_t)>>*)
-                    malloc(sizeof(unordered_multimap<uint64_t, int, function<size_t(uint64_t)>>*)*fasta_reads.size());
+    // polje koje mapira indeks sekvence -> mapa minimizera
+    auto min_hash_to_index = (unordered_multimap<uint64_t, int>*)
+                    malloc(sizeof(unordered_multimap<uint64_t, int>)*fasta_reads.size());
+    // polje koje mapira indeks sekvence -> adresa poredanog polja minimizera
+    auto mins_in_order = (minimizer**) malloc(number_of_reads*sizeof(minimizer**));
+    //polje koje mapira indeks sekvence -> velicina poredanog polja minimizera
+    auto mins_number = (uint32_t*) malloc(number_of_reads*sizeof(uint32_t));
 
-    // napuni polje mapa minimizera tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
+    // napuni inicijalizirana polja tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
+    // i indeksu polja njegovih poredanih minimizera
     for (int i=0; i<number_of_reads; i++){
-        const char* sequence = fasta_reads[i]->get_data();
-        indexSequence(sequence, w, k);
+        process_sequence(fasta_reads[i]->get_data(),
+                         fasta_reads[i]->get_data_length(),
+                         w,
+                         k,
+                         min_hash_to_index+i,
+                         mins_in_order+i,
+                         mins_number+i);
     }
 
     for(int i = 0; i < number_of_reads; i++){
         for (int j = i+1; j < number_of_reads; ++j) {
-            //todo obraditi svaki par sekvenci i ispisati slicnosti
+            int lis_result = compare_with_lis(*(mins_in_order+i),
+                                              mins_number[i],
+                                              min_hash_to_index+j,
+                                              *(mins_in_order+j));
+            //todo odluciti sto cemo dalje
         }
     }
 

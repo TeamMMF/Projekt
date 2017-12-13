@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <climits>
+#include <CustomTypes.h>
 
 
 using namespace std;
@@ -323,10 +324,33 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 }
 
 
-int compare_with_lis(unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>* map_first,
-                     unordered_multimap<uint64_t, hashEntry, function<size_t(uint64_t)>>* map_second){
+
+
+int compare_with_lis(minimizer* seq1_mins_sorted,
+                     int seq1_mins_size,
+                     unordered_multimap<uint64_t, int>* seq2_hash_to_index,
+                     minimizer* seq2_mins_sorted){
+    vector<int> lis_arr;
+
+    for(int i = 0; i < seq1_mins_size; i++){
+        auto range = seq2_hash_to_index->equal_range(seq1_mins_sorted[i].hash);
+        int min_diff = 0;
+        int final = 0;
+        for (auto it = range.first; it != range.second; ++it) {
+            int cur_diff = it->second - seq1_mins_sorted->index;
+            if(seq2_mins_sorted[it->second].rev == seq1_mins_sorted[i].rev
+               && cur_diff < min_diff){
+                final = it->second;
+                min_diff = cur_diff;
+            }
+        }
+        lis_arr.push_back(final);
+    }
+
+    return lis(&lis_arr[0], lis_arr.size());
 
 }
+
 
 int lis( int* a, int N ) {
   int *best, i, j, max = INT_MIN;

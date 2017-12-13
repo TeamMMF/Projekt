@@ -671,11 +671,11 @@ void process_sequence(const char* sequence,
                       uint32_t k,
                       std::unordered_multimap<uint64_t, int> *hash_to_index_map_addr,
                       minimizer** ordered_minimizers_addr,
-                      uint32_t* ordered_minimizers_addr_l){
+                      uint32_t* ordered_minimizers_l){
 
-    find_minimizers3(sequence, sequence_l, w, k, ordered_minimizers_addr, sequence_l - w - k + 2, ordered_minimizers_addr_l );
+    find_minimizers3(sequence, sequence_l, w, k, ordered_minimizers_addr, sequence_l - w - k + 2, ordered_minimizers_l );
 
-    for(uint32_t i = 0; i < *ordered_minimizers_addr_l; i++){
+    for(uint32_t i = 0; i < *ordered_minimizers_l; i++){
         minimizer tmp = (*ordered_minimizers_addr)[i];
         hash_to_index_map_addr->emplace(tmp.hash, tmp.index);
     }

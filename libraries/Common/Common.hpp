@@ -40,7 +40,7 @@ void process_sequence(const char* sequence,
                       uint32_t k,
                       std::unordered_multimap<uint64_t, int> *hash_to_index_map_addr,
                       minimizer** ordered_minimizers_addr,
-                      uint32_t* ordered_minimizers_addr_l);
+                      uint32_t* ordered_minimizers_l);
 
 const int hash_width = 20;
 
