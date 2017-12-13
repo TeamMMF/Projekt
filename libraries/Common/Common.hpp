@@ -34,11 +34,13 @@ std::unordered_multimap<uint64_t, hashEntry, function<size_t( uint64_t)>> indexS
  * hash_to_index_map_addr - adresa na koju se treba staviti mapa hashMinimizera -> index
  * ordered_minimizers_addr - adresa na koju se treba staviti sortirano polje parova (minimizer_index, minimizer_hash)
  */
-void process_sequence(char* sequence,
-                      int w,
-                      int k,
-                      std::unordered_multimap<uint64_t, int, function<size_t( uint64_t)>> *hash_to_index_map_addr,
-                      minimizer* ordered_minimizers_addr);
+void process_sequence(const char* sequence,
+                      uint32_t sequence_l,
+                      uint32_t w,
+                      uint32_t k,
+                      std::unordered_multimap<uint64_t, int> *hash_to_index_map_addr,
+                      minimizer** ordered_minimizers_addr,
+                      uint32_t* ordered_minimizers_addr_l);
 
 const int hash_width = 20;
 

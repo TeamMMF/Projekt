@@ -9,6 +9,7 @@
 #include <cmath>
 #include <climits>
 #include <cstring>
+#include <CustomTypes.h>
 
 
 using namespace std;
@@ -628,54 +629,6 @@ void find_minimizers3
                 (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(min_positions[j]), min_rev[j]};
             }
 
-            /*
-            for (uint32_t j = 0; j < w; j++) {
-                u = hash_buffer[i + j];
-                v = r_hash_buffer[i + j];
-
-                if (u < v && u == m) {
-                    if (min_position == 0) {
-                        (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
-
-                    } else {
-                        uint32_t n = min_position - 1;
-                        while(n >= 0){
-                            minimizer last = (*minimizers)[min_position - 1];
-                            if(last.hash != m){
-                                (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
-                            }
-                            else if(last.index == (i+j) && !last.index){
-                                break;
-                            }
-                        }
-                        if(last.index != m){
-                            (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), false};
-                        }
-                        else if(last.index != (i + j)){
-                            for(uint16_t n = min_position - 1; n >= 0; n--){
-                                minimizer before = (*minimizers)[n];
-                                if(before.hash != m || (before.index == (i+j))) {
-                                    (*minimizers)[min_position++] = (minimizer) {m, (uint32_t) (i + j), false};
-                                }
-                                else if( before.index == (i+j) && !before.rev){
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                } else if (v < u && v == m) {
-                    if (min_position == 0) {
-                        (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), true};
-                    } else {
-                        minimizer last = (*minimizers)[min_position - 1];
-                        if(last.index != (i + j)){
-                            (*minimizers)[min_position++] = (minimizer) {m, (uint32_t)(i + j), true};
-                        }
-                    }
-                }
-            }
-            */
 
             delete[] min_positions;
             delete[] min_rev;
@@ -712,52 +665,19 @@ void find_minimizers3
     return;
 }
 
+void process_sequence(const char* sequence,
+                      uint32_t sequence_l,
+                      uint32_t w,
+                      uint32_t k,
+                      std::unordered_multimap<uint64_t, int> *hash_to_index_map_addr,
+                      minimizer** ordered_minimizers_addr,
+                      uint32_t* ordered_minimizers_addr_l){
 
+    find_minimizers3(sequence, sequence_l, w, k, ordered_minimizers_addr, sequence_l - w - k + 2, ordered_minimizers_addr_l );
 
-/**
- * Finds all kmers of the given sequence
- * CALL FREE ON RETURNED POINTER
- * CHECK BEFORE CALLING THAT seq_l - k + 1 > 0
- * @param seq
- * @param k
- * @param kmers_l
- * @return
- */
-/*char** find_kmers
-        (const char *seq,
-         uint16_t k,
-         uint16_t kmers_l)
-{
-
-    char** kmers = (char**) malloc(kmers_l* sizeof(char*));
-    for(int i = 0; i < kmers_l; i++){
-        kmers[i] = (char *) malloc(k+1);
-        if(kmers[i] == NULL){
-            exit(1);
-        }
-        strncpy(kmers[i], &seq[i], k);
-        kmers[i][k] = '\0';
+    for(uint32_t i = 0; i < *ordered_minimizers_addr_l; i++){
+        minimizer tmp = (*ordered_minimizers_addr)[i];
+        hash_to_index_map_addr->emplace(tmp.hash, tmp.index);
     }
 
-    return kmers;
-}*/
-
-/*
- * Predati mallocirane kmers!
- * Freeati u pocetnoj funkciji
- * PROVJERA seq_l - k + 1 > 0
- *//*
-void find_kmers(const char *seq, uint16_t k, char **kmers, uint16_t kmers_l)
-{
-
-    for(int i = 0; i < kmers_l; i++){
-        kmers[i] = (char *) malloc(k+1);
-        if(kmers[i] == NULL){
-            exit(1);
-        }
-        strncpy(kmers[i], &seq[i], k);
-        kmers[i][k] = '\0';
-    }
-
-    return;
-}*/
+}
