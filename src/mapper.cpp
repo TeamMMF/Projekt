@@ -7,6 +7,7 @@
 #include "Dynamic.h"
 #include <CustomTypes.h>
 #include <chrono>
+#include <lcskpp.h>
 #include "bioparser/bioparser.hpp"
 
 #define WINDOW_DEFAULT 5
