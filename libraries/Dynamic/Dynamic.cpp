@@ -326,8 +326,6 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 }
 
 
-
-
 int compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
                      unordered_multimap<uint64_t, int> &seq2_hash_to_index,
@@ -338,7 +336,7 @@ int compare_with_lis(minimizer* seq1_mins_sorted,
         auto range = seq2_hash_to_index.equal_range(seq1_mins_sorted[i].hash);
         if(range.first._M_cur == NULL)
             continue;
-        int min_diff = range.first->second - seq1_mins_sorted -> index;
+        int min_diff = INT_MAX;
         int final = range.first->second;
         for (auto it = range.first; it != range.second; ++it) {
             int cur_diff = it->second - seq1_mins_sorted -> index;
@@ -358,6 +356,52 @@ int compare_with_lis(minimizer* seq1_mins_sorted,
         reverse(lis_arr.begin(),lis_arr.end());
 
     return lis(lis_arr);
+
+}
+
+
+
+pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
+                     int seq1_mins_size,
+                     unordered_multimap<uint64_t, int> &seq2_hash_to_index,
+                     minimizer* seq2_mins_sorted){
+    vector<int> lis_arr_same;
+    vector<int> lis_arr_diff;
+
+    for(int i = 0; i < seq1_mins_size; i++){
+        auto range = seq2_hash_to_index.equal_range(seq1_mins_sorted[i].hash);
+        if(range.first._M_cur == NULL)
+            continue;
+        int min_diff_same = INT_MAX;
+        int min_diff_diff = INT_MAX;
+        int final_same = range.first->second;
+        int final_diff = range.first->second;
+        for (auto it = range.first; it != range.second; ++it) {
+            int cur_diff = it->second - seq1_mins_sorted -> index;
+            if(seq2_mins_sorted[it -> second].rev == seq1_mins_sorted[i].rev && cur_diff <= min_diff_same){
+                final_same = it -> second;
+                min_diff_same = cur_diff;
+            }else if (seq2_mins_sorted[it -> second].rev != seq1_mins_sorted[i].rev && cur_diff <= min_diff_diff){
+                final_diff = it -> second;
+                min_diff_diff = cur_diff;
+            }
+        }
+        if(final_same!=-1) {
+            lis_arr_same.push_back(final_same);
+        }
+        if(final_diff!=-1) {
+            lis_arr_diff.push_back(final_diff);
+        }
+    }
+    reverse(lis_arr_diff.begin(),lis_arr_diff.end());
+
+    int lis_same = lis (lis_arr_same);
+    int lis_diff = lis (lis_arr_diff);
+    if(lis_diff > lis_same){
+        return make_pair(lis_diff,'-');
+    }else{
+        return make_pair(lis_same,'+');
+    }
 
 }
 
