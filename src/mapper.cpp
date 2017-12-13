@@ -14,7 +14,9 @@
 
 const char *progress = "-\\|/";
 
-double lis_threshold(int l1, int l2);
+bool lis_threshold(int result,int l1, int l2);
+
+void report_status(const char string[16], int i, long reads);
 
 void show_usage(string arg) {
     fprintf(stdout, "%s Version %d.%d\n",
@@ -65,8 +67,7 @@ int main(int argc, char const *argv[]) {
     // i indeksu polja njegovih poredanih minimizera
     printf("Colecting data [-]");
     for (int i=0; i<number_of_reads; i++){
-        fprintf(stdout,"%c%c%c]",8,8,progress[i%4]);
-        fflush(stdout);
+        report_status("Collecting data",i, number_of_reads);
         unordered_multimap<uint64_t, int> map(fasta_reads[i]->get_data_length());
         process_sequence(fasta_reads[i]->get_data(),
                          fasta_reads[i]->get_data_length(),
@@ -77,18 +78,18 @@ int main(int argc, char const *argv[]) {
                          mins_number+i);
         min_hash_to_index.emplace(i,map);
     }
-    fprintf(stdout,"%c%c%c- Done",8,8,8);
+    fprintf(stdout,"\rCollecting data - Done    ");
     fprintf(stdout,"\nComparing sequences [-]");
     FILE* output = fopen("out.paf","w");
     for(int i = 0; i < number_of_reads; i++){
-        fprintf(stdout,"%c%c%c]",8,8,progress[i%4]);
-        fflush(stdout);
+        report_status("Comparing sequences",i, number_of_reads);
         for (int j = i+1; j < number_of_reads; ++j) {
             int lis_result = compare_with_lis(mins_in_order[i],
                                               mins_number[i],
                                               min_hash_to_index.find(j)->second,
                                               mins_in_order[j]);
-            if(lis_result < 3){
+            if(!lis_threshold(lis_result,mins_number[i],
+                                          mins_number[j])){
                 continue;
             }
             fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
@@ -102,13 +103,18 @@ int main(int argc, char const *argv[]) {
             );
         }
     }
-    fprintf(stdout,"%c%c%c- Done\n",8,8,8);
+    fprintf(stdout,"\rComparing sequences - Done     \n");
     fprintf(stdout,"Results can be foud in the file %s\n",result_file_path.c_str());
 
     return 0;
 }
 
-double lis_threshold(int l1, int l2) {
-    int smaller = l1<l2 ? l1 : l2;
-    return smaller/2;
+void report_status(const char* operation, int curr, long total) {
+    int ratio = 100*curr/total;
+    fprintf(stdout,"\r%s [%c] %d%c",operation, progress[curr%4],ratio, '%');
+    fflush(stdout);
+}
+
+bool lis_threshold(int result, int l1, int l2) {
+    return result > 7;
 }
