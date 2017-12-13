@@ -6,6 +6,7 @@
 #include "FASTARead.h"
 #include "Dynamic.h"
 #include <CustomTypes.h>
+#include <chrono>
 #include "bioparser/bioparser.hpp"
 
 #define WINDOW_DEFAULT 5
@@ -65,6 +66,7 @@ int main(int argc, char const *argv[]) {
 
     // napuni inicijalizirana polja tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
     // i indeksu polja njegovih poredanih minimizera
+    chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     printf("Colecting data [-]");
     for (int i=0; i<number_of_reads; i++){
         report_status("Collecting data",i, number_of_reads);
@@ -104,17 +106,20 @@ int main(int argc, char const *argv[]) {
         }
     }
     fprintf(stdout,"\rComparing sequences - Done     \n");
-    fprintf(stdout,"Results can be foud in the file %s\n",result_file_path.c_str());
+    chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
+    long duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
+    fprintf(stdout,"Completed in %ld seconds, results can be foud in the file %s.\n",duration,result_file_path.c_str());
 
     return 0;
 }
 
 void report_status(const char* operation, int curr, long total) {
-    int ratio = 100*curr/total;
-    fprintf(stdout,"\r%s [%c] %d%c",operation, progress[curr%4],ratio, '%');
+    long ratio = 100*curr/total;
+    fprintf(stdout,"\r%s [%c] %ld%c",operation, progress[curr%4],ratio, '%');
     fflush(stdout);
 }
 
 bool lis_threshold(int result, int l1, int l2) {
-    return result > 7;
+    double middle = (l1 + l2)/2.;
+    return result/middle > 0.0027;
 }
