@@ -7,9 +7,10 @@
 #include "Dynamic.h"
 #include <CustomTypes.h>
 #include <chrono>
+#include <lcskpp.h>
 #include "bioparser/bioparser.hpp"
 
-#define WINDOW_DEFAULT 10
+#define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
 
 
@@ -50,12 +51,12 @@ int main(int argc, char const *argv[]) {
         show_usage(argv[0]);
         return 1;
     }
-    fprintf(stdout,"Reading file\n");
     // čita datoteku i sprema svako očitanje u poseban objekt razreda FASTARead
     vector<unique_ptr<FASTARead>> fasta_reads;
     auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
     fasta_reader1->read_objects(fasta_reads, static_cast<uint64_t>(-1));
     long number_of_reads = fasta_reads.size();
+    fprintf(stdout,"Reading file - Done\n");
 
     // polje koje mapira indeks sekvence -> mapa minimizera;
     unordered_map<int,unordered_multimap<uint64_t, int>> min_hash_to_index(number_of_reads);
@@ -86,10 +87,38 @@ int main(int argc, char const *argv[]) {
     for(int i = 0; i < number_of_reads; i++){
         report_status("Comparing sequences",i, number_of_reads);
         for (int j = i+1; j < number_of_reads; ++j) {
-            int lis_same_strand = compare_with_lis(mins_in_order[i],
+            pair<int,char> lis_result = compare_with_lis(mins_in_order[i],
                                               mins_number[i],
                                               min_hash_to_index.find(j)->second,
-                                              mins_in_order[j],true);
+                                              mins_in_order[j]);
+            if(!lis_threshold(lis_result.first,mins_number[i],
+                                          mins_number[j])){
+                continue;
+            }
+            fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+                    fasta_reads[i] -> get_name(),
+                    fasta_reads[i] -> get_data_length(),
+                    0,
+                    0,
+                    lis_result.second,
+                    fasta_reads[j] -> get_name(),
+                    fasta_reads[j] ->get_data_length()
+            );
+        }
+    }
+    fprintf(stdout,"\rComparing sequences - Done     \n");
+
+/* ZOVI ME MATE PAULINOVIC
+
+    fprintf(stdout,"\nComparing sequences naive [-]");
+    FILE* output_n = fopen("out_naive.paf","w");
+    for(int i = 0; i < number_of_reads; i++){
+        report_status("Comparing sequences naive",i, number_of_reads);
+        for (int j = i+1; j < number_of_reads; ++j) {
+            int lis_same_strand = compare_with_lis(mins_in_order[i],
+                                                   mins_number[i],
+                                                   min_hash_to_index.find(j)->second,
+                                                   mins_in_order[j],true);
             int lis_diff_strand = compare_with_lis(mins_in_order[i],
                                                    mins_number[i],
                                                    min_hash_to_index.find(j)->second,
@@ -104,10 +133,10 @@ int main(int argc, char const *argv[]) {
                 strand = '+';
             }
             if(!lis_threshold(lis_final,mins_number[i],
-                                          mins_number[j])){
+                              mins_number[j])){
                 continue;
             }
-            fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+            fprintf(output_n, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                     fasta_reads[i] -> get_name(),
                     fasta_reads[i] -> get_data_length(),
                     0,
@@ -118,7 +147,9 @@ int main(int argc, char const *argv[]) {
             );
         }
     }
-    fprintf(stdout,"\rComparing sequences - Done     \n");
+    fprintf(stdout,"\rComparing sequences - Done     \n");*/
+
+
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     long duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
     fprintf(stdout,"Completed in %ld seconds, results can be foud in the file %s.\n",duration,result_file_path.c_str());
@@ -133,5 +164,5 @@ void report_status(const char* operation, int curr, long total) {
 }
 
 bool lis_threshold(int result, int l1, int l2) {
-    return result > 4;
+    return result > 9;
 }
