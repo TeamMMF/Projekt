@@ -28,17 +28,19 @@ public:
 
         this->name = (char *) malloc((name_length + 1) * sizeof(char));
         strncpy(this->name, name, name_length);
-        this->data_length = data_length;
+        this->name[name_length] = '\0';
 
+        this->data_length = data_length;
         this->data = (char *) malloc((data_length + 1) * sizeof(char));
         strncpy(this->data, data, data_length);
+        this->data[data_length] = '\0';
     }
 
-    int getThis();
     const char *get_data();
-    const char *get_name();
-    int get_data_length();
 
+    const char *get_name();
+
+    uint32_t get_data_length();
 
 
 };

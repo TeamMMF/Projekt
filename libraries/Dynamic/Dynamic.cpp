@@ -328,27 +328,71 @@ uint64_t max_between_indexes(vector<uint64_t> array, int start, int end){ // bot
 
 int compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
-                     unordered_multimap<uint64_t, int>* seq2_hash_to_index,
+                     unordered_multimap<uint64_t, int> &seq2_hash_to_index,
                      minimizer* seq2_mins_sorted){
     vector<int> lis_arr;
 
     for(int i = 0; i < seq1_mins_size; i++){
-        auto range = seq2_hash_to_index->equal_range(seq1_mins_sorted[i].hash);
-        int min_diff = 0;
-        int final = 0;
+        auto range = seq2_hash_to_index.equal_range(seq1_mins_sorted[i].hash);
+        if(range.first._M_cur == NULL)
+            continue;
+        int min_diff = range.first->second - seq1_mins_sorted -> index;
+        int final = range.first->second;
         for (auto it = range.first; it != range.second; ++it) {
-            int cur_diff = it->second - seq1_mins_sorted->index;
-            if(seq2_mins_sorted[it->second].rev == seq1_mins_sorted[i].rev
-               && cur_diff < min_diff){
-                final = it->second;
+            int cur_diff = it->second - seq1_mins_sorted -> index;
+            if(/*seq2_mins_sorted[it -> second].rev == seq1_mins_sorted[i].rev
+               && */cur_diff < min_diff){
+                final = it -> second;
                 min_diff = cur_diff;
             }
         }
-        lis_arr.push_back(final);
+        if(final!=-1) {
+            lis_arr.push_back(final);
+        }
     }
 
-    return lis(&lis_arr[0], lis_arr.size());
+    return lis_2(lis_arr);
 
+}
+
+
+// Binary search (note boundaries in the caller)
+int cell_index(std::vector<int> &v, int l, int r, int key) {
+    while (r-l > 1) {
+        int m = l + (r-l)/2;
+        if (v[m] >= key)
+            r = m;
+        else
+            l = m;
+    }
+
+    return r;
+}
+
+int lis_2(std::vector<int> &v) {
+    int v_size = v.size();
+    if (v_size == 0)
+        return 0;
+
+    std::vector<int> tail(v_size, 0);
+    int length = 1; // always points empty slot in tail
+
+    tail[0] = v[0];
+    for (size_t i = 1; i < v_size; i++) {
+        if (v[i] < tail[0])
+            // new smallest value
+            tail[0] = v[i];
+        else if (v[i] > tail[length-1])
+            // v[i] extends largest subsequence
+            tail[length++] = v[i];
+        else
+            // v[i] will become end candidate of an existing subsequence or
+            // Throw away larger elements in all LIS, to make room for upcoming grater elements than v[i]
+            // (and also, v[i] would have already appeared in one of LIS, identify the location and replace it)
+            tail[cell_index(tail, -1, length-1, v[i])] = v[i];
+    }
+
+    return length;
 }
 
 

@@ -12,6 +12,6 @@ const char* FASTARead::get_data(){
     return data;
 };
 
-int FASTARead::get_data_length(){
+uint32_t FASTARead::get_data_length(){
     return data_length;
 }

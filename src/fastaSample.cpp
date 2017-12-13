@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <unordered_map>
+#include <cstdint>
 
 #include "FASTASampleClass.cpp"
 #include "bioparser/bioparser.hpp"
@@ -24,6 +26,7 @@ int main(int argc, char const *argv[])
 	for (auto &fasta_object : fasta_objects) {
 		cout << (*fasta_object).get_description() << endl << endl;
 	}
+	cout << sizeof(unordered_multimap<uint64_t, int>*)<<endl;
 
 	return 0;
 }

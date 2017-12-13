@@ -82,7 +82,7 @@ int main(){
     minimizer* ordered_minimizers_addr;
     uint32_t ordered_minimizers_addr_l;
 
-    process_sequence(s.c_str(), s.length(), w, k, &hash_to_index_map_addr, &ordered_minimizers_addr, &ordered_minimizers_addr_l);
+    process_sequence(s.c_str(), s.length(), w, k, hash_to_index_map_addr, &ordered_minimizers_addr, &ordered_minimizers_addr_l);
 
     printf("PROCESS SEQUENCE: \n");
     for(int i = 0; i < ordered_minimizers_addr_l; i++){

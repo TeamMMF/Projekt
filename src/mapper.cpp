@@ -5,13 +5,16 @@
 #include "Common.hpp"
 #include "FASTARead.h"
 #include "Dynamic.h"
-#include <iostream>
+#include <CustomTypes.h>
 #include "bioparser/bioparser.hpp"
 
 #define WINDOW_DEFAULT 5
-#define KMER_DEFAULT 3
-#define EPSILON_DEFAULT 1
+#define KMER_DEFAULT 15
 
+
+const char *progress = "-\\|/";
+
+double lis_threshold(int l1, int l2);
 
 void show_usage(string arg) {
     fprintf(stdout, "%s Version %d.%d\n",
@@ -19,12 +22,9 @@ void show_usage(string arg) {
             SequenceOverlaping_VERSION_MAJOR,
             SequenceOverlaping_VERSION_MINOR
     );
-    fprintf(stdout, "Usage: %s <option(s)> <readfile>\n", arg.c_str());
+    fprintf(stdout, "Usage: %s <option(s)> <readfile> <resultsfile>\n", arg.c_str());
     fprintf(stdout, "Available options are:\n");
     fprintf(stdout, "-h, --help\t\t\tshow usage instructions.\n");
-    fprintf(stdout, "-w, --window\t\t\tspecify the window size, default is %d\n", WINDOW_DEFAULT);
-    fprintf(stdout, "-k, --kmer\t\t\tspecify the k-mer size, default is %d\n", KMER_DEFAULT);
-   // fprintf(stdout, "-e, --kmer\t\t\tspecify the epsilon value, default is %d\n", EPSILON_DEFAULT);
 
 }
 
@@ -32,93 +32,83 @@ int main(int argc, char const *argv[]) {
 
     uint32_t k = KMER_DEFAULT;
     uint32_t w = WINDOW_DEFAULT;
-    uint32_t eps = EPSILON_DEFAULT;
 
     string read_file_path;
-    string reference_file_path;
+    string result_file_path;
 
-    if (argc < 2) {
+    if (argc < 3) {
         show_usage(argv[0]);
         return 1;
     }
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if ((arg == "-h") || (arg == "--help")) {
-            show_usage(argv[0]);
-            return 0;
-        } else {
-
-            if ((arg == "-w") || (arg == "--window")) {
-                if (i + 1 >= argc) {
-                    std::cerr << "option --window takes one argument." << std::endl;
-                    return 1;
-                }
-                w = atoi(argv[++i]);
-
-            } else if ((arg == "-k") || (arg == "--kmer")) {
-                if (i + 1 >= argc) {
-                    std::cerr << "option --kmer takes one argument." << std::endl;
-                    return 1;
-                }
-                k = atoi(argv[++i]);
-
-            } else if ((arg == "-e") || (arg == "--epsilon")) {
-                if (i + 1 >= argc) {
-                    std::cerr << "option --epsilon takes one argument." << std::endl;
-                    return 1;
-                }
-                eps = atoi(argv[++i]);
-
-            } else if (i + 1 == argc) {
-                read_file_path = argv[i];
-            } else {
-                show_usage(argv[0]);
-                return 1;
-            }
-        }
-    }
+    read_file_path = argv[1];
+    result_file_path = argv[2];
 
     if (read_file_path.empty()) {
         show_usage(argv[0]);
         return 1;
     }
-
+    fprintf(stdout,"Reading file\n");
     // čita datoteku i sprema svako očitanje u poseban objekt razreda FASTARead
     vector<unique_ptr<FASTARead>> fasta_reads;
     auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
     fasta_reader1->read_objects(fasta_reads, static_cast<uint64_t>(-1));
     long number_of_reads = fasta_reads.size();
 
-
-    // polje koje mapira indeks sekvence -> mapa minimizera
-    auto min_hash_to_index = (unordered_multimap<uint64_t, int>*)
-                    malloc(sizeof(unordered_multimap<uint64_t, int>)*fasta_reads.size());
+    // polje koje mapira indeks sekvence -> mapa minimizera;
+    unordered_map<int,unordered_multimap<uint64_t, int>> min_hash_to_index(number_of_reads);
     // polje koje mapira indeks sekvence -> adresa poredanog polja minimizera
-    auto mins_in_order = (minimizer**) malloc(number_of_reads*sizeof(minimizer**));
+    auto mins_in_order = (minimizer**) malloc(number_of_reads*sizeof(minimizer*));
     //polje koje mapira indeks sekvence -> velicina poredanog polja minimizera
     auto mins_number = (uint32_t*) malloc(number_of_reads*sizeof(uint32_t));
 
     // napuni inicijalizirana polja tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
     // i indeksu polja njegovih poredanih minimizera
+    printf("Colecting data [-]");
     for (int i=0; i<number_of_reads; i++){
+        fprintf(stdout,"%c%c%c]",8,8,progress[i%4]);
+        fflush(stdout);
+        unordered_multimap<uint64_t, int> map(fasta_reads[i]->get_data_length());
         process_sequence(fasta_reads[i]->get_data(),
                          fasta_reads[i]->get_data_length(),
                          w,
                          k,
-                         min_hash_to_index+i,
+                         map,
                          mins_in_order+i,
                          mins_number+i);
+        min_hash_to_index.emplace(i,map);
     }
-
+    fprintf(stdout,"%c%c%c- Done",8,8,8);
+    fprintf(stdout,"\nComparing sequences [-]");
+    FILE* output = fopen("out.paf","w");
     for(int i = 0; i < number_of_reads; i++){
+        fprintf(stdout,"%c%c%c]",8,8,progress[i%4]);
+        fflush(stdout);
         for (int j = i+1; j < number_of_reads; ++j) {
-            int lis_result = compare_with_lis(*(mins_in_order+i),
+            int lis_result = compare_with_lis(mins_in_order[i],
                                               mins_number[i],
-                                              min_hash_to_index+j,
-                                              *(mins_in_order+j));
-            //todo odluciti sto cemo dalje
+                                              min_hash_to_index.find(j)->second,
+                                              mins_in_order[j]);
+            if(lis_result < 3){
+                continue;
+            }
+            fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+                    fasta_reads[i] -> get_name(),
+                    fasta_reads[i] -> get_data_length(),
+                    0,
+                    0,
+                    '+',
+                    fasta_reads[j] -> get_name(),
+                    fasta_reads[j] ->get_data_length()
+            );
         }
     }
+    fprintf(stdout,"%c%c%c- Done\n",8,8,8);
+    fprintf(stdout,"Results can be foud in the file %s\n",result_file_path.c_str());
 
     return 0;
+}
+
+double lis_threshold(int l1, int l2) {
+    int smaller = l1<l2 ? l1 : l2;
+    return smaller/2;
 }

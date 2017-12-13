@@ -669,7 +669,7 @@ void process_sequence(const char* sequence,
                       uint32_t sequence_l,
                       uint32_t w,
                       uint32_t k,
-                      std::unordered_multimap<uint64_t, int> *hash_to_index_map_addr,
+                      std::unordered_multimap<uint64_t, int> &hash_to_index_map,
                       minimizer** ordered_minimizers_addr,
                       uint32_t* ordered_minimizers_l){
 
@@ -677,7 +677,7 @@ void process_sequence(const char* sequence,
 
     for(uint32_t i = 0; i < *ordered_minimizers_l; i++){
         minimizer tmp = (*ordered_minimizers_addr)[i];
-        hash_to_index_map_addr->emplace(tmp.hash, tmp.index);
+        hash_to_index_map.emplace(tmp.hash, tmp.index);
     }
 
 }
