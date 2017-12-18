@@ -45,9 +45,9 @@ void process_sequence(const char* sequence,
 const int hash_width = 20;
 
 const int offset_width = 6;
-typedef tuple<uint64_t, tuple<string, int, int>> hashMinPair;
+typedef tuple<uint64_t, tuple<string, int, int>> hashMinPair3;
 
-std::vector<hashMinPair> indexTable(vector<string> sequences, int w, int k);
+std::vector<hashMinPair3> indexTable(vector<string> sequences, int w, int k);
 
 typedef tuple<string, int, int, int> minimizer_hit;
 
@@ -69,5 +69,22 @@ uint64_t invertible_minimizer_hash(uint64_t x);
 uint64_t invertible_minimizer_hash_inverse(uint64_t x);
 void find_minimizers3(const char *seq, uint32_t seq_l, uint32_t w, uint32_t k, minimizer** minimizers, uint32_t min_l_pred, uint32_t* min_l_real);
 void find_minimizers4(const char *seq, uint32_t seq_l, uint32_t w, uint32_t k, minimizer** minimizers, uint32_t min_l_pred, uint32_t* min_l_real);
-
+void find_minimizers5
+        (const char *seq,
+         uint32_t seq_l,
+         uint32_t seq_id,
+         uint32_t w,
+         uint32_t k,
+         std::vector<uint64_t >* minimizers,
+         std::vector<hashMinPair>* minimizer_hits
+        );
+void process_sequence2(const char* sequence,
+                       uint32_t sequence_l,
+                       uint32_t sequence_id,
+                       uint32_t w,
+                       uint32_t k,
+                       std::vector<std::vector<uint64_t >>* ordered_minimizers_addr,
+                       std::vector<hashMinPair>* minimizer_hits);
+bool hashMinPair_comparator(hashMinPair a, hashMinPair b);
+void fill_lookup_table(std::vector<hashMinPair>* v, unordered_map<uint64_t, uint64_t>* lookup_table);
 #endif

@@ -29,8 +29,16 @@ typedef struct {
 
 typedef struct {
     uint64_t hash;
-    char* seq_id;
-    uint16_t index;
+    uint32_t seq_id;
+    uint32_t index;
+    bool rev;
+} hashMinPair;
+
+typedef struct {
+    uint64_t hash;
+    const char* seq_id;
+    uint32_t seq_id_length;
+    uint32_t index;
     bool rev;
 } hashMinPair2;
 

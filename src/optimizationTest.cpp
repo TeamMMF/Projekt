@@ -133,6 +133,9 @@ int main(){
 
     }
 
+    free(minimizer1);
+    free(minimizer2);
+
 
 
 }

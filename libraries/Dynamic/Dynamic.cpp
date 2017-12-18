@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <cstring>
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 #include <climits>
 #include <CustomTypes.h>
@@ -365,9 +366,11 @@ pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
                      unordered_multimap<uint64_t, int> &seq2_hash_to_index,
                      minimizer* seq2_mins_sorted){
+
     vector<int> lis_arr_same;
     vector<int> lis_arr_diff;
 
+    //fprintf(stdout, "SEDMI SPRAT\n");
     for(int i = 0; i < seq1_mins_size; i++){
 
         auto range = seq2_hash_to_index.equal_range(seq1_mins_sorted[i].hash);
@@ -380,7 +383,7 @@ pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
         int final_diff =range.first->second;
 
         for (auto it = range.first; it != range.second; ++it) {
-            int cur_diff = abs(it->second - seq1_mins_sorted[i].index);
+            int cur_diff = (int) abs(it->second - seq1_mins_sorted[i].index);
 
             if(seq2_mins_sorted[it -> second].rev == seq1_mins_sorted[i].rev && cur_diff < min_diff_same){
                 final_same = it -> second;
