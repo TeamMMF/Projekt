@@ -34,7 +34,12 @@ public:
     std::string get_description();
     std::string get_data();
     std::string get_name();
+    uint32_t get_name_length();
 
+};
+
+uint32_t  FastaSampleClass:get_name_length(){
+    return name_legth;
 };
 
 std::string FASTASampleClass::get_name() {

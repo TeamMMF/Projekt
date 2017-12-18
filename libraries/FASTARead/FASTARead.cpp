@@ -15,3 +15,7 @@ const char* FASTARead::get_data(){
 uint32_t FASTARead::get_data_length(){
     return data_length;
 }
+
+uint32_t FASTARead::get_name_length() {
+    return name_length;
+}

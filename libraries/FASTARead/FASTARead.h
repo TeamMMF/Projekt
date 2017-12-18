@@ -42,6 +42,7 @@ public:
 
     uint32_t get_data_length();
 
+    uint32_t get_name_length();
 
 };
 
