@@ -34,8 +34,17 @@ int main(){
 
     destroy_reverse_complement(&rev_comp);
 
-    printf("%llu\n", minimizer_hash(s));
-    printf("%llu\n", minimizer_hash3(s.c_str(), s.length()));
+
+//******************************************************************************************
+
+    // NE ZNAM ZAŠTO RADIŠ OVO, BUT PLS NE MIJENJAJ FORMATE ISPISA VIŠE
+
+
+//******************************************************************************************
+
+
+    printf("%lu\n", minimizer_hash(s));
+    printf("%lu\n", minimizer_hash3(s.c_str(), s.length()));
 
     uint16_t w = 5;
     minimizer *minimizers;
@@ -51,10 +60,10 @@ int main(){
     char k11[] = {'C', 'G', 'G'};
     char k12[] = {'G', 'G', 'T'};
     char k13[] = {'G', 'T', 'T'};
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
-    printf("%22llu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k10, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k11, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k12, k)));
+    printf("%22lu\n", invertible_minimizer_hash(minimizer_hash3(k13, k)));
     printf("\n");
     //for(auto m : minis){
     //    printf("(%ld, %d, %s)\n", get<0>(m), get<1>(m), get<2>(m) != 0 ? "true" : "false");
@@ -87,9 +96,9 @@ int main(){
 
     //stl_time /= 1000;
     //c_time /= 1000;
-    printf("STL  time: %llu\n", stl_time);
-    printf("C    time: %llu\n", c_time);
-    printf("Cred time: %llu\n", c_red_time);
+    printf("STL  time: %lu\n", stl_time);
+    printf("C    time: %lu\n", c_time);
+    printf("Cred time: %lu\n", c_red_time);
 
     /*
     std::unordered_multimap<uint64_t, int> hash_to_index_map_addr;
@@ -132,7 +141,7 @@ int main(){
         minimizer tmp1 = minimizer1[i];
         minimizer tmp2 = minimizer2[i];
         bool condition = tmp1.hash == tmp2.hash && tmp1.index == tmp2.index && tmp1.rev == tmp2.rev;
-        printf("(%llu, %d, %s), (%llu, %d, %s) ==> %s\n", tmp1.hash, tmp1.index, tmp1.rev ? "True" : "False", tmp2.hash, tmp2.index, tmp2.rev ? "True" : "False", condition ? "TRUE" : "FALSE");
+        printf("(%lu, %d, %s), (%lu, %d, %s) ==> %s\n", tmp1.hash, tmp1.index, tmp1.rev ? "True" : "False", tmp2.hash, tmp2.index, tmp2.rev ? "True" : "False", condition ? "TRUE" : "FALSE");
 
     }
 

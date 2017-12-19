@@ -38,8 +38,8 @@ public:
 
 };
 
-uint32_t  FastaSampleClass:get_name_length(){
-    return name_legth;
+uint32_t  FASTASampleClass::get_name_length(){
+    return name_length;
 };
 
 std::string FASTASampleClass::get_name() {
