@@ -20,7 +20,6 @@ const char *progress = "-\\|/";
 
 bool lis_threshold(int result,int l1, int l2);
 
-void report_status(const char string[16], int i, long reads);
 
 void show_usage(string arg) {
     fprintf(stdout, "%s Version %d.%d\n",
@@ -71,7 +70,7 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
     printf("Reading file - Done\n");
 
-    unordered_map<uint64_t, vector<hashMinPair2>> lookup_map(1000); // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
+    unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
     std::vector<std::vector<uint64_t >> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
 
 
@@ -80,27 +79,29 @@ int main(int argc, char const *argv[]) {
     for (int i=0; i<number_of_reads; i++){
         report_status("Collecting data",i, number_of_reads);
         process_sequence3(fasta_reads[i]->get_data(),
-                              fasta_reads[i]->get_data_length(),
-                              i,
-                              w,
-                              k,
-                              mins_in_order,
-                              lookup_map
+                          fasta_reads[i]->get_data_length(),
+                          i,
+                          w,
+                          k,
+                          mins_in_order,
+                          lookup_map
         );
     }
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
-    printf("Preparing data for processing.");
+    printf("Preparing data for processing.\n");
+    fflush(stdout);
     chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
-
+    fflush(stdout);
     printf("\nComparing sequences [-]");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
     FILE* output = fopen("out.paf","w");
     for (int i = 0; i < number_of_reads; ++i) {
+        report_status("Comparing sequences",i, number_of_reads);
         vector<pair<int, bool>> result = find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,4);
         for(auto res : result){
             fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",

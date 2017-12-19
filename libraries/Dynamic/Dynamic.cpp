@@ -370,9 +370,9 @@ int compare_with_lis(minimizer* seq1_mins_sorted,
 
 
 pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
-                     int seq1_mins_size,
-                     unordered_multimap<uint64_t, int> &seq2_hash_to_index,
-                     minimizer* seq2_mins_sorted){
+                                int seq1_mins_size,
+                                unordered_multimap<uint64_t, int> &seq2_hash_to_index,
+                                minimizer* seq2_mins_sorted){
 
     vector<int> lis_arr_same;
     vector<int> lis_arr_diff;
@@ -424,9 +424,9 @@ pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
 }
 
 vector<pair<int, bool>> find_overlaps_by_LIS(int  query_id,
-                                                  vector<uint64_t>& minimizer_hashes,
-                                                   unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
-                                                  int lis_threshold){
+                                             vector<uint64_t>& minimizer_hashes,
+                                             unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
+                                             int lis_threshold){
     unordered_map<uint64_t, vector<int>> same_strand;
     unordered_map<uint64_t, vector<int>> different_strand;
 

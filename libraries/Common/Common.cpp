@@ -317,10 +317,10 @@ std::vector<hashMinPair3> indexTable(vector<string> sequences, int w, int k) {
 
 
 vector<mapInfo>  map_minimizers(unordered_multimap<uint64_t, tuple<string, int, int>, function<size_t(uint64_t)>> lookup_table,
-               string query_sequence,
-               int w,
-               int k,
-               int epsilon) {
+                                string query_sequence,
+                                int w,
+                                int k,
+                                int epsilon) {
 
 
     vector<minimizer_hit> hits;
@@ -1009,9 +1009,7 @@ bool hashMinPair_comparator(hashMinPair a, hashMinPair b){
 }
 
 bool hashMinPair2_comparator(hashMinPair2 a, hashMinPair2 b){
-    if(a.index <= b.index) return true;
-    return false;
-
+    return a.index<b.index;
 }
 
 void fill_lookup_table(std::vector<hashMinPair>* v, unordered_map<uint64_t, uint64_t>* lookup_table){
