@@ -229,6 +229,7 @@ int main(int argc, char const *argv[]) {
             printf("USED BYTES SO FAR: %20llu\n",size);
         }
     }
+    /*
     printf("MINIMIZERS FOUND: %llu, TOTAL BYTE USAGE:%llu\n", min_found, size);
     minimizer_hits.shrink_to_fit();
     fprintf(stdout,"\rCollecting data - Done    ");
@@ -237,14 +238,14 @@ int main(int argc, char const *argv[]) {
     unordered_map<uint64_t, uint64_t> lookup_table;
     fill_lookup_table(&minimizer_hits, &lookup_table);
 
-    printf("%d %d", minimizer_hits.size(), lookup_table.size());
-    for(int i = 0; i < 100; i++){
-        printf("%llu -> %llu\n", minimizer_hits[i].hash, lookup_table.find(minimizer_hits[i].hash)->second);
-    }
-    /*for(int i = 0; i < 100; i++){
-        hashMinPair tmp = minimizer_hits[i];
-        fprintf(stdout, "%3d, %20llu, %10u, %10u, %s\n", i, tmp.hash, tmp.seq_id, tmp.index, tmp.rev ? "True" : "False");
-    }*/
+       printf("%d %d", minimizer_hits.size(), lookup_table.size());
+       for(int i = 0; i < 100; i++){
+           printf("%llu -> %llu\n", minimizer_hits[i].hash, lookup_table.find(minimizer_hits[i].hash)->second);
+       }
+      for(int i = 0; i < 100; i++){
+           hashMinPair tmp = minimizer_hits[i];
+           fprintf(stdout, "%3d, %20llu, %10u, %10u, %s\n", i, tmp.hash, tmp.seq_id, tmp.index, tmp.rev ? "True" : "False");
+       }*/
 
 
     return 0;

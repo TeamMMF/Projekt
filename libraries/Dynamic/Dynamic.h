@@ -34,7 +34,7 @@ uint64_t LCS_kpp(std::string s1, std::string s2, int k);
 
 size_t tuple_hash(std::tuple<int, int, bool> x);
 
-int lis(std::vector<int> &v);
+int lis(const std::vector<int> &v);
 
 int compare_with_lis(minimizer* seq1_mins_sorted,
                                      int seq1_mins_size,
@@ -45,5 +45,10 @@ std::pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
                      int seq1_mins_size,
                      std::unordered_multimap<uint64_t, int> &seq2_hash_to_index,
                      minimizer* seq2_mins_sorted);
+
+std::vector<std::pair<uint64_t, bool>> find_overlaps_by_LIS(int  query_id,
+                                                  std::vector<uint64_t>& minimizer_hashes,
+                                                  std::unordered_map<uint64_t, std::vector<hashMinPair2>&>& minimizers_for_hash,
+                                                  int lis_threshold);
 
 #endif

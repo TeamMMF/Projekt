@@ -17,6 +17,13 @@ int lds(vector<int> vector);
 
 using namespace std;
 
+
+typedef struct{
+    uint64_t  seq_id;
+    int index;
+    bool reverse;
+} tir;
+
 void LCS( const char* s1, const char* s2, int s1_l, int s2_l){
     int r = s1_l + 1;
     int c = s2_l + 1;
@@ -416,6 +423,48 @@ pair<int,char> compare_with_lis(minimizer* seq1_mins_sorted,
 
 }
 
+vector<pair<uint64_t, bool>> find_overlaps_by_LIS(int  query_id,
+                                                  vector<uint64_t>& minimizer_hashes,
+                                                   unordered_map<uint64_t, vector<hashMinPair2>&>&  minimizers_for_hash,
+                                                  int lis_threshold){
+    unordered_map<uint64_t, vector<int>> same_strand;
+    unordered_map<uint64_t, vector<int>> different_strand;
+
+    for(auto h : minimizer_hashes){
+        auto matches = minimizers_for_hash.find(h);
+        if(matches == minimizers_for_hash.end())
+            continue;
+        for(auto match : matches->second){
+            if(match.seq_id <= query_id){
+                continue;
+            }
+            if(match.rev){
+                different_strand[match.seq_id].push_back(match.index);
+            }else{
+                same_strand[match.seq_id].push_back(match.index);
+            }
+        }
+    }
+
+    vector<pair<uint64_t, bool>> overlaps;
+    for(auto &entry : same_strand){
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(entry.first,true);
+        }
+    }
+
+    for(auto &entry : different_strand){
+        reverse(entry.second.begin(),entry.second.end());
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(make_pair(entry.first,false));
+        }
+    }
+
+    return overlaps;
+
+
+};
+
 
 // Binary search (note boundaries in the caller)
 int cell_index(std::vector<int> &v, int l, int r, int key) {
@@ -430,7 +479,7 @@ int cell_index(std::vector<int> &v, int l, int r, int key) {
     return r;
 }
 
-int lis(std::vector<int> &v) {
+int lis(const std::vector<int> &v) {
     int v_size = v.size();
     if (v_size == 0)
         return 0;
