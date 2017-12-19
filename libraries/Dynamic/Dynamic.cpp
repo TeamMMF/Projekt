@@ -442,7 +442,9 @@ vector<pair<int, bool>> find_overlaps_by_LIS(int  query_id,
             break;
         }
         for(auto match : matches->second){
-
+            if(match.seq_id <= query_id){
+                continue;
+            }
             if(match.rev ^ curr_rev){
                 different_strand[match.seq_id].push_back(match.index);
             }else{
