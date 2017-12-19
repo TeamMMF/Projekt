@@ -71,8 +71,7 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
     printf("Reading file - Done\n");
 
-    unordered_map<uint64_t, vector<hashMinPair2>&> lookup_map(1000); // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    printf("Max map size %ld",lookup_map.max_size());
+    unordered_map<uint64_t, vector<hashMinPair2>> lookup_map(1000); // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
     std::vector<std::vector<uint64_t >> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
 
 
@@ -80,7 +79,7 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     for (int i=0; i<number_of_reads; i++){
         report_status("Collecting data",i, number_of_reads);
-        process_sequence(fasta_reads[i]->get_data(),
+        process_sequence3(fasta_reads[i]->get_data(),
                               fasta_reads[i]->get_data_length(),
                               i,
                               w,
@@ -100,12 +99,24 @@ int main(int argc, char const *argv[]) {
 
     printf("\nComparing sequences [-]");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
+    FILE* output = fopen("out.paf","w");
     for (int i = 0; i < number_of_reads; ++i) {
-        find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,4);
+        vector<pair<int, bool>> result = find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,4);
+        for(auto res : result){
+            fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+                    fasta_reads[i] -> get_name(),
+                    fasta_reads[i] -> get_data_length(),
+                    0,
+                    0,
+                    res.second ? '+' : '-',
+                    fasta_reads[res.first] -> get_name(),
+                    fasta_reads[res.first] ->get_data_length()
+            );
+        }
     }
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
     printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
-    printf("Total execution time: %ld seconds", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
+    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
 
     return 0;
 }

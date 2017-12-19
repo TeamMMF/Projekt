@@ -1008,6 +1008,12 @@ bool hashMinPair_comparator(hashMinPair a, hashMinPair b){
     if(b.index < a.index) return true;
 }
 
+bool hashMinPair2_comparator(hashMinPair2 a, hashMinPair2 b){
+    if(a.index <= b.index) return true;
+    return false;
+
+}
+
 void fill_lookup_table(std::vector<hashMinPair>* v, unordered_map<uint64_t, uint64_t>* lookup_table){
     uint64_t last = 0;
     for(uint32_t i = 0, len = v->size(); i < len; i++){
@@ -1184,4 +1190,12 @@ void process_sequence3(const char* sequence,
     find_minimizers6(sequence, sequence_l, sequence_id, w, k, mins, minimizer_hits);
     mins.shrink_to_fit();
     ordered_minimizers_addr.emplace_back(mins);
+}
+
+void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
+    auto it = minimizer_hits.begin();
+    while (it != minimizer_hits.end()) {
+        sort(it->second.begin(), it->second.end(), hashMinPair2_comparator);
+        it++;
+    }
 }

@@ -104,4 +104,7 @@ void find_minimizers6
          std::vector<uint64_t >& minimizers,
          std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits
         );
+
+void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
+
 #endif
