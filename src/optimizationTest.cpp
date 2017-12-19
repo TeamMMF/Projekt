@@ -6,13 +6,16 @@
 #include <tuple>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 #include <CustomTypes.h>
 #include "Common.hpp"
 
 using namespace std;
 
 int main(){
+    /*
     std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
+
     uint8_t k = 3;
     char** kmers;
     find_kmers(s.c_str(), 3, &kmers, s.length() - k + 1);
@@ -124,7 +127,7 @@ int main(){
 
     printf("%ld", hash_to_index_map_addr.size());
      */
-
+    /*
     free(minimizers);
     minimizer* minimizer1;
     minimizer* minimizer2;
@@ -144,9 +147,31 @@ int main(){
 
     free(minimizer1);
     free(minimizer2);
+    */
+
+    string s1 = "GAGATCTGA";
+    string s2 = "CAGAACTGT";
+    string s3 = "GAGTTCAGA";
+    std::vector<vector<uint64_t>> minimizers(3);
+    std::vector<hashMinPair> minimizer_pairs;
+
+    find_minimizers5(s1.c_str(), s1.length(), 0, 2 ,3, &(minimizers[0]), &minimizer_pairs);
+    find_minimizers5(s2.c_str(), s2.length(), 1, 2 ,3, &(minimizers[1]), &minimizer_pairs);
+    find_minimizers5(s3.c_str(), s3.length(), 2, 2 ,3, &(minimizers[2]), &minimizer_pairs);
 
 
+        for(int j = 0; j < minimizer_pairs.size(); j++){
+            printf("%llu, %u, %u, %s\n", minimizer_pairs[j].hash, minimizer_pairs[j].seq_id, minimizer_pairs[j].index, minimizer_pairs[j].rev ? "True" : "False");
+        }
 
+    sort(minimizer_pairs.begin(), minimizer_pairs.end(), hashMinPair_comparator);
+    printf("\n");
+    for(int j = 0; j < minimizer_pairs.size(); j++){
+        printf("%llu, %u, %u, %s\n", minimizer_pairs[j].hash, minimizer_pairs[j].seq_id, minimizer_pairs[j].index, minimizer_pairs[j].rev ? "True" : "False");
+    }
+
+    printf("%d", sizeof(std::tuple<uint64_t,uint32_t ,uint32_t, bool>));
+    return 0;
 }
 
 
