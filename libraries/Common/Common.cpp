@@ -1332,7 +1332,7 @@ void process_sequence4(const char* sequence,
     std::vector<minimizer> mins(sequence_l - w - k + 2);
     find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
-    ordered_minimizers_addr.emplace_back(mins);
+    ordered_minimizers_addr[sequence_id] = mins;
 }
 
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>> map){
