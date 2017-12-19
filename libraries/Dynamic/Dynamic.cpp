@@ -434,11 +434,16 @@ vector<pair<int, bool>> find_overlaps_by_LIS(int  query_id,
         auto matches = minimizers_for_hash.find(h);
         if(matches == minimizers_for_hash.end())
             continue;
+        bool curr_rev;
         for(auto match : matches->second){
-            if(match.seq_id <= query_id){
-                continue;
+            if(match.seq_id == query_id){
+                curr_rev = match.rev;
             }
-            if(match.rev){
+            break;
+        }
+        for(auto match : matches->second){
+
+            if(match.rev ^ curr_rev){
                 different_strand[match.seq_id].push_back(match.index);
             }else{
                 same_strand[match.seq_id].push_back(match.index);

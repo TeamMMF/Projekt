@@ -102,7 +102,7 @@ int main(int argc, char const *argv[]) {
     FILE* output = fopen("out.paf","w");
     for (int i = 0; i < number_of_reads; ++i) {
         report_status("Comparing sequences",i, number_of_reads);
-        vector<pair<int, bool>> result = find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,4);
+        vector<pair<int, bool>> result = find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,6);
         for(auto res : result){
             fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                     fasta_reads[i] -> get_name(),
@@ -111,7 +111,7 @@ int main(int argc, char const *argv[]) {
                     0,
                     res.second ? '+' : '-',
                     fasta_reads[res.first] -> get_name(),
-                    fasta_reads[res.first] ->get_data_length()
+                    fasta_reads[res.first] -> get_data_length()
             );
         }
     }
