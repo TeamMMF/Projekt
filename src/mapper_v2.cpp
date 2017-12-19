@@ -131,13 +131,13 @@ int main(int argc, char const *argv[]) {
     for (int i = 0; i < number_of_reads; ++i) {
         report_status("Comparing sequences",i, number_of_reads);
         thread_futures.emplace_back(thread_pool->submit_task(
-                lis_overlap_parallelization(
+                lis_overlap_parallelization,
                         i,
-                        mins_in_order[i],
-                        lookup_map,
+                        std::ref(mins_in_order[i]),
+                        std::ref(lookup_map),
                         6,
-                        fasta_reads,
-                        output)));
+                        std::ref(fasta_reads),
+                        output));
     }
 
     for (auto& it: thread_futures) {
