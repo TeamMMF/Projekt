@@ -468,8 +468,6 @@ vector<pair<int, bool>> find_overlaps_by_LIS(int  query_id,
     }
 
     return overlaps;
-
-
 };
 
 
