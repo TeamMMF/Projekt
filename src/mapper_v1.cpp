@@ -69,6 +69,8 @@ int main(int argc, char const *argv[]) {
     //polje koje mapira indeks sekvence -> velicina poredanog polja minimizera
     auto mins_number = (uint32_t*) malloc(number_of_reads*sizeof(uint32_t));
 
+
+
     // napuni inicijalizirana polja tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
     // i indeksu polja njegovih poredanih minimizera
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();

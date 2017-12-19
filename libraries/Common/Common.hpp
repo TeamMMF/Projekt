@@ -107,4 +107,19 @@ void find_minimizers6
 
 void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
 
+void process_sequence4(const char* sequence,
+                       uint32_t sequence_l,
+                       uint32_t sequence_id,
+                       uint32_t w,
+                       uint32_t k,
+                       std::vector<std::vector<minimizer>>& ordered_minimizers_addr);
+void find_minimizers7
+        (const char *seq,
+         uint32_t seq_l,
+         uint32_t seq_id,
+         uint32_t w,
+         uint32_t k,
+         std::vector<minimizer>& minimizers);
+
+void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>> map);
 #endif
