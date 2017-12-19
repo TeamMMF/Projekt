@@ -144,7 +144,7 @@ target_link_libraries(mapper_v2 Dynamic)
 target_link_libraries(mapper_v2 bioparser)
 target_link_libraries(mapper_v2 lcskpp)
 target_link_libraries(mapper_v2 FASTARead)
-target_link_libraries(mapper_v2 thread_pool)
+target_link_libraries(mapper_v2 thread_pool pthread)
 
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
