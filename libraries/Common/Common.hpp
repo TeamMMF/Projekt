@@ -87,4 +87,21 @@ void process_sequence2(const char* sequence,
                        std::vector<hashMinPair>* minimizer_hits);
 bool hashMinPair_comparator(hashMinPair a, hashMinPair b);
 void fill_lookup_table(std::vector<hashMinPair>* v, unordered_map<uint64_t, uint64_t>* lookup_table);
+
+void process_sequence3(const char* sequence,
+                       uint32_t sequence_l,
+                       uint32_t sequence_id,
+                       uint32_t w,
+                       uint32_t k,
+                       std::vector<std::vector<uint64_t>>& ordered_minimizers_addr,
+                       std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
+void find_minimizers6
+        (const char *seq,
+         uint32_t seq_l,
+         uint32_t seq_id,
+         uint32_t w,
+         uint32_t k,
+         std::vector<uint64_t >& minimizers,
+         std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits
+        );
 #endif

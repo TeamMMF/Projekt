@@ -201,7 +201,7 @@ int main(int argc, char const *argv[]) {
 
 
     std::vector<std::vector<uint64_t >> mins_in_order;
-    vector<hashMinPair> minimizer_hits;
+    std::unordered_map<uint64_t , std::vector<hashMinPair2>> minimizer_hits;
 
     // napuni inicijalizirana polja tako da indeks pojedinog ocitanja (iz fasta_reads) odgovara indeksu njegove mape minimizera
     // i indeksu polja njegovih poredanih minimizera
@@ -215,25 +215,27 @@ int main(int argc, char const *argv[]) {
     for (int i=0; i<number_of_reads; i++){
         //report_status("Collecting data",i, number_of_reads);
 
-        process_sequence2(fasta_reads[i]->get_data(),
+        process_sequence3(fasta_reads[i]->get_data(),
                           fasta_reads[i]->get_data_length(),
                           i,
                           w,
                           k,
-                          &mins_in_order,
-                          &minimizer_hits);
-        //printf("READ %5d, minimizers found:%5d, vector_cap: %5d, seq_l: %5d\n",i, mins_in_order[i].size(), mins_in_order[i].capacity(), fasta_reads[i]->get_data_length());
+                          mins_in_order,
+                          minimizer_hits);
+        printf("READ %5d, minimizers found:%5d, map_size: %5d, seq_l: %5d\n",i, mins_in_order[i].size(), minimizer_hits.size(), fasta_reads[i]->get_data_length());
         size += mins_in_order[i].size() * sizeof(minimizer);
         min_found += mins_in_order[i].size();
-        if(i % 100 == 0){
-            printf("USED BYTES SO FAR: %20llu\n",size);
-        }
+        //if(i % 100 == 0){
+        //    printf("USED BYTES SO FAR: %20llu\n",size);
+        //}
     }
     printf("MINIMIZERS FOUND: %llu, TOTAL BYTE USAGE:%llu\n", min_found, size);
-    minimizer_hits.shrink_to_fit();
     fprintf(stdout,"\rCollecting data - Done    ");
-    sort(minimizer_hits.begin(), minimizer_hits.end(), hashMinPair_comparator);
 
+
+
+    /*sort(minimizer_hits.begin(), minimizer_hits.end(), hashMinPair_comparator);
+     *
     unordered_map<uint64_t, uint64_t> lookup_table;
     fill_lookup_table(&minimizer_hits, &lookup_table);
 
@@ -241,7 +243,7 @@ int main(int argc, char const *argv[]) {
     for(int i = 0; i < 100; i++){
         printf("%llu -> %llu\n", minimizer_hits[i].hash, lookup_table.find(minimizer_hits[i].hash)->second);
     }
-    /*for(int i = 0; i < 100; i++){
+    for(int i = 0; i < 100; i++){
         hashMinPair tmp = minimizer_hits[i];
         fprintf(stdout, "%3d, %20llu, %10u, %10u, %s\n", i, tmp.hash, tmp.seq_id, tmp.index, tmp.rev ? "True" : "False");
     }*/
