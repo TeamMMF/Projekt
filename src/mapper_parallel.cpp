@@ -50,7 +50,7 @@ void lis_overlap_parallelization(int  query_id,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,
-                                 vector<uint64_t> nogos){
+                                 vector<uint64_t>& nogos){
 
     vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,nogos);
     for(auto res : result){

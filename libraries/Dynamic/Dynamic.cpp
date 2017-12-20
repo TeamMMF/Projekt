@@ -511,7 +511,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                       vector<minimizer>& minimizers,
                                                       unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
                                                       int lis_threshold,
-                                                      vector<uint64_t> nogos){
+                                                      vector<uint64_t>& nogos){
     unordered_map<uint64_t, vector<int>> same_strand;
     unordered_map<uint64_t, vector<int>> different_strand;
     for(auto min : minimizers){
