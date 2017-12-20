@@ -1351,3 +1351,48 @@ void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unor
         }
     }
 }
+
+void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map,
+                                       std::vector<uint64_t>& no_gos, double threshold){
+
+    std::unordered_map<uint64_t ,uint32_t> min_occurences(map.size());
+    uint64_t num_of_minimizers = 0;
+
+    for(uint32_t i = 0, len = minimizers.size(); i < len; i++){
+        vector<minimizer> tmp = minimizers[i];
+        num_of_minimizers += tmp.size();
+
+        for(uint32_t j = 0, len2 = tmp.size(); j < len2; j++){
+            minimizer tmp2 = tmp[j];
+            auto it = map.find(tmp2.hash);
+            if (it == map.end()) {
+                std::vector<hashMinPair2> vec;
+                vec.emplace_back((hashMinPair2) {i, tmp2.index, tmp2.rev});
+                map.emplace(tmp2.hash, vec);
+            } else {
+                it->second.emplace_back((hashMinPair2) {i, tmp2.index, tmp2.rev});
+            }
+
+            min_occurences[tmp2.hash]++;
+        }
+    }
+
+    std::vector<std::pair<uint64_t, uint32_t>> min_occur(min_occurences.begin(), min_occurences.end());
+    sort(min_occur.begin(), min_occur.end(), occurences_comparator);
+    double acc = 0;
+    for(int i = 0, len = min_occur.size(); i < len; i++){
+        acc += min_occur[i].second / (double) num_of_minimizers;
+
+        if(acc > threshold){
+            break;
+        }
+
+        no_gos.emplace_back(min_occur[i].first);
+    }
+
+
+}
+
+bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,uint32_t>& b){
+    return a.second > b.second;
+}

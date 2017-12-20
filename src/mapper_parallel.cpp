@@ -117,8 +117,11 @@ int main(int argc, char const *argv[]) {
         report_status("Collecting data",i++, number_of_reads);
         it.wait();
     }
-
-    fill_lookup_table(mins_in_order, lookup_map);
+    //IZMJENE
+    std::vector<uint64_t> nogos;
+    double thresh = 1/16.0;
+    fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
+    //END IZMJENE
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
