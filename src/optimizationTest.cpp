@@ -149,6 +149,9 @@ int main(){
     free(minimizer2);
     */
 
+    printf("%llu\n", invertible_minimizer_hash_inverse(0));
+
+
     string s1 = "GAGATCTGA";
     string s2 = "CAGAACTGT";
     string s3 = "GAGTTCAGA";
