@@ -146,6 +146,14 @@ target_link_libraries(mapper_v2 lcskpp)
 target_link_libraries(mapper_v2 FASTARead)
 target_link_libraries(mapper_v2 thread_pool pthread)
 
+add_executable(mapper_parallel ${SOURCES}/mapper_parallel.cpp)
+target_link_libraries(mapper_parallel Common)
+target_link_libraries(mapper_parallel Dynamic)
+target_link_libraries(mapper_parallel bioparser)
+target_link_libraries(mapper_parallel lcskpp)
+target_link_libraries(mapper_parallel FASTARead)
+target_link_libraries(mapper_parallel thread_pool pthread)
+
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
 
