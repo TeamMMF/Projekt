@@ -60,7 +60,7 @@ std::vector<std::pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                                 std::vector<minimizer>& minimizers,
                                                                 std::unordered_map<uint64_t, std::vector<hashMinPair2>>&  minimizers_for_hash,
                                                                 int lis_threshold,
-                                                                std::vector<uint64_t> nogos);
+                                                                std::vector<uint64_t>& nogos);
 
 
 #endif
