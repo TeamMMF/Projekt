@@ -122,4 +122,9 @@ void find_minimizers7
          std::vector<minimizer>& minimizers);
 
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map);
+
+bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,uint32_t>& b);
+
+void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map,
+                                       std::vector<uint64_t>& no_gos, double threshold);
 #endif

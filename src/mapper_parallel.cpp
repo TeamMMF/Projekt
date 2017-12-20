@@ -49,9 +49,10 @@ void lis_overlap_parallelization(int  query_id,
                                  unordered_map<uint64_t, vector<hashMinPair2>>&  lookup_map,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
-                                 FILE* output){
+                                 FILE* output,
+                                 vector<uint64_t> nogos){
 
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold);
+    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,nogos);
     for(auto res : result){
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                 fasta_reads[query_id] -> get_name(),
@@ -117,13 +118,16 @@ int main(int argc, char const *argv[]) {
         report_status("Collecting data",i++, number_of_reads);
         it.wait();
     }
-
-    fill_lookup_table(mins_in_order, lookup_map);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
-
     printf("Preparing data for processing.\n");
     fflush(stdout);
+    //IZMJENE
+    std::vector<uint64_t> nogos;
+    double thresh = 1/16.0;
+    fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
+    //END IZMJENE
+
     chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
@@ -147,7 +151,8 @@ int main(int argc, char const *argv[]) {
                 std::ref(lookup_map),
                 6,
                 std::ref(fasta_reads),
-                output));
+                output,
+                nogos));
     }
     int j = 0;
     for (auto& it: thread_futures_lis) {
