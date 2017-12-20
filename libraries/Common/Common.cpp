@@ -1191,7 +1191,11 @@ void process_sequence3(const char* sequence,
     ordered_minimizers_addr.emplace_back(mins);
 }
 
-void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
+void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iterator end) {
+    sort(begin, end, hashMinPair2_comparator);
+}
+
+void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
 
     std::shared_ptr<thread_pool::ThreadPool> thread_pool =
@@ -1202,12 +1206,20 @@ void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& mi
     while (it != minimizer_hits.end()) {
         auto a = it-> second.begin();
         thread_futures.emplace_back(thread_pool->submit_task(
-                std::sort, it->second.begin(), it->second.end(), hashMinPair2_comparator));
+                sort_wrap, it->second.begin(), it->second.end()));
         it++;
     }
 
     for (auto &it: thread_futures) {
         it.wait();
+    }
+}
+
+void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
+    auto it = minimizer_hits.begin();
+    while (it != minimizer_hits.end()) {
+        sort(it->second.begin(), it->second.end(),hashMinPair2_comparator);
+        it++;
     }
 }
 

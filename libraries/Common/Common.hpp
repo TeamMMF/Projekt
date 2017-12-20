@@ -120,6 +120,7 @@ void find_minimizers7
          uint32_t w,
          uint32_t k,
          std::vector<minimizer>& minimizers);
+void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
 
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map);
 

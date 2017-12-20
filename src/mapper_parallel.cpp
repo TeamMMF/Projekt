@@ -129,8 +129,7 @@ int main(int argc, char const *argv[]) {
     double thresh = 1/16.0;
     fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
     //END IZMJENE
-
-    sort_by_indices(lookup_map);
+    sort_by_indices_parallel(lookup_map);
     sort(nogos.begin(),nogos.end());
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
@@ -164,7 +163,6 @@ int main(int argc, char const *argv[]) {
 
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
     printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
-    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
-
+    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count())
     return 0;
 }
