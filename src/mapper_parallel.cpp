@@ -130,6 +130,7 @@ int main(int argc, char const *argv[]) {
 
     chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     sort_by_indices(lookup_map);
+    sort(nogos.begin(),nogos.end());
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
     fflush(stdout);
@@ -149,7 +150,7 @@ int main(int argc, char const *argv[]) {
                 i,
                 std::ref(mins_in_order[i]),
                 std::ref(lookup_map),
-                6,
+                4,
                 std::ref(fasta_reads),
                 output,
                 nogos));
