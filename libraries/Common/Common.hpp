@@ -121,5 +121,5 @@ void find_minimizers7
          uint32_t k,
          std::vector<minimizer>& minimizers);
 
-void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>> map);
+void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map);
 #endif

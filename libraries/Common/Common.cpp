@@ -1329,13 +1329,13 @@ void process_sequence4(const char* sequence,
                        uint32_t k,
                        std::vector<std::vector<minimizer>>& ordered_minimizers_addr){
 
-    std::vector<minimizer> mins(sequence_l - w - k + 2);
+    std::vector<minimizer> mins;
     find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
 }
 
-void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>> map){
+void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map){
     for(uint32_t i = 0, len = minimizers.size(); i < len; i++){
         vector<minimizer> tmp = minimizers[i];
         for(uint32_t j = 0, len2 = tmp.size(); j < len2; j++){

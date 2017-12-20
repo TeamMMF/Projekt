@@ -11,6 +11,7 @@
 #include <lcskpp.h>
 #include "bioparser/bioparser.hpp"
 #include <algorithm>
+#include <include/thread_pool/thread_pool.hpp>
 
 #define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
@@ -43,6 +44,27 @@ bool lis_threshold(int result, int l1, int l2) {
     return result > 9;
 }
 
+void lis_overlap_parallelization(int  query_id,
+                                 vector<minimizer>& minimizer_hashes,
+                                 unordered_map<uint64_t, vector<hashMinPair2>>&  lookup_map,
+                                 int lis_threshold,
+                                 vector<unique_ptr<FASTARead>>& fasta_reads,
+                                 FILE* output){
+
+    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold);
+    for(auto res : result){
+        fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+                fasta_reads[query_id] -> get_name(),
+                fasta_reads[query_id] -> get_data_length(),
+                0,
+                0,
+                res.second ? '+' : '-',
+                fasta_reads[res.first] -> get_name(),
+                fasta_reads[res.first] -> get_data_length()
+        );
+    }
+}
+
 // Mislio si izvest veceg Matu Paulinovica... Take a seat Skywalker
 int main(int argc, char const *argv[]) {
 
@@ -71,22 +93,32 @@ int main(int argc, char const *argv[]) {
     printf("Reading file - Done\n");
 
     unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    std::vector<std::vector<uint64_t >> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
+    std::vector<std::vector<minimizer>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
+    // create thread pool
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
+    // create storage for return values of find_overlaps_by_LIS
+    std::vector<std::future<void>> thread_futures_data;
 
     printf("Colecting data [-]");
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     for (int i=0; i<number_of_reads; i++){
-        report_status("Collecting data",i, number_of_reads);
-        process_sequence3(fasta_reads[i]->get_data(),
-                          fasta_reads[i]->get_data_length(),
-                          i,
-                          w,
-                          k,
-                          mins_in_order,
-                          lookup_map
-        );
+        thread_futures_data.emplace_back(thread_pool_data->submit_task(
+                process_sequence4, fasta_reads[i]->get_data(),
+                fasta_reads[i]->get_data_length(),
+                i,
+                w,
+                k,
+                std::ref(mins_in_order)
+        ));
     }
+    int i = 0;
+    for (auto& it: thread_futures_data) {
+        report_status("Collecting data",i++, number_of_reads);
+        it.wait();
+    }
+
+    fill_lookup_table(mins_in_order, lookup_map);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
@@ -98,23 +130,31 @@ int main(int argc, char const *argv[]) {
     printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
     fflush(stdout);
     printf("\nComparing sequences [-]");
+
+    // create thread pool
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis = thread_pool::createThreadPool();
+    // create storage for return values of find_overlaps_by_LIS
+    std::vector<std::future<void>> thread_futures_lis;
+
+
+    FILE* output = fopen(result_file_path.c_str(),"w");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
-    FILE* output = fopen("out.paf","w");
     for (int i = 0; i < number_of_reads; ++i) {
-        report_status("Comparing sequences",i, number_of_reads);
-        vector<pair<int, bool>> result = find_overlaps_by_LIS(i,mins_in_order[i],lookup_map,6);
-        for(auto res : result){
-            fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
-                    fasta_reads[i] -> get_name(),
-                    fasta_reads[i] -> get_data_length(),
-                    0,
-                    0,
-                    res.second ? '+' : '-',
-                    fasta_reads[res.first] -> get_name(),
-                    fasta_reads[res.first] -> get_data_length()
-            );
-        }
+        thread_futures_lis.emplace_back(thread_pool_lis->submit_task(
+                lis_overlap_parallelization,
+                i,
+                std::ref(mins_in_order[i]),
+                std::ref(lookup_map),
+                6,
+                std::ref(fasta_reads),
+                output));
     }
+    int j = 0;
+    for (auto& it: thread_futures_lis) {
+        report_status("Comparing sequences",j++, number_of_reads);
+        it.wait();
+    }
+
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
     printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
     printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
