@@ -104,6 +104,7 @@ int main(int argc, char const *argv[]) {
     printf("Colecting data [-]");
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     for (int i=0; i<number_of_reads; i++){
+            //concurrency?
         thread_futures_data.emplace_back(thread_pool_data->submit_task(
                 process_sequence4, fasta_reads[i]->get_data(),
                 fasta_reads[i]->get_data_length(),

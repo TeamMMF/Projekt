@@ -1,6 +1,7 @@
 
 
 #include "Common.hpp"
+#include "../threadpool/include/thread_pool/thread_pool.hpp"
 #include <tuple>
 #include <algorithm>
 #include <unordered_set>
@@ -1192,9 +1193,21 @@ void process_sequence3(const char* sequence,
 
 void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
+
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool =
+            thread_pool::createThreadPool();
+    std::vector<std::future<void>> thread_futures;
+
+    //sortiranje vektora u mapi i concurrency??
     while (it != minimizer_hits.end()) {
-        sort(it->second.begin(), it->second.end(), hashMinPair2_comparator);
+        auto a = it-> second.begin();
+        thread_futures.emplace_back(thread_pool->submit_task(
+                std::sort, it->second.begin(), it->second.end(), hashMinPair2_comparator));
         it++;
+    }
+
+    for (auto &it: thread_futures) {
+        it.wait();
     }
 }
 
@@ -1352,8 +1365,11 @@ void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unor
     }
 }
 
-void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map,
-                                       std::vector<uint64_t>& no_gos, double threshold){
+void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers,
+                                       std::unordered_map<uint64_t,
+                                               vector<hashMinPair2>>& map,
+                                       std::vector<uint64_t>& no_gos,
+                                       double threshold){
 
     std::unordered_map<uint64_t ,uint32_t> min_occurences(map.size());
     uint64_t num_of_minimizers = 0;
