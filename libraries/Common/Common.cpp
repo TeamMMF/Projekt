@@ -1200,8 +1200,9 @@ void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& mi
 
     //sortiranje vektora u mapi i concurrency??
     while (it != minimizer_hits.end()) {
+        auto a = it-> second.begin();
         thread_futures.emplace_back(thread_pool->submit_task(
-                sort, it->second.begin(), it->second.end(), hashMinPair2_comparator));
+                std::sort, it->second.begin(), it->second.end(), hashMinPair2_comparator));
         it++;
     }
 
