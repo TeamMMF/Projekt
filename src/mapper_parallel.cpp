@@ -125,7 +125,7 @@ int main(int argc, char const *argv[]) {
     //IZMJENE
     chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     std::vector<uint64_t> nogos;
-    double thresh = 1/16.0;
+    double thresh = 1.0;
     fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
     //END IZMJENE
 

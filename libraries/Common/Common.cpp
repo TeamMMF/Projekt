@@ -1383,7 +1383,12 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& mini
     for(int i = 0, len = min_occur.size(); i < len; i++){
         acc += min_occur[i].second / (double) num_of_minimizers;
 
-        if(min_occur[i].second <= 34){
+        /*if(min_occur[i].second <= 34){
+            break;
+        }*/
+
+        if(acc > threshold){
+            printf("ZADNJI JE %d\n", min_occur[i].second);
             break;
         }
         no_gos.emplace_back(min_occur[i].first);
