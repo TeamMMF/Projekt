@@ -45,7 +45,7 @@ bool lis_threshold(int result, int l1, int l2) {
 }
 
 void lis_overlap_parallelization(int  query_id,
-             vector<uint64_t>& minimizer_hashes,
+             vector<minimizer>& minimizer_hashes,
              unordered_map<uint64_t, vector<hashMinPair2>>&  lookup_map,
              int lis_threshold,
              vector<unique_ptr<FASTARead>>& fasta_reads,
@@ -93,22 +93,23 @@ int main(int argc, char const *argv[]) {
     printf("Reading file - Done\n");
 
     unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    std::vector<std::vector<uint64_t>> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
-
+    std::vector<std::vector<minimizer>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
     printf("Colecting data [-]");
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     for (int i=0; i<number_of_reads; i++){
         report_status("Collecting data",i, number_of_reads);
-        process_sequence3(fasta_reads[i]->get_data(),
+
+        process_sequence4(fasta_reads[i]->get_data(),
                           fasta_reads[i]->get_data_length(),
                           i,
                           w,
                           k,
-                          mins_in_order,
-                          lookup_map
+                          mins_in_order
         );
     }
+
+    fill_lookup_table(mins_in_order, lookup_map);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
@@ -125,6 +126,7 @@ int main(int argc, char const *argv[]) {
     std::shared_ptr<thread_pool::ThreadPool> thread_pool = thread_pool::createThreadPool();
     // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<void>> thread_futures;
+
 
     FILE* output = fopen("out.paf","w");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
