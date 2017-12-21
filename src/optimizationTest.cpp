@@ -148,7 +148,7 @@ int main(){
     free(minimizer1);
     free(minimizer2);
     */
-
+/*
     printf("%llu\n", invertible_minimizer_hash_inverse(0));
 
 
@@ -174,6 +174,16 @@ int main(){
     }
 
     printf("%d", sizeof(std::tuple<uint64_t,uint32_t ,uint32_t, bool>));
+    */
+
+    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
+    std::vector<minimizer> first;
+    std::vector<minimizer> second;
+    std::unordered_map<uint64_t, uint32_t> map1;
+    std::unordered_map<uint64_t, hashMinPair2> map2;
+    find_minimizers7(s.c_str(), s.length(), 0, 2, 3, first);
+    find_minimizers_deq(s.c_str(), s.length(), 0, 2, 3, second, map1, map2  );
+    printf("%d -> %d", first.size(), second.size());
     return 0;
 }
 

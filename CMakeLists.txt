@@ -128,6 +128,14 @@ target_link_libraries(mapper_v2 lcskpp)
 target_link_libraries(mapper_v2 FASTARead)
 target_link_libraries(mapper_v2 thread_pool pthread)
 
+add_executable(mapper_v3 ${SOURCES}/mapper_v3.cpp)
+target_link_libraries(mapper_v3 Common)
+target_link_libraries(mapper_v3 Dynamic)
+target_link_libraries(mapper_v3 bioparser)
+target_link_libraries(mapper_v3 lcskpp)
+target_link_libraries(mapper_v3 FASTARead)
+target_link_libraries(mapper_v3 thread_pool pthread)
+
 add_executable(mapper_parallel ${SOURCES}/mapper_parallel.cpp)
 target_link_libraries(mapper_parallel Common)
 target_link_libraries(mapper_parallel Dynamic)
@@ -145,12 +153,12 @@ add_executable(vectors ${SOURCES}/vectorSample.cpp)
 
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
-
+]]#
 add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
 target_link_libraries(optimizationTest Common)
 target_link_libraries(optimizationTest bioparser)
 target_link_libraries(optimizationTest CustomTypes)
-
+#[[
 add_executable(fastaSample ${SOURCES}/fastaSample.cpp )
 target_link_libraries(fastaSample bioparser)
 
