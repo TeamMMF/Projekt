@@ -94,10 +94,62 @@ add_subdirectory(libraries/bioparser EXCLUDE_FROM_ALL)
 
 
 # add the executable
+
+
+add_executable(mapper_testing ${SOURCES}/mapper_testing.cpp)
+target_link_libraries(mapper_testing Common)
+target_link_libraries(mapper_testing Dynamic)
+target_link_libraries(mapper_testing bioparser)
+target_link_libraries(mapper_testing lcskpp)
+target_link_libraries(mapper_testing FASTARead)
+target_link_libraries(mapper_testing thread_pool pthread)
+
+add_executable(mapper ${SOURCES}/mapper_parallel.cpp)
+target_link_libraries(mapper Common)
+target_link_libraries(mapper Dynamic)
+target_link_libraries(mapper bioparser)
+target_link_libraries(mapper lcskpp)
+target_link_libraries(mapper FASTARead)
+target_link_libraries(mapper thread_pool pthread)
+
+add_executable(mapper_v1 ${SOURCES}/mapper_v1.cpp)
+target_link_libraries(mapper_v1 Common)
+target_link_libraries(mapper_v1 Dynamic)
+target_link_libraries(mapper_v1 bioparser)
+target_link_libraries(mapper_v1 lcskpp)
+target_link_libraries(mapper_v1 FASTARead)
+target_link_libraries(mapper_v1 thread_pool pthread)
+
+add_executable(mapper_v2 ${SOURCES}/mapper_v2.cpp)
+target_link_libraries(mapper_v2 Common)
+target_link_libraries(mapper_v2 Dynamic)
+target_link_libraries(mapper_v2 bioparser)
+target_link_libraries(mapper_v2 lcskpp)
+target_link_libraries(mapper_v2 FASTARead)
+target_link_libraries(mapper_v2 thread_pool pthread)
+
+add_executable(mapper_parallel ${SOURCES}/mapper_parallel.cpp)
+target_link_libraries(mapper_parallel Common)
+target_link_libraries(mapper_parallel Dynamic)
+target_link_libraries(mapper_parallel bioparser)
+target_link_libraries(mapper_parallel lcskpp)
+target_link_libraries(mapper_parallel FASTARead)
+target_link_libraries(mapper_parallel thread_pool pthread)
+
+#[[
+
 add_executable(sample ${SOURCES}/sample.cpp)
 target_link_libraries(sample Common)
 
 add_executable(vectors ${SOURCES}/vectorSample.cpp)
+
+add_executable(LISSample ${SOURCES}/LISSample.cpp)
+target_link_libraries(LISSample Dynamic)
+
+add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
+target_link_libraries(optimizationTest Common)
+target_link_libraries(optimizationTest bioparser)
+target_link_libraries(optimizationTest CustomTypes)
 
 add_executable(fastaSample ${SOURCES}/fastaSample.cpp )
 target_link_libraries(fastaSample bioparser)
@@ -121,43 +173,4 @@ target_link_libraries(lcskppSampleMinimizers Common)
 target_link_libraries(lcskppSampleMinimizers Dynamic)
 target_link_libraries(lcskppSampleMinimizers bioparser)
 target_link_libraries(lcskppSampleMinimizers lcskpp)
-
-add_executable(mappert ${SOURCES}/mapper_testing.cpp)
-target_link_libraries(mappert Common)
-target_link_libraries(mappert Dynamic)
-target_link_libraries(mappert bioparser)
-target_link_libraries(mappert lcskpp)
-target_link_libraries(mappert FASTARead)
-target_link_libraries(mappert thread_pool)
-
-add_executable(mapper_v1 ${SOURCES}/mapper_v1.cpp)
-target_link_libraries(mapper_v1 Common)
-target_link_libraries(mapper_v1 Dynamic)
-target_link_libraries(mapper_v1 bioparser)
-target_link_libraries(mapper_v1 lcskpp)
-target_link_libraries(mapper_v1 FASTARead)
-target_link_libraries(mapper_v1 thread_pool)
-
-add_executable(mapper_v2 ${SOURCES}/mapper_v2.cpp)
-target_link_libraries(mapper_v2 Common)
-target_link_libraries(mapper_v2 Dynamic)
-target_link_libraries(mapper_v2 bioparser)
-target_link_libraries(mapper_v2 lcskpp)
-target_link_libraries(mapper_v2 FASTARead)
-target_link_libraries(mapper_v2 thread_pool pthread)
-
-add_executable(mapper_parallel ${SOURCES}/mapper_parallel.cpp)
-target_link_libraries(mapper_parallel Common)
-target_link_libraries(mapper_parallel Dynamic)
-target_link_libraries(mapper_parallel bioparser)
-target_link_libraries(mapper_parallel lcskpp)
-target_link_libraries(mapper_parallel FASTARead)
-target_link_libraries(mapper_parallel thread_pool pthread)
-
-add_executable(LISSample ${SOURCES}/LISSample.cpp)
-target_link_libraries(LISSample Dynamic)
-
-add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
-target_link_libraries(optimizationTest Common)
-target_link_libraries(optimizationTest bioparser)
-target_link_libraries(optimizationTest CustomTypes)
+#]]

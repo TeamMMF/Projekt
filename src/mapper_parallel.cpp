@@ -135,25 +135,27 @@ int main(int argc, char const *argv[]) {
     }
     int i = 0;
     for (auto& it: thread_futures_data) {
-        report_status("Collecting data",i++, number_of_reads);
+        report_status("Collecting minimizers",i++, number_of_reads);
         it.wait();
     }
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
-    printf("\rCollecting data - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
-    printf("Preparing data for processing.\n");
+    printf("\rCollecting minimizers - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
+    printf("Started indexing.\n");
     fflush(stdout);
     //IZMJENE
-    chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     std::vector<uint64_t> nogos;
     double thresh = 1/16.0;
     fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
     //END IZMJENE
-    sort_by_indices_parallel(lookup_map);
-    sort(nogos.begin(),nogos.end());
+    chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
+    printf("Indexing finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t3 - t2 ).count());
+
+    sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
-    printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
+    printf("Soring finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
     fflush(stdout);
-    printf("\nComparing sequences [-]");
+    sort(nogos.begin(),nogos.end());
+    printf("Comparing sequences [-]");
 
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis = thread_pool::createThreadPool();
