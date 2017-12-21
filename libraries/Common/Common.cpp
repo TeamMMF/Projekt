@@ -1380,17 +1380,22 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& mini
     std::vector<std::pair<uint64_t, uint32_t>> min_occur(min_occurences.begin(), min_occurences.end());
     sort(min_occur.begin(), min_occur.end(), occurences_comparator);
     double acc = 0;
+    uint64_t thrown_out = 0;
     for(int i = 0, len = min_occur.size(); i < len; i++){
         acc += min_occur[i].second / (double) num_of_minimizers;
-
-        /*if(min_occur[i].second <= 34){
-            break;
-        }*/
-
-        if(acc > threshold){
+        thrown_out += min_occur[i].second;
+        if(min_occur[i].second <= 34){
             printf("ZADNJI JE %d\n", min_occur[i].second);
+            printf("Number of minimizers %llu\n", num_of_minimizers);
+            printf("Number of thrown out %llu\n", thrown_out);
             break;
         }
+
+        /*if(acc > threshold){
+            printf("ZADNJI JE %d\n", min_occur[i].second);
+            printf("Number of minimizers %llu\n", num_of_minimizers);
+            break;
+        }*/
         no_gos.emplace_back(min_occur[i].first);
     }
 
