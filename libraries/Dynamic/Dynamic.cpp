@@ -507,6 +507,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     return overlaps;
 };
 
+
 vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                       vector<minimizer>& minimizers,
                                                       unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
@@ -516,6 +517,46 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     unordered_map<uint64_t, vector<int>> different_strand;
     for(auto min : minimizers){
         if(binary_search(nogos.begin(),nogos.end(),min.hash))
+            continue;
+        auto matches = minimizers_for_hash.find(min.hash);
+        if(matches == minimizers_for_hash.end())
+            continue;
+        for(auto match : matches->second){
+            if(match.seq_id <= query_id){
+                continue;
+            }
+            if(match.rev ^ min.rev){
+                different_strand[match.seq_id].push_back(match.index);
+            }else{
+                same_strand[match.seq_id].push_back(match.index);
+            }
+        }
+    }
+    vector<pair<int, bool>> overlaps;
+    for(auto &entry : same_strand){
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(entry.first,true);
+        }
+    }
+
+    for(auto &entry : different_strand){
+        reverse(entry.second.begin(),entry.second.end());
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(make_pair(entry.first,false));
+        }
+    }
+    return overlaps;
+};
+
+vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
+                                                      vector<minimizer>& minimizers,
+                                                      unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
+                                                      int lis_threshold,
+                                                      unordered_map<uint64_t, uint32_t >& occurrences){
+    unordered_map<uint64_t, vector<int>> same_strand;
+    unordered_map<uint64_t, vector<int>> different_strand;
+    for(auto min : minimizers){
+        if(occurrences[min.hash]>34)
             continue;
         auto matches = minimizers_for_hash.find(min.hash);
         if(matches == minimizers_for_hash.end())

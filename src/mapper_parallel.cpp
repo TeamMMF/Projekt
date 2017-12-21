@@ -107,9 +107,9 @@ void lis_overlap_parallelization(int  query_id,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,
-                                 vector<uint64_t>& nogos){
+                                 unordered_map<uint64_t,uint32_t >& occurences){
 
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,nogos);
+    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,occurences);
     for(auto res : result){
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                 fasta_reads[query_id] -> get_name(),
@@ -173,7 +173,7 @@ int main(int argc, char const *argv[]) {
     }
     int i = 0;
     unordered_map<uint64_t ,uint32_t > min_occurences;
-    vector<uint64_t > nogos;
+    //nogo planvector<uint64_t > nogos;
     uint32_t  number_of_minimizers=0;
     for (auto& it: thread_futures_data) {
         report_status("Collecting minimizers",i++, number_of_reads);
@@ -181,7 +181,7 @@ int main(int argc, char const *argv[]) {
         uint32_t id = it.get();
         number_of_minimizers+=add_to_lookup_table(id, mins_in_order[id], lookup_map, min_occurences);
     }
-    reduce_minimizers(number_of_minimizers,min_occurences,nogos);
+    //nogo plan reduce_minimizers(number_of_minimizers,min_occurences,nogos);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting minimizers - Finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
@@ -189,7 +189,7 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Soring finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
     fflush(stdout);
-    sort(nogos.begin(),nogos.end());
+    //nogo plan sort(nogos.begin(),nogos.end());
     printf("Comparing sequences [-]");
 
     // create thread pool
@@ -209,7 +209,7 @@ int main(int argc, char const *argv[]) {
                 4,
                 std::ref(fasta_reads),
                 output,
-                nogos));
+                std::ref(min_occurences)));
     }
     int j = 0;
     for (auto& it: thread_futures_lis) {
