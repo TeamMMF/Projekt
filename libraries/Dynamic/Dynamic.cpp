@@ -487,7 +487,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                 continue;
             }
             if(match.rev ^ min.rev){
-                different_strand[match.seq_id].push_back(match.index);
+                different_strand[match.seq_id].push_back(-match.index);
             }else{
                 same_strand[match.seq_id].push_back(match.index);
             }
@@ -501,7 +501,6 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     }
 
     for(auto &entry : different_strand){
-        reverse(entry.second.begin(),entry.second.end());
         if(lis(entry.second)>=lis_threshold){
             overlaps.emplace_back(make_pair(entry.first,false));
         }
@@ -528,7 +527,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                 continue;
             }
             if(match.rev ^ min.rev){
-                different_strand[match.seq_id].push_back(match.index);
+                different_strand[match.seq_id].push_back(-match.index);
             }else{
                 same_strand[match.seq_id].push_back(match.index);
             }
@@ -542,7 +541,6 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     }
 
     for(auto &entry : different_strand){
-        reverse(entry.second.begin(),entry.second.end());
         if(lis(entry.second)>=lis_threshold){
             overlaps.emplace_back(make_pair(entry.first,false));
         }
@@ -568,7 +566,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                 continue;
             }
             if(match.rev ^ min.rev){
-                different_strand[match.seq_id].push_back(match.index);
+                different_strand[match.seq_id].push_back(-match.index);
             }else{
                 same_strand[match.seq_id].push_back(match.index);
             }
@@ -582,7 +580,6 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     }
 
     for(auto &entry : different_strand){
-        reverse(entry.second.begin(),entry.second.end());
         if(lis(entry.second)>=lis_threshold){
             overlaps.emplace_back(make_pair(entry.first,false));
         }

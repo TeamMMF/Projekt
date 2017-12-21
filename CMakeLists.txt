@@ -144,6 +144,14 @@ target_link_libraries(mapper_parallel lcskpp)
 target_link_libraries(mapper_parallel FASTARead)
 target_link_libraries(mapper_parallel thread_pool pthread)
 
+add_executable(mapper_dynamic ${SOURCES}/mapper_dynamic.cpp)
+target_link_libraries(mapper_dynamic Common)
+target_link_libraries(mapper_dynamic Dynamic)
+target_link_libraries(mapper_dynamic bioparser)
+target_link_libraries(mapper_dynamic lcskpp)
+target_link_libraries(mapper_dynamic FASTARead)
+target_link_libraries(mapper_dynamic thread_pool pthread)
+
 #[[
 
 add_executable(sample ${SOURCES}/sample.cpp)
