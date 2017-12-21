@@ -120,7 +120,6 @@ void find_minimizers7
          uint32_t w,
          uint32_t k,
          std::vector<minimizer>& minimizers);
-void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
 
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map);
 
@@ -128,4 +127,5 @@ bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,u
 
 void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map,
                                        std::vector<uint64_t>& no_gos, double threshold);
+void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iterator end);
 #endif

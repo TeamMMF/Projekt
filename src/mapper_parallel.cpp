@@ -34,6 +34,25 @@ void show_usage(string arg) {
 
 }
 
+void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
+    auto it = minimizer_hits.begin();
+
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool = thread_pool::createThreadPool();
+    std::vector<std::future<void>> thread_futures;
+
+    //sortiranje vektora u mapi i concurrency??
+    while (it != minimizer_hits.end()) {
+        auto a = it-> second.begin();
+        thread_futures.emplace_back(thread_pool->submit_task(
+                sort_wrap, it->second.begin(), it->second.end()));
+        it++;
+    }
+
+    for (auto &it: thread_futures) {
+        it.wait();
+    }
+}
+
 void report_status(const char* operation, int curr, long total) {
     long ratio = 100*curr/total;
     fprintf(stdout,"\r%s [%c] %ld%c",operation, progress[curr%4],ratio, '%');
@@ -163,6 +182,6 @@ int main(int argc, char const *argv[]) {
 
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
     printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
-    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count())
+    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
     return 0;
 }

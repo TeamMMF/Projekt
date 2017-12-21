@@ -1195,25 +1195,6 @@ void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iter
     sort(begin, end, hashMinPair2_comparator);
 }
 
-void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
-    auto it = minimizer_hits.begin();
-
-    std::shared_ptr<thread_pool::ThreadPool> thread_pool =
-            thread_pool::createThreadPool();
-    std::vector<std::future<void>> thread_futures;
-
-    //sortiranje vektora u mapi i concurrency??
-    while (it != minimizer_hits.end()) {
-        auto a = it-> second.begin();
-        thread_futures.emplace_back(thread_pool->submit_task(
-                sort_wrap, it->second.begin(), it->second.end()));
-        it++;
-    }
-
-    for (auto &it: thread_futures) {
-        it.wait();
-    }
-}
 
 void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
