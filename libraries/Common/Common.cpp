@@ -1328,6 +1328,8 @@ void find_minimizers7
 }
 
 
+
+
 void process_sequence4(const char* sequence,
                        uint32_t sequence_l,
                        uint32_t sequence_id,
@@ -1416,6 +1418,6 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& mini
 
 }
 
-bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,uint32_t>& b){
+bool occurences_comparator(const std::pair<uint64_t,uint32_t>& a, const std::pair<uint64_t,uint32_t>& b){
     return a.second > b.second;
 }
