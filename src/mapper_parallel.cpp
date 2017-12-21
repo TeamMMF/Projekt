@@ -34,6 +34,22 @@ void show_usage(string arg) {
 
 }
 
+void reduce_minimizers(uint32_t  number_of_minimizers,
+                       std::unordered_map<uint64_t ,uint32_t>& min_occurences,
+                       vector<uint64_t>& nogos){
+    std::vector<std::pair<uint64_t, uint32_t>> min_occur(min_occurences.begin(), min_occurences.end());
+    sort(min_occur.begin(), min_occur.end(), occurences_comparator);
+    double acc = 0;
+    for(int i = 0, len = min_occur.size(); i < len; i++){
+        acc += min_occur[i].second / (double) number_of_minimizers;
+
+        if(min_occur[i].second <= 34){
+            break;
+        }
+        nogos.emplace_back(min_occur[i].first);
+    }
+}
+
 void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
 
@@ -51,6 +67,28 @@ void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPa
     for (auto &it: thread_futures) {
         it.wait();
     }
+}
+
+uint32_t add_to_lookup_table(uint32_t seq_id,
+                         std::vector<minimizer> &minimizers,
+                         std::unordered_map<uint64_t,
+                                 vector<hashMinPair2>>& map,
+                         std::unordered_map<uint64_t ,uint32_t>& min_occurences){
+    uint32_t  len = minimizers.size();
+    for(uint32_t j = 0; j < len; j++){
+        minimizer min = minimizers[j];
+        auto it = map.find(min.hash);
+        if (it == map.end()) {
+            std::vector<hashMinPair2> vec;
+            vec.emplace_back((hashMinPair2) {seq_id, min.index, min.rev});
+            map.emplace(min.hash, vec);
+        } else {
+            it->second.emplace_back((hashMinPair2) {seq_id, min.index, min.rev});
+        }
+
+        min_occurences[min.hash]++;
+    }
+    return len;
 }
 
 void report_status(const char* operation, int curr, long total) {
@@ -110,7 +148,7 @@ int main(int argc, char const *argv[]) {
     auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
     fasta_reader1->read_objects(fasta_reads, static_cast<uint64_t>(-1));
     long number_of_reads = fasta_reads.size();
-    printf("Reading file - Done\n");
+    printf("Reading file - Done.\n");
 
     unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
     std::vector<std::vector<minimizer>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
@@ -118,14 +156,14 @@ int main(int argc, char const *argv[]) {
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
     // create storage for return values of find_overlaps_by_LIS
-    std::vector<std::future<void>> thread_futures_data;
+    std::vector<std::future<uint32_t >> thread_futures_data;
 
     printf("Colecting data [-]");
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
     for (int i=0; i<number_of_reads; i++){
             //concurrency?
         thread_futures_data.emplace_back(thread_pool_data->submit_task(
-                process_sequence4, fasta_reads[i]->get_data(),
+                process_sequence4_id, fasta_reads[i]->get_data(),
                 fasta_reads[i]->get_data_length(),
                 i,
                 w,
@@ -134,25 +172,22 @@ int main(int argc, char const *argv[]) {
         ));
     }
     int i = 0;
+    unordered_map<uint64_t ,uint32_t > min_occurences;
+    vector<uint64_t > nogos;
+    uint32_t  number_of_minimizers=0;
     for (auto& it: thread_futures_data) {
         report_status("Collecting minimizers",i++, number_of_reads);
         it.wait();
+        uint32_t id = it.get();
+        number_of_minimizers+=add_to_lookup_table(id, mins_in_order[id], lookup_map, min_occurences);
     }
+    reduce_minimizers(number_of_minimizers,min_occurences,nogos);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
-    printf("\rCollecting minimizers - Finished in %ld seconds\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
-    printf("Started indexing.\n");
-    fflush(stdout);
-    //IZMJENE
-    std::vector<uint64_t> nogos;
-    double thresh = 1/16.0;
-    fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
-    //END IZMJENE
-    chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
-    printf("Indexing finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t3 - t2 ).count());
+    printf("\rCollecting minimizers - Finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
     sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
-    printf("Soring finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
+    printf("Soring finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
     fflush(stdout);
     sort(nogos.begin(),nogos.end());
     printf("Comparing sequences [-]");

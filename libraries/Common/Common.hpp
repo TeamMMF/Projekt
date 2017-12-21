@@ -113,6 +113,13 @@ void process_sequence4(const char* sequence,
                        uint32_t w,
                        uint32_t k,
                        std::vector<std::vector<minimizer>>& ordered_minimizers_addr);
+
+uint32_t process_sequence4_id(const char* sequence,
+                              uint32_t sequence_l,
+                              uint32_t sequence_id,
+                              uint32_t w,
+                              uint32_t k,
+                              std::vector<std::vector<minimizer>>& ordered_minimizers_addr);
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,

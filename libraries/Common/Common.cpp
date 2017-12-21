@@ -1341,6 +1341,20 @@ void process_sequence4(const char* sequence,
     ordered_minimizers_addr[sequence_id] = mins;
 }
 
+uint32_t process_sequence4_id(const char* sequence,
+                           uint32_t sequence_l,
+                           uint32_t sequence_id,
+                           uint32_t w,
+                           uint32_t k,
+                           std::vector<std::vector<minimizer>>& ordered_minimizers_addr){
+
+    std::vector<minimizer> mins;
+    find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
+    mins.shrink_to_fit();
+    ordered_minimizers_addr[sequence_id] = mins;
+    return sequence_id;
+}
+
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map){
     for(uint32_t i = 0, len = minimizers.size(); i < len; i++){
         vector<minimizer> tmp = minimizers[i];
@@ -1357,6 +1371,7 @@ void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unor
         }
     }
 }
+
 
 void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers,
                                        std::unordered_map<uint64_t,
