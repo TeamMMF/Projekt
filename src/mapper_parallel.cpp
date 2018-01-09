@@ -189,7 +189,7 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Soring finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
     fflush(stdout);
-    //nogo plan sort(nogos.begin(),nogos.end());
+    //nogo plan sort(nogos.begin(),nog  os.end());
     printf("Comparing sequences [-]");
 
     // create thread pool

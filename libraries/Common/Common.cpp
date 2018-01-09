@@ -1419,3 +1419,111 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& mini
 bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,uint32_t>& b){
     return a.second > b.second;
 }
+
+void find_minimizers_deq(
+        const char *seq,
+        uint32_t seq_l,
+        uint32_t seq_id,
+        uint32_t w,
+        uint32_t k,
+        std::vector<minimizer>& minimizers,
+        std::unordered_map<uint64_t, uint32_t>& occurences,
+        std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
+){
+    std::deque<uint32_t> deq(w);
+    std::deque<uint32_t> rdeq(w);
+
+    uint64_t *hash_buffer = new uint64_t[w];
+    uint64_t *r_hash_buffer = new uint64_t[w];
+
+    uint32_t i;
+    for (i = 0; i < w; i++) {
+        hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
+        r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
+
+        while( (!deq.empty()) && hash_buffer[i % w] <= hash_buffer[deq.back() % w]){
+            deq.pop_back();
+        }
+
+        deq.push_back(i);
+
+        while( (!rdeq.empty()) && hash_buffer[i % w] <= hash_buffer[rdeq.back() % w]){
+            rdeq.pop_back();
+        }
+
+        rdeq.push_back(i);
+    }
+
+    uint32_t min_l_pred = seq_l - k;
+    int32_t last_min_pos = -1;
+    uint64_t last_hash = UINT32_MAX;
+
+    for( ; i < min_l_pred; i++){
+        hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
+        r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
+
+        uint32_t ind = deq.front();
+        uint32_t rind = rdeq.front();
+        uint64_t u = hash_buffer[ind % w];
+        uint64_t v = r_hash_buffer[rind % w];
+
+        if(u < v){
+            if( last_hash != u && last_min_pos != ind){
+                minimizers.emplace_back((minimizer) {u, ind, false});
+                last_hash = u;
+                last_min_pos = ind;
+            }
+
+        }
+        else if (v < u){
+            if( last_hash != v && last_min_pos != rind){
+                minimizers.emplace_back((minimizer) {v,rind, true});
+                last_hash = v;
+                last_min_pos = rind;
+            }
+        }
+
+        while ( (!deq.empty()) && deq.front() <= i - w){
+            deq.pop_front();
+        }
+        while ( (!rdeq.empty()) && rdeq.front() <= i - w){
+            rdeq.pop_front();
+        }
+
+        while ( (!deq.empty()) && hash_buffer[i % w] < hash_buffer[deq.back() % w]){
+            deq.pop_back();
+        }
+        while ( (!rdeq.empty()) && r_hash_buffer[i % w] < r_hash_buffer[deq.back() % w]){
+            deq.pop_back();
+        }
+
+        deq.push_back(i);
+        rdeq.push_back(i);
+    }
+
+    uint32_t ind = deq.front();
+    uint32_t rind = rdeq.front();
+    uint64_t u = hash_buffer[ind % w];
+    uint64_t v = r_hash_buffer[rind % w];
+
+    if(u < v){
+        if( last_hash != u && last_min_pos != ind){
+            minimizers.emplace_back((minimizer) {u, ind, false});
+            last_hash = u;
+            last_min_pos = ind;
+        }
+
+    }
+    else if (v < u){
+        if( last_hash != v && last_min_pos != rind){
+            minimizers.emplace_back((minimizer) {v,rind, true});
+            last_hash = v;
+            last_min_pos = rind;
+        }
+    }
+
+
+    delete[] hash_buffer;
+    delete[] r_hash_buffer;
+
+}

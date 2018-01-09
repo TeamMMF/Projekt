@@ -136,6 +136,11 @@ target_link_libraries(mapper_parallel lcskpp)
 target_link_libraries(mapper_parallel FASTARead)
 target_link_libraries(mapper_parallel thread_pool pthread)
 
+add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
+target_link_libraries(optimizationTest Common)
+target_link_libraries(optimizationTest bioparser)
+target_link_libraries(optimizationTest CustomTypes)
+
 #[[
 
 add_executable(sample ${SOURCES}/sample.cpp)
@@ -146,10 +151,7 @@ add_executable(vectors ${SOURCES}/vectorSample.cpp)
 add_executable(LISSample ${SOURCES}/LISSample.cpp)
 target_link_libraries(LISSample Dynamic)
 
-add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
-target_link_libraries(optimizationTest Common)
-target_link_libraries(optimizationTest bioparser)
-target_link_libraries(optimizationTest CustomTypes)
+
 
 add_executable(fastaSample ${SOURCES}/fastaSample.cpp )
 target_link_libraries(fastaSample bioparser)

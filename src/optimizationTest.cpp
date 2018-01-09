@@ -13,9 +13,9 @@
 using namespace std;
 
 int main(){
-    /*
-    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
 
+    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
+    /*
     uint8_t k = 3;
     char** kmers;
     find_kmers(s.c_str(), 3, &kmers, s.length() - k + 1);
@@ -155,6 +155,7 @@ int main(){
     string s1 = "GAGATCTGA";
     string s2 = "CAGAACTGT";
     string s3 = "GAGTTCAGA";
+    /*
     std::vector<vector<uint64_t>> minimizers(3);
     std::vector<hashMinPair> minimizer_pairs;
 
@@ -174,6 +175,16 @@ int main(){
     }
 
     printf("%d", sizeof(std::tuple<uint64_t,uint32_t ,uint32_t, bool>));
+     */
+
+    std::vector<minimizer> first;
+    std::vector<minimizer> second;
+    std::unordered_map<uint64_t, uint32_t> map1;
+    std::unordered_map<uint64_t, hashMinPair2> map2;
+    find_minimizers7(s.c_str(), s.length(), 0, 2, 3, first);
+    find_minimizers_deq(s.c_str(), s.length(), 0, 2, 3, second, map1, map2  );
+
+    printf("%d -> %d", first.size(), second.size());
     return 0;
 }
 
