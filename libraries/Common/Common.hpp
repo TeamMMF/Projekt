@@ -173,8 +173,6 @@ void find_minimizers_deq_single(
         uint32_t seq_id,
         int32_t w,
         uint32_t k,
-        std::vector<minimizer>& minimizers,
-        std::unordered_map<uint64_t, uint32_t>& occurences,
-        std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
+        std::vector<minimizer>& minimizers
 );
 #endif

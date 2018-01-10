@@ -1523,7 +1523,7 @@ uint32_t process_sequence4_id(const char* sequence,
                            std::vector<std::vector<minimizer>>& ordered_minimizers_addr){
 
     std::vector<minimizer> mins;
-    find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
+    find_minimizers_deq_single(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
     return sequence_id;
@@ -1748,9 +1748,7 @@ void find_minimizers_deq_single(
         uint32_t seq_id,
         int32_t w,
         uint32_t k,
-        std::vector<minimizer>& minimizers,
-        std::unordered_map<uint64_t, uint32_t>& occurences,
-        std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
+        std::vector<minimizer>& minimizers
 ){
     std::deque<int32_t> deq;
 

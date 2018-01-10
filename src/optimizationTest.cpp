@@ -184,7 +184,7 @@ int main(){
     std::unordered_map<uint64_t, hashMinPair2> map2;
     find_minimizers7(s.c_str(), s.length(), 0, 3, 4, first);
     find_minimizers_deq(s.c_str(), s.length(), 0, 3, 4, second, map1, map2  );
-    find_minimizers_deq_single(s.c_str(), s.length(), 0, 3, 4, third, map1, map2);
+    find_minimizers_deq_single(s.c_str(), s.length(), 0, 3, 4, third);
 
     printf("%lu -> %lu -> %lu\n", first.size(), second.size(), third.size());
     for(int i = 0; i < third.size(); i++){
@@ -204,7 +204,7 @@ int main(){
         chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
         find_minimizers_deq(s.c_str(), s.length(), 0, 5, 15, second, map1, map2  );
         chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
-        find_minimizers_deq_single(s.c_str(), s.length(), 0, 5, 15, third, map1, map2  );
+        find_minimizers_deq_single(s.c_str(), s.length(), 0, 5, 15, third);
         chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
 
         auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();
