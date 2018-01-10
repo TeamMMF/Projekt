@@ -128,9 +128,29 @@ void find_minimizers7
          uint32_t k,
          std::vector<minimizer>& minimizers);
 
+void find_minimizers_deq(
+        const char *seq,
+        uint32_t seq_l,
+        uint32_t seq_id,
+        uint32_t w,
+        uint32_t k,
+        std::vector<minimizer>& minimizers,
+        std::unordered_map<uint64_t, uint32_t>& occurences,
+        std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
+);
+
+void process_sequence_all(const char* sequence,
+                          uint32_t sequence_l,
+                          uint32_t sequence_id,
+                          uint32_t w,
+                          uint32_t k,
+                          std::vector<std::vector<minimizer>>& ordered_minimizers_addr,
+                          std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits,
+                          std::unordered_map<uint64_t,uint32_t>& occurrences);
+
 void fill_lookup_table(std::vector<std::vector<minimizer>> minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map);
 
-bool occurences_comparator(std::pair<uint64_t,uint32_t>& a, std::pair<uint64_t,uint32_t>& b);
+bool occurences_comparator(const std::pair<uint64_t,uint32_t>& a, const std::pair<uint64_t,uint32_t>& b);
 
 void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minimizer>>& minimizers, std::unordered_map<uint64_t, vector<hashMinPair2>>& map,
                                        std::vector<uint64_t>& no_gos, double threshold);
