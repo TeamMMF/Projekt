@@ -179,12 +179,46 @@ int main(){
 
     std::vector<minimizer> first;
     std::vector<minimizer> second;
+    std::vector<minimizer> third;
     std::unordered_map<uint64_t, uint32_t> map1;
     std::unordered_map<uint64_t, hashMinPair2> map2;
-    find_minimizers7(s.c_str(), s.length(), 0, 2, 3, first);
-    find_minimizers_deq(s.c_str(), s.length(), 0, 2, 3, second, map1, map2  );
+    find_minimizers7(s.c_str(), s.length(), 0, 3, 4, first);
+    find_minimizers_deq(s.c_str(), s.length(), 0, 3, 4, second, map1, map2  );
+    find_minimizers_deq_single(s.c_str(), s.length(), 0, 3, 4, third, map1, map2);
 
-    printf("%d -> %d", first.size(), second.size());
+    printf("%lu -> %lu -> %lu\n", first.size(), second.size(), third.size());
+    for(int i = 0; i < third.size(); i++){
+        printf("(%22lu, %10d, %5s) -> (%22lu, %10d, %5s) -> (%22lu, %10d, %5s)\n", first[i].hash, first[i].index, first[i].rev ? "True" : "False", second[i].hash, second[i].index, second[i].rev ? "True" : "False", third[i].hash, third[i].index, third[i].rev ? "True" : "False" );
+    }
+
+
+    uint64_t old_time = 0;
+    uint64_t ddeq_time = 0;
+    uint64_t sdeq_time = 0;
+    for(int i = 0; i < 10000; i++){
+        std::vector<minimizer> first;
+        std::vector<minimizer> second;
+        std::vector<minimizer> third;
+        chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
+        find_minimizers7(s.c_str(), s.length(), 0, 5, 15, first);
+        chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
+        find_minimizers_deq(s.c_str(), s.length(), 0, 5, 15, second, map1, map2  );
+        chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
+        find_minimizers_deq_single(s.c_str(), s.length(), 0, 5, 15, third, map1, map2  );
+        chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
+
+        auto duration1 = chrono::duration_cast<chrono::microseconds>( t2 - t1 ).count();
+        auto duration2 = chrono::duration_cast<chrono::microseconds>( t3 - t2 ).count();
+        auto duration3 = chrono::duration_cast<chrono::microseconds>( t4 - t3 ).count();
+        old_time += duration1;
+        ddeq_time += duration2;
+        sdeq_time += duration3;
+    }
+
+    printf("Staro vrijeme: %22lu\n", old_time / 10000);
+    printf("DDEQ vrijeme:  %22lu\n", ddeq_time / 10000);
+    printf("SDEQ vrijeme:  %22lu\n", sdeq_time / 10000);
+
     return 0;
 }
 

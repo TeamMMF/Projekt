@@ -1594,103 +1594,143 @@ void find_minimizers_deq(
         const char *seq,
         uint32_t seq_l,
         uint32_t seq_id,
-        uint32_t w,
+        int32_t w,
         uint32_t k,
         std::vector<minimizer>& minimizers,
         std::unordered_map<uint64_t, uint32_t>& occurences,
         std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
 ){
-    std::deque<uint32_t> deq(w);
-    std::deque<uint32_t> rdeq(w);
+    std::deque<int32_t> deq;
+    std::deque<int32_t> rdeq;
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
 
-    uint32_t i;
-    for (i = 0; i < w; i++) {
+    int32_t i;
+    for (i = 0; i < w - 1; i++) {
         hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
         r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
 
-        while( (!deq.empty()) && hash_buffer[i % w] <= hash_buffer[deq.back() % w]){
+        /*
+        if(hash_buffer[i%w] < r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , hash_buffer[i%w], "false");
+        }
+        else if(hash_buffer[i%w] > r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , r_hash_buffer[i%w], "true");
+        }
+        else{
+            printf("%3d -> %22lu, %5s\n", i, hash_buffer[i%w], "AMBIGIOUS STRING");
+        }
+        */
+        while( (!deq.empty()) && hash_buffer[i % w] < hash_buffer[deq.back() % w]){
             deq.pop_back();
         }
 
         deq.push_back(i);
 
-        while( (!rdeq.empty()) && hash_buffer[i % w] <= hash_buffer[rdeq.back() % w]){
+        while( (!rdeq.empty()) && r_hash_buffer[i % w] < r_hash_buffer[rdeq.back() % w]){
             rdeq.pop_back();
         }
 
         rdeq.push_back(i);
     }
 
-    uint32_t min_l_pred = seq_l - k;
-    int32_t last_min_pos = -1;
-    uint64_t last_hash = UINT32_MAX;
-
+    int32_t min_l_pred = seq_l - k;
+    int last_min_pos = -1;
+    uint64_t last_hash;
+    uint64_t buf_val;
+    uint64_t r_buf_val;
     for( ; i < min_l_pred; i++){
-        hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
+        buf_val = hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
+        r_buf_val = r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
 
-        uint32_t ind = deq.front();
-        uint32_t rind = rdeq.front();
+        /*
+        if(hash_buffer[i%w] < r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , hash_buffer[i%w], "false");
+        }
+        else if(hash_buffer[i%w] > r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , r_hash_buffer[i%w], "true");
+        }
+        else{
+            printf("%3d -> %22lu, %5s\n", i, hash_buffer[i%w], "AMBIGIOUS STRING");
+        }
+         */
+
+        if ((!deq.empty()) && deq.front() <= (i - w)){
+            deq.pop_front();
+        }
+
+        if ((!rdeq.empty()) && rdeq.front() <= (i - w)){
+            rdeq.pop_front();
+        }
+
+        if(buf_val != r_buf_val){
+            while ( (!deq.empty()) && buf_val < hash_buffer[deq.back() % w]){
+                deq.pop_back();
+            }
+
+            while ( (!rdeq.empty()) && r_buf_val < r_hash_buffer[rdeq.back() % w]){
+                rdeq.pop_back();
+            }
+
+            deq.push_back(i);
+            rdeq.push_back(i);
+        }
+
+
+        int32_t ind = deq.front();
+        int32_t rind = rdeq.front();
         uint64_t u = hash_buffer[ind % w];
         uint64_t v = r_hash_buffer[rind % w];
 
+        int counter = 0;
         if(u < v){
-            if( last_hash != u && last_min_pos != ind){
-                minimizers.emplace_back((minimizer) {u, ind, false});
-                last_hash = u;
-                last_min_pos = ind;
-            }
+            //while(counter < deq.size() && hash_buffer[ind % w] == u){
 
+                if(last_min_pos < ind){
+                    minimizers.emplace_back((minimizer) {u, ind, false});
+                    last_min_pos = ind;
+                }
+               /* else {
+                    break;
+                }
+                ind = deq.at(counter++);
+                */
+            //}
         }
+
         else if (v < u){
-            if( last_hash != v && last_min_pos != rind){
-                minimizers.emplace_back((minimizer) {v,rind, true});
-                last_hash = v;
-                last_min_pos = rind;
+
+            //while(counter < rdeq.size() && r_hash_buffer[rind % w] == v){
+                if(last_min_pos < rind){
+                    minimizers.emplace_back((minimizer) {v,rind, true});
+                    last_min_pos = rind;
+                }
+             /*   else {
+                    break;
+                }
+                rind = deq.at(counter++);*/
+           // }
+        }
+
+        else{
+            int32_t ind = deq.front();
+            int32_t rind = deq.front();
+            if(ind < rind){
+                if(last_min_pos < ind){
+                    minimizers.emplace_back((minimizer) {u, ind, false});
+                    last_min_pos = ind;
+                }
+
+            }
+            else if(ind > rind){
+                if(last_min_pos < rind){
+                    minimizers.emplace_back((minimizer) {v,rind, true});
+                    last_min_pos = rind;
+                }
             }
         }
-
-        while ( (!deq.empty()) && deq.front() <= i - w){
-            deq.pop_front();
-        }
-        while ( (!rdeq.empty()) && rdeq.front() <= i - w){
-            rdeq.pop_front();
-        }
-        while ( (!deq.empty()) && hash_buffer[i % w] < hash_buffer[deq.back() % w]){
-            deq.pop_back();
-        }
-        while ( (!rdeq.empty()) && r_hash_buffer[i % w] < r_hash_buffer[rdeq.back() % w]){
-            rdeq.pop_back();
-        }
-
-        deq.push_back(i);
-        rdeq.push_back(i);
     }
-
-    uint32_t ind = deq.front();
-    uint32_t rind = rdeq.front();
-    uint64_t u = hash_buffer[ind % w];
-    uint64_t v = r_hash_buffer[rind % w];
-
-    if(u < v){
-        if( last_hash != u && last_min_pos != ind){
-            minimizers.emplace_back((minimizer) {u, ind, false});
-            last_hash = u;
-            last_min_pos = ind;
-        }
-
-    }
-    else if (v < u){
-        if( last_hash != v && last_min_pos != rind){
-            minimizers.emplace_back((minimizer) {v,rind, true});
-            last_hash = v;
-            last_min_pos = rind;
-        }
-    }
-
 
     delete[] hash_buffer;
     delete[] r_hash_buffer;
@@ -1701,110 +1741,117 @@ bool occurences_comparator(const std::pair<uint64_t,uint32_t>& a, const std::pai
     return a.second > b.second;
 }
 
-void find_minimizers_deq(
+
+void find_minimizers_deq_single(
         const char *seq,
         uint32_t seq_l,
         uint32_t seq_id,
-        uint32_t w,
+        int32_t w,
         uint32_t k,
         std::vector<minimizer>& minimizers,
         std::unordered_map<uint64_t, uint32_t>& occurences,
         std::unordered_map<uint64_t, hashMinPair2>& minimizer_hits
 ){
-    std::deque<uint32_t> deq(w);
-    std::deque<uint32_t> rdeq(w);
+    std::deque<int32_t> deq;
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
 
-    uint32_t i;
-    for (i = 0; i < w; i++) {
-        hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
+    int32_t i;
+    for (i = 0; i < w - 1; i++) {
+        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
+        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
 
-        while( (!deq.empty()) && hash_buffer[i % w] <= hash_buffer[deq.back() % w]){
-            deq.pop_back();
+        //printf("%3d -> %22lu, %22lu, %d\n", i , hash_buffer[i%w],r_hash_buffer[i%w], hash_buffer[i%w] < r_hash_buffer[i%w] ? 0 : 1);
+        /*
+        if(hash_buffer[i%w] < r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , hash_buffer[i%w], "false");
         }
-
-        deq.push_back(i);
-
-        while( (!rdeq.empty()) && hash_buffer[i % w] <= hash_buffer[rdeq.back() % w]){
-            rdeq.pop_back();
+        else if(hash_buffer[i%w] > r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , r_hash_buffer[i%w], "true");
         }
+        else{
+            printf("%3d -> %22lu, %5s\n", i, hash_buffer[i%w], "AMBIGIOUS STRING");
+        }
+        */
+        if(hash_buffer[i] < r_hash_buffer[i]){
+            while( (!deq.empty()) && hash_buffer[i] < hash_buffer[abs(deq.back())]){
+                deq.pop_back();
+            }
+            deq.push_back(i);
 
-        rdeq.push_back(i);
+        }
+        else if(hash_buffer[i] > r_hash_buffer[i]){
+            while( (!deq.empty()) && r_hash_buffer[i] < r_hash_buffer[abs(deq.back())]){
+                deq.pop_back();
+            }
+            deq.push_back(-i);
+        }
     }
 
-    uint32_t min_l_pred = seq_l - k;
-    int32_t last_min_pos = -1;
-    uint64_t last_hash = UINT32_MAX;
+    int32_t min_l_pred = seq_l - k;
+    int last_min_pos = -1;
 
-    for( ; i < min_l_pred; i++){
-        hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));
+    uint64_t buf_val;
+    uint64_t r_buf_val;
+    for( ; i < min_l_pred; i++) {
+        buf_val = hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
+        r_buf_val = r_hash_buffer[i % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]), k));
 
-        uint32_t ind = deq.front();
-        uint32_t rind = rdeq.front();
-        uint64_t u = hash_buffer[ind % w];
-        uint64_t v = r_hash_buffer[rind % w];
-
-        if(u < v){
-            if( last_hash != u && last_min_pos != ind){
-                minimizers.emplace_back((minimizer) {u, ind, false});
-                last_hash = u;
-                last_min_pos = ind;
-            }
-
+        //printf("%3d -> %22lu, %22lu, %d\n", i , hash_buffer[i%w],r_hash_buffer[i%w], hash_buffer[i%w] < r_hash_buffer[i%w] ? 0 : 1);
+        /*
+        if(hash_buffer[i%w] < r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , hash_buffer[i%w], "false");
         }
-        else if (v < u){
-            if( last_hash != v && last_min_pos != rind){
-                minimizers.emplace_back((minimizer) {v,rind, true});
-                last_hash = v;
-                last_min_pos = rind;
-            }
+        else if(hash_buffer[i%w] > r_hash_buffer[i%w]){
+            printf("%3d -> %22lu, %5s\n", i , r_hash_buffer[i%w], "true");
         }
+        else{
+            printf("%3d -> %22lu, %5s\n", i, hash_buffer[i%w], "AMBIGIOUS STRING");
+        }
+         */
 
-        while ( (!deq.empty()) && deq.front() <= i - w){
+        if ((!deq.empty()) && abs(deq.front()) <= (i - w)) {
             deq.pop_front();
         }
-        while ( (!rdeq.empty()) && rdeq.front() <= i - w){
-            rdeq.pop_front();
+
+        if (buf_val < r_buf_val) {
+            while ((!deq.empty()) && buf_val < (deq.back() > 0 ? hash_buffer[deq.back() % w] : r_hash_buffer[(-deq.back()) % w])) {
+                deq.pop_back();
+            }
+            deq.push_back(i);
+        } else if (buf_val > r_buf_val) {
+
+            while ((!deq.empty()) && r_buf_val < (deq.back() > 0 ? hash_buffer[deq.back() % w] : r_hash_buffer[(-deq.back()) % w])) {
+                deq.pop_back();
+            }
+
+            deq.push_back(-i);
         }
 
-        while ( (!deq.empty()) && hash_buffer[i % w] < hash_buffer[deq.back() % w]){
-            deq.pop_back();
-        }
-        while ( (!rdeq.empty()) && r_hash_buffer[i % w] < r_hash_buffer[deq.back() % w]){
-            deq.pop_back();
-        }
 
-        deq.push_back(i);
-        rdeq.push_back(i);
+        int32_t ind = deq.front();
+        uint64_t u = ind > 0 ? hash_buffer[ind % w] : r_hash_buffer[(-ind) % w];
+
+        int counter = 0;
+        while (ind > 0 ? hash_buffer[ind % w] == u : r_hash_buffer[(-ind) % w] == u) {
+
+
+            if (last_min_pos < abs(ind)) {
+                minimizers.emplace_back((minimizer) {u, abs(ind), ind >= 0});
+                last_min_pos = abs(ind);
+            } else {
+                break;
+            }
+            if(counter + 1 >= deq.size()){
+                break;
+            }
+            ind = deq.at(++counter);
+        }
     }
-
-    uint32_t ind = deq.front();
-    uint32_t rind = rdeq.front();
-    uint64_t u = hash_buffer[ind % w];
-    uint64_t v = r_hash_buffer[rind % w];
-
-    if(u < v){
-        if( last_hash != u && last_min_pos != ind){
-            minimizers.emplace_back((minimizer) {u, ind, false});
-            last_hash = u;
-            last_min_pos = ind;
-        }
-
-    }
-    else if (v < u){
-        if( last_hash != v && last_min_pos != rind){
-            minimizers.emplace_back((minimizer) {v,rind, true});
-            last_hash = v;
-            last_min_pos = rind;
-        }
-    }
-
 
     delete[] hash_buffer;
     delete[] r_hash_buffer;
 
 }
+
