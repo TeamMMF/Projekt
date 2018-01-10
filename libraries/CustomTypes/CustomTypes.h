@@ -13,6 +13,11 @@ typedef struct {
 } minimizer;
 
 typedef struct {
+    uint64_t  hash;
+    int32_t  index;
+} minim;
+
+typedef struct {
     int target_min_index;
     int target_max_index;
     int query_min_index;
@@ -39,6 +44,11 @@ typedef struct {
     uint32_t index;
     bool rev;
 } hashMinPair2;
+
+typedef  struct {
+    uint32_t  seq_id;
+    int32_t  index;
+} hashMinPair3;
 
 typedef struct{
     char* qs_name;

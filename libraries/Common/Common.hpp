@@ -105,7 +105,7 @@ void find_minimizers6
          std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits
         );
 
-void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits);
+void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair3>>& minimizer_hits);
 
 void process_sequence4(const char* sequence,
                        uint32_t sequence_l,
@@ -117,16 +117,16 @@ void process_sequence4(const char* sequence,
 uint32_t process_sequence4_id(const char* sequence,
                               uint32_t sequence_l,
                               uint32_t sequence_id,
-                              uint32_t w,
+                              int32_t w,
                               uint32_t k,
-                              std::vector<std::vector<minimizer>>& ordered_minimizers_addr);
+                              std::vector<std::vector<minim>>& ordered_minimizers_addr);
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,
          uint32_t seq_id,
-         uint32_t w,
+         int32_t w,
          uint32_t k,
-         std::vector<minimizer>& minimizers);
+         std::vector<minim>& minimizers);
 
 void find_minimizers_deq(
         const char *seq,
@@ -175,4 +175,6 @@ void find_minimizers_deq_single(
         uint32_t k,
         std::vector<minimizer>& minimizers
 );
+
+bool hashMinPair3_comparator(hashMinPair2 a, hashMinPair2 b);
 #endif

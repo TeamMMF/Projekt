@@ -1013,6 +1013,10 @@ bool hashMinPair2_comparator(hashMinPair2 a, hashMinPair2 b){
     return a.index<b.index;
 }
 
+bool hashMinPair3_comparator(hashMinPair2 a, hashMinPair2 b){
+    return abs(a.index)<abs(b.index);
+}
+
 void fill_lookup_table(std::vector<hashMinPair>* v, unordered_map<uint64_t, uint64_t>* lookup_table){
     uint64_t last = 0;
     for(uint32_t i = 0, len = v->size(); i < len; i++){
@@ -1368,10 +1372,10 @@ void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iter
 }
 
 
-void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
+void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair3>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
     while (it != minimizer_hits.end()) {
-        sort(it->second.begin(), it->second.end(),hashMinPair2_comparator);
+        sort(it->second.begin(), it->second.end(),hashMinPair3_comparator);
         it++;
     }
 }
@@ -1381,9 +1385,9 @@ void find_minimizers7
         (const char *seq,
          uint32_t seq_l,
          uint32_t seq_id,
-         uint32_t w,
+         int32_t w,
          uint32_t k,
-         std::vector<minimizer>& minimizers
+         std::vector<minim>& minimizers
         )
 {
 
@@ -1415,14 +1419,14 @@ void find_minimizers7
             }
 
             else if(u < v && u <= last_min_hash){
-                minimizers.emplace_back((minimizer) {u, (uint32_t) (i + w - 1), false });
+                minimizers.emplace_back((minim) {u, (i + w - 1)});
                 //printf("%llu -> %u, %u, %s\n", u, seq_id, i + w - 1, "True");
                 last_min_position = i + w - 1;
                 last_min_hash = u;
             }
 
             else if(u > v && v <= last_min_hash) {
-                minimizers.emplace_back((minimizer) {v, (uint32_t) (i + w - 1), false });
+                minimizers.emplace_back((minim) {v, -(i + w - 1)});
                 //printf("%llu -> %u, %u, %s\n", v, seq_id, i + w - 1, "False");
                 last_min_position = i + w - 1;
                 last_min_hash = v;
@@ -1474,7 +1478,7 @@ void find_minimizers7
             last_min_position = min_positions[min_pos_size - 1];
 
             for(uint32_t j = 0; j < min_pos_size; j++) {
-                minimizers.emplace_back((minimizer) {m, (uint32_t) min_positions[j], min_rev[j]});
+                minimizers.emplace_back((minim) {m, min_rev[j] ? min_positions[j] : min_positions[j]});
 
                 //printf("%llu -> %u, %u, %s\n", m, seq_id, min_positions[j], min_rev[j] ? "True" : "False");
             }
@@ -1505,11 +1509,11 @@ void find_minimizers7
 void process_sequence4(const char* sequence,
                        uint32_t sequence_l,
                        uint32_t sequence_id,
-                       uint32_t w,
+                       int32_t w,
                        uint32_t k,
-                       std::vector<std::vector<minimizer>>& ordered_minimizers_addr){
+                       std::vector<std::vector<minim>>& ordered_minimizers_addr){
 
-    std::vector<minimizer> mins;
+    std::vector<minim> mins;
     find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
@@ -1518,12 +1522,12 @@ void process_sequence4(const char* sequence,
 uint32_t process_sequence4_id(const char* sequence,
                            uint32_t sequence_l,
                            uint32_t sequence_id,
-                           uint32_t w,
+                           int32_t w,
                            uint32_t k,
-                           std::vector<std::vector<minimizer>>& ordered_minimizers_addr){
+                           std::vector<std::vector<minim>>& ordered_minimizers_addr){
 
-    std::vector<minimizer> mins;
-    find_minimizers_deq_single(sequence, sequence_l, sequence_id, w, k, mins);
+    std::vector<minim> mins;
+    find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
     return sequence_id;

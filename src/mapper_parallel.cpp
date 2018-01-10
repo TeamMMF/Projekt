@@ -70,9 +70,9 @@ void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPa
 }
 
 uint32_t add_to_lookup_table(uint32_t seq_id,
-                         std::vector<minimizer> &minimizers,
+                         std::vector<minim> &minimizers,
                          std::unordered_map<uint64_t,
-                                 vector<hashMinPair2>>& map,
+                                 vector<hashMinPair3>>& map,
                          std::unordered_map<uint64_t ,uint32_t>& min_occurences){
     uint32_t  len = minimizers.size();
     for(uint32_t j = 0; j < len; j++){
@@ -80,10 +80,10 @@ uint32_t add_to_lookup_table(uint32_t seq_id,
         auto it = map.find(min.hash);
         if (it == map.end()) {
             std::vector<hashMinPair2> vec;
-            vec.emplace_back((hashMinPair2) {seq_id, min.index, min.rev});
+            vec.emplace_back((hashMinPair3) {seq_id, min.index});
             map.emplace(min.hash, vec);
         } else {
-            it->second.emplace_back((hashMinPair2) {seq_id, min.index, min.rev});
+            it->second.emplace_back((hashMinPair3) {seq_id, min.index});
         }
 
         min_occurences[min.hash]++;
@@ -150,8 +150,8 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
     printf("Reading file - Done.\n");
 
-    unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    std::vector<std::vector<minimizer>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
+    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
+    std::vector<std::vector<minim>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
