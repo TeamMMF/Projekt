@@ -15,7 +15,7 @@
 #define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
 
-
+/*
 const char *progress = "-\\|/";
 
 bool lis_threshold(int result,int l1, int l2);
@@ -42,10 +42,10 @@ void report_status(const char* operation, int curr, long total) {
 bool lis_threshold(int result, int l1, int l2) {
     return result > 9;
 }
-
+*/
 // Mislio si izvest veceg Matu Paulinovica... Take a seat Skywalker
 int main(int argc, char const *argv[]) {
-
+    /*
     uint32_t k = KMER_DEFAULT;
     uint32_t w = WINDOW_DEFAULT;
 
@@ -118,6 +118,6 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
     printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
     printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
-
+    */
     return 0;
 }

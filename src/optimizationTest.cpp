@@ -13,9 +13,9 @@
 using namespace std;
 
 int main(){
-
-    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
     /*
+    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
+
     uint8_t k = 3;
     char** kmers;
     find_kmers(s.c_str(), 3, &kmers, s.length() - k + 1);
@@ -100,7 +100,7 @@ int main(){
     printf("C    time: %lu\n", c_time);
     printf("Cred time: %lu\n", c_red_time);
 
-    /*
+
     std::unordered_multimap<uint64_t, int> hash_to_index_map_addr;
     minimizer* ordered_minimizers_addr;
     uint32_t ordered_minimizers_addr_l;
@@ -126,8 +126,8 @@ int main(){
     }
 
     printf("%ld", hash_to_index_map_addr.size());
-     */
-    /*
+
+
     free(minimizers);
     minimizer* minimizer1;
     minimizer* minimizer2;
@@ -147,7 +147,7 @@ int main(){
 
     free(minimizer1);
     free(minimizer2);
-    */
+
 
     printf("%llu\n", invertible_minimizer_hash_inverse(0));
 
@@ -155,7 +155,7 @@ int main(){
     string s1 = "GAGATCTGA";
     string s2 = "CAGAACTGT";
     string s3 = "GAGTTCAGA";
-    /*
+
     std::vector<vector<uint64_t>> minimizers(3);
     std::vector<hashMinPair> minimizer_pairs;
 
@@ -175,7 +175,7 @@ int main(){
     }
 
     printf("%d", sizeof(std::tuple<uint64_t,uint32_t ,uint32_t, bool>));
-     */
+
 
     std::vector<minimizer> first;
     std::vector<minimizer> second;
@@ -218,7 +218,7 @@ int main(){
     printf("Staro vrijeme: %22lu\n", old_time / 10000);
     printf("DDEQ vrijeme:  %22lu\n", ddeq_time / 10000);
     printf("SDEQ vrijeme:  %22lu\n", sdeq_time / 10000);
-
+*/
     return 0;
 }
 

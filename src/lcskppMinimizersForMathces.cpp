@@ -13,7 +13,7 @@
 
 #define K 3
 #define W 5
-
+/*
 vector<pair<int,int>> get_matches(vector<tuple<uint64_t, int, int>> minimizers1, vector<tuple<uint64_t, int, int>> minimizers2){
 
     vector<pair<int,int>> matches;
@@ -31,8 +31,9 @@ vector<pair<int,int>> get_matches(vector<tuple<uint64_t, int, int>> minimizers1,
     }
     return matches;
 };
-
+*/
 int main(int argc, char const *argv[]){
+    /*
     int length;
 
     //string sequence_file_path(argv[1]);
@@ -64,7 +65,7 @@ int main(int argc, char const *argv[]){
             cout <<endl;
         }
     }
-
+*/
     return 0;
 }
 

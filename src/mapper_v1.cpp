@@ -17,7 +17,7 @@
 #define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
 
-
+/*
 const char *progress = "-\\|/";
 
 bool lis_threshold(int result,int l1, int l2);
@@ -35,9 +35,9 @@ void show_usage(string arg) {
     fprintf(stdout, "-h, --help\t\t\tshow usage instructions.\n");
 
 }
-
+*/
 int main(int argc, char const *argv[]) {
-
+    /*
     uint32_t k = KMER_DEFAULT;
     uint32_t w = WINDOW_DEFAULT;
 
@@ -118,10 +118,10 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     long duration = chrono::duration_cast<chrono::seconds>( t2 - t1 ).count();
     fprintf(stdout,"Completed in %ld seconds, results can be foud in the file %s.\n",duration,result_file_path.c_str());
-
+*/
     return 0;
 }
-
+/*
 void report_status(const char* operation, int curr, long total) {
     long ratio = 100*curr/total;
     fprintf(stdout,"\r%s [%c] %ld%c",operation, progress[curr%4],ratio, '%');
@@ -131,3 +131,4 @@ void report_status(const char* operation, int curr, long total) {
 bool lis_threshold(int result, int l1, int l2) {
     return result > 9;
 }
+*/

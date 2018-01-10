@@ -15,6 +15,7 @@
 using namespace std;
 
 int main(int argc, char const *argv[]){
+    /*
     const int k = 3;
     int length;
 
@@ -41,7 +42,7 @@ int main(int argc, char const *argv[]){
             printf("\n");
         }
     }
-
+*/
     return 0;
 }
 

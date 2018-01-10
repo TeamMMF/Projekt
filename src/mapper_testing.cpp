@@ -14,7 +14,7 @@
 #define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
 
-
+/*
 const char *progress = "-\\|/";
 
 bool lis_threshold(int result,int l1, int l2);
@@ -32,7 +32,7 @@ void show_usage(string arg) {
     fprintf(stdout, "-h, --help\t\t\tshow usage instructions.\n");
 
 }
-/*
+
 int main(int argc, char const *argv[]) {
 
     uint32_t k = KMER_DEFAULT;
@@ -160,7 +160,7 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-*/
+
 
 void report_status(const char* operation, int curr, long total) {
     long ratio = 100*curr/total;
@@ -246,8 +246,9 @@ int main(int argc, char const *argv[]) {
     for(int i = 0; i < 100; i++){
         hashMinPair tmp = minimizer_hits[i];
         fprintf(stdout, "%3d, %20llu, %10u, %10u, %s\n", i, tmp.hash, tmp.seq_id, tmp.index, tmp.rev ? "True" : "False");
-    }*/
+    }
 
 
     return 0;
 }
+ */

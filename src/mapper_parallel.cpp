@@ -79,7 +79,7 @@ uint32_t add_to_lookup_table(uint32_t seq_id,
         minimizer min = minimizers[j];
         auto it = map.find(min.hash);
         if (it == map.end()) {
-            std::vector<hashMinPair2> vec;
+            std::vector<hashMinPair3> vec;
             vec.emplace_back((hashMinPair3) {seq_id, min.index});
             map.emplace(min.hash, vec);
         } else {

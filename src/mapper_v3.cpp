@@ -71,8 +71,8 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
     printf("Reading file - Done\n");
 
-    unordered_map<uint64_t, vector<hashMinPair2>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    std::vector<std::vector<minimizer >> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
+    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
+    std::vector<std::vector<minim >> mins_in_order; // id sekvence -> poredani minimizeri sekvence po indeksu
 
 
     printf("Colecting data [-]");

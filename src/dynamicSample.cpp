@@ -9,6 +9,7 @@
 
 
 int main(){
+    /*
     LCS("AAA", "ABA", 3, 3);
     LCS("XMJYAUZ", "MZJAWXU", 7, 7);
     LCS_k("aaaaaaaa", "aaaaaaaa", 8, 8, 2);
@@ -28,7 +29,7 @@ int main(){
     std::cout << unsigned(LCS_kpp("ATCTTGGGGTTAG", "ATCGGGGGGGTAG", 3)) << std::endl;
 
     check_precedence(std::make_tuple(1,1,true), std::make_tuple(2,2,true));
-    /*
+
     std::unordered_map<matchPair, int, std::function<size_t(std::tuple<int,int,bool>)>> ordering(10, tuple_hash);
     std::cout << tuple_hash(std::make_tuple(1,1,true)) << std::endl;
     ordering.emplace(std::make_tuple(1,1,true), 2);

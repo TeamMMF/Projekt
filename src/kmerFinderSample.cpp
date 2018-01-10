@@ -21,7 +21,7 @@ using namespace std;
 
 
 int main(int argc, char const *argv[]) {
-
+/*
     string project_root(PROJECT_ROOT);
 
     vector<unique_ptr<FASTASampleClass>> fasta_objects;
@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
 
     fasta_reader->read_objects(fasta_objects, static_cast<uint64_t>(-1));
 
-    /*
+
     vector<unique_ptr<FASTASampleClass>> fasta_objects2;
     auto fasta_reader2 = bioparser::createReader<FASTASampleClass, bioparser::FastaReader>(
             project_root + "src/resources/lambda_reference.fasta");
@@ -127,7 +127,7 @@ int main(int argc, char const *argv[]) {
 
         break;
     }
-    */
+
     int counter =0;
     for (auto &fasta_object : fasta_objects) {
         minimizer *minimizer1;
@@ -154,7 +154,7 @@ int main(int argc, char const *argv[]) {
         }
         counter++;
     }
-
+    */
     return 0;
 }
 
