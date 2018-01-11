@@ -50,25 +50,6 @@ void reduce_minimizers(uint32_t  number_of_minimizers,
     }
 }
 
-void sort_by_indices_parallel(std::unordered_map<uint64_t, std::vector<hashMinPair2>>& minimizer_hits) {
-    auto it = minimizer_hits.begin();
-
-    std::shared_ptr<thread_pool::ThreadPool> thread_pool = thread_pool::createThreadPool();
-    std::vector<std::future<void>> thread_futures;
-
-    //sortiranje vektora u mapi i concurrency??
-    while (it != minimizer_hits.end()) {
-        auto a = it-> second.begin();
-        thread_futures.emplace_back(thread_pool->submit_task(
-                sort_wrap, it->second.begin(), it->second.end()));
-        it++;
-    }
-
-    for (auto &it: thread_futures) {
-        it.wait();
-    }
-}
-
 uint32_t add_to_lookup_table(uint32_t seq_id,
                          std::vector<minim> &minimizers,
                          std::unordered_map<uint64_t,
@@ -76,7 +57,7 @@ uint32_t add_to_lookup_table(uint32_t seq_id,
                          std::unordered_map<uint64_t ,uint32_t>& min_occurences){
     uint32_t  len = minimizers.size();
     for(uint32_t j = 0; j < len; j++){
-        minimizer min = minimizers[j];
+        minim min = minimizers[j];
         auto it = map.find(min.hash);
         if (it == map.end()) {
             std::vector<hashMinPair3> vec;
@@ -102,8 +83,8 @@ bool lis_threshold(int result, int l1, int l2) {
 }
 
 void lis_overlap_parallelization(int  query_id,
-                                 vector<minimizer>& minimizer_hashes,
-                                 unordered_map<uint64_t, vector<hashMinPair2>>&  lookup_map,
+                                 vector<minim>& minimizer_hashes,
+                                 unordered_map<uint64_t, vector<hashMinPair3>>&  lookup_map,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,

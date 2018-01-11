@@ -45,8 +45,8 @@ bool lis_threshold(int result, int l1, int l2) {
 }
 
 void lis_overlap_parallelization(int  query_id,
-                                 vector<minimizer>& minimizer_hashes,
-                                 unordered_map<uint64_t, vector<hashMinPair2>>&  lookup_map,
+                                 vector<minim>& minimizer_hashes,
+                                 unordered_map<uint64_t, vector<hashMinPair3>>&  lookup_map,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,
@@ -140,7 +140,6 @@ int main(int argc, char const *argv[]) {
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis = thread_pool::createThreadPool();
     // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<void>> thread_futures_lis;
-
 
     FILE* output = fopen(result_file_path.c_str(),"w");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();

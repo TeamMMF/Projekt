@@ -194,8 +194,8 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
 
 
 vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
-                                                      vector<minimizer>& minimizers,
-                                                      unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
+                                                      vector<minim>& minimizers,
+                                                      unordered_map<uint64_t, vector<hashMinPair3>>&  minimizers_for_hash,
                                                       int lis_threshold,
                                                       vector<uint64_t>& nogos){
     unordered_map<uint64_t, vector<int>> same_strand;
@@ -210,10 +210,11 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
             if(match.seq_id <= query_id){
                 continue;
             }
-            if(match.rev ^ min.rev){
-                different_strand[match.seq_id].push_back(-match.index);
+            int final = abs(match.index);
+            if(match.index * min.index < 0 ){
+                different_strand[match.seq_id].push_back(-final);
             }else{
-                same_strand[match.seq_id].push_back(match.index);
+                same_strand[match.seq_id].push_back(final);
             }
         }
     }
@@ -232,9 +233,10 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     return overlaps;
 };
 
+
 vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
-                                                      vector<minimizer>& minimizers,
-                                                      unordered_map<uint64_t, vector<hashMinPair2>>&  minimizers_for_hash,
+                                                      vector<minim>& minimizers,
+                                                      unordered_map<uint64_t, vector<hashMinPair3>>&  minimizers_for_hash,
                                                       int lis_threshold,
                                                       unordered_map<uint64_t, uint32_t >& occurrences){
     unordered_map<uint64_t, vector<int>> same_strand;
@@ -249,10 +251,11 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
             if(match.seq_id <= query_id){
                 continue;
             }
-            if(match.rev ^ min.rev){
-                different_strand[match.seq_id].push_back(-match.index);
+            int final = abs(match.index);
+            if(match.index * min.index < 0){
+                different_strand[match.seq_id].push_back(-abs(match.index));
             }else{
-                same_strand[match.seq_id].push_back(match.index);
+                same_strand[match.seq_id].push_back(final);
             }
         }
     }
@@ -270,7 +273,6 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     }
     return overlaps;
 };
-
 
 // Binary search (note boundaries in the caller)
 int cell_index(std::vector<int> &v, int l, int r, int key) {
