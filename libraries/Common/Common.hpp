@@ -91,4 +91,24 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minim>>& minimize
 void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iterator end);
 
 bool hashMinPair3_comparator(hashMinPair3 a, hashMinPair3 b);
+
+void find_maximizers7
+        (const char *seq,
+         uint32_t seq_l,
+         uint32_t seq_id,
+         int32_t w,
+         uint32_t k,
+         std::vector<minim>& minimizers
+        );
+
+void find_maximizers_full
+        (const char *seq,
+         uint32_t seq_l,
+         uint32_t seq_id,
+         int32_t w,
+         uint32_t k,
+         std::vector<minim>& minimizers,
+         std::unordered_map<uint64_t, std::vector<hashMinPair3>>& minimizer_hits,
+         std::unordered_map<uint64_t ,uint32_t >& occurrences
+        );
 #endif
