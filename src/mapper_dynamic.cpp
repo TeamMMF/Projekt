@@ -96,6 +96,9 @@ int main(int argc, char const *argv[]) {
     unordered_map<uint64_t, vector<hashMinPair3>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
     std::vector<std::vector<minim>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
+    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map_max;
+    std::vector<std::vector<minim>> max_in_order(number_of_reads);
+
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
     // create storage for return values of find_overlaps_by_LIS
@@ -112,6 +115,14 @@ int main(int argc, char const *argv[]) {
                 k,
                 std::ref(mins_in_order)
         ));
+        thread_futures_data.emplace_back(thread_pool_data->submit_task(
+                process_sequence4_max, fasta_reads[i]->get_data(),
+                fasta_reads[i]->get_data_length(),
+                i,
+                w,
+                k,
+                std::ref(max_in_order)
+        ));
     }
     int i = 0;
     for (auto& it: thread_futures_data) {
@@ -125,12 +136,16 @@ int main(int argc, char const *argv[]) {
     //IZMJENE
     chrono::high_resolution_clock::time_point t3 = chrono::high_resolution_clock::now();
     std::vector<uint64_t> nogos;
+    std::vector<uint64_t> nogos_max;
     double thresh = 1.0;
     fill_lookup_table_nogo_minimizers(mins_in_order, lookup_map, nogos, thresh/100);
+    fill_lookup_table_nogo_minimizers(max_in_order, lookup_map_max, nogos_max, thresh/100);
     //END IZMJENE
 
     sort_by_indices(lookup_map);
+    sort_by_indices(lookup_map_max);
     sort(nogos.begin(),nogos.end());
+    sort(nogos_max.begin(), nogos_max.end());
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Data prepared in %ld seconds", chrono::duration_cast<chrono::seconds>( t4 - t3 ).count());
     fflush(stdout);
@@ -153,6 +168,15 @@ int main(int argc, char const *argv[]) {
                 std::ref(fasta_reads),
                 output,
                 nogos));
+        thread_futures_lis.emplace_back(thread_pool_lis->submit_task(
+                lis_overlap_parallelization,
+                i,
+                std::ref(max_in_order[i]),
+                std::ref(lookup_map_max),
+                4,
+                std::ref(fasta_reads),
+                output,
+                nogos_max));
     }
     int j = 0;
     for (auto& it: thread_futures_lis) {

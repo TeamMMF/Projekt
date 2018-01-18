@@ -772,6 +772,19 @@ void process_sequence4(const char* sequence,
     ordered_minimizers_addr[sequence_id] = mins;
 }
 
+void process_sequence4_max(const char* sequence,
+                       uint32_t sequence_l,
+                       uint32_t sequence_id,
+                       int32_t w,
+                       uint32_t k,
+                       std::vector<std::vector<minim>>& ordered_minimizers_addr){
+
+    std::vector<minim> mins;
+    find_maximizers7(sequence, sequence_l, sequence_id, w, k, mins);
+    mins.shrink_to_fit();
+    ordered_minimizers_addr[sequence_id] = mins;
+}
+
 
 uint32_t process_sequence4_id(const char* sequence,
                            uint32_t sequence_l,

@@ -111,4 +111,11 @@ void find_maximizers_full
          std::unordered_map<uint64_t, std::vector<hashMinPair3>>& minimizer_hits,
          std::unordered_map<uint64_t ,uint32_t >& occurrences
         );
+
+void process_sequence4_max(const char* sequence,
+                           uint32_t sequence_l,
+                           uint32_t sequence_id,
+                           int32_t w,
+                           uint32_t k,
+                           std::vector<std::vector<minim>>& ordered_minimizers_addr);
 #endif
