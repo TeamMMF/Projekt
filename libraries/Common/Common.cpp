@@ -175,6 +175,9 @@ void find_minimizers_full
         )
 {
 
+    if(seq_l < k + w){
+        return;
+    }
     const uint32_t kmers_l = seq_l - k + 1;
     //const uint16_t min_l = seq_l - w - k + 2;
 
@@ -355,6 +358,10 @@ void find_minimizers7
          std::vector<minim>& minimizers
         )
 {
+
+    if(seq_l < w + k){
+        return;
+    }
 
     const uint32_t kmers_l = seq_l - k + 1;
     //const uint16_t min_l = seq_l - w - k + 2;
