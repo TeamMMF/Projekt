@@ -13,9 +13,9 @@
 using namespace std;
 
 int main(){
-    /*
-    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
 
+    std::string s = "AACCTTGGAACCGGTTACGTGCTAGCAGTGATGCTGAGCTGAGAGATCTTAGAGCTAGTCAGCTACGATCAGCTACGCTACGACTACGATTATTAAGCGGGCGGGATCACGACTACGACTAGCGACTTATGGAGTCTCTCTTATTAGGGTGTGGTTCTCTGCGCGTATAGGCTGATCGATCAGCTAGGTGAGCTAGCATCGATCAGTG";
+    /*
     uint8_t k = 3;
     char** kmers;
     find_kmers(s.c_str(), 3, &kmers, s.length() - k + 1);
@@ -219,7 +219,40 @@ int main(){
     printf("DDEQ vrijeme:  %22lu\n", ddeq_time / 10000);
     printf("SDEQ vrijeme:  %22lu\n", sdeq_time / 10000);
 */
+
+    std::vector<minim> minis;
+    find_minimizers7(s.c_str(),s.length(),0,4,5, minis);
+    for(int i = 0; i < minis.size(); i++){
+        printf("%22llu -> %4d\n", minis[i].hash, minis[i].index);
+    }
+
+    /*
+    const char * p = s.c_str();
+    int k = 5;
+    uint64_t  last_hash = minimizer_hash3(p, k);
+    uint64_t  last_value = find_hash_value(p[0]);
+
+    for(int i = 1; i < s.size() - 4; i++){
+
+        printf("%22lu <---> %22lu\n", minimizer_hash3(&(p[i]), k), minimizer_hash4(p, i, &last_hash, 4, &last_value ) );
+    }
+
+
+    for(int i = 1; i < s.size() - 4; i++){
+
+        printf("%22lu <---> %22lu\n", minimizer_hash3(&(p[i]), k), minimizer_hash4(p, i, &last_hash, 4, &last_value ) );
+    }
+
+    printf("COMPLEMENTS\n");
+    last_hash = minimizer_hash3_rev(p, k);
+    last_value = find_hash_value(complement(p[0]));
+
+    for(int i = 1; i < s.size() - 4; i++){
+
+        printf("%22lu <---> %22lu\n", minimizer_hash3_rev(&(p[i]), k), minimizer_hash4_rev(p, i, &last_hash, 4, &last_value ) );
+    }
     return 0;
+     */
 }
 
 
