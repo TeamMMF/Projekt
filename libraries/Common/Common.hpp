@@ -118,4 +118,7 @@ void process_sequence4_max(const char* sequence,
                            int32_t w,
                            uint32_t k,
                            std::vector<std::vector<minim>>& ordered_minimizers_addr);
+
+uint64_t minimizer_hash4(const char* seq, int32_t index, uint64_t  last_hash, uint32_t power, uint64_t* first_nucleotide_value);
+uint64_t minimizer_hash4_rev(const char* seq, int32_t index, uint64_t  last_hash, uint32_t power, uint64_t* first_nucleotide_value);
 #endif

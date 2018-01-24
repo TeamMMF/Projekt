@@ -80,7 +80,7 @@ size_t find_hash_value(char c) {
             return 3;
 
         default:
-            throw runtime_error("Invalid value");
+            return 0;
     }
 }
 
@@ -139,8 +139,7 @@ uint64_t minimizer_hash3(const char* seq, uint32_t seq_l)
     return hash;
 }
 
-uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l)
-{
+uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l) {
     uint64_t hash = 0;
 
     for (int i = seq_l - 1; i >= 0; i--) {
@@ -149,8 +148,6 @@ uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l)
 
     return hash;
 }
-
-
 
 
 bool hashMinPair2_comparator(hashMinPair2 a, hashMinPair2 b){
@@ -183,21 +180,29 @@ void find_minimizers_full
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
+    uint64_t first_nuc_val = 0;
+    uint64_t first_nuc_val_r = 0;
+    uint32_t power = k - 1;
+    uint64_t prev_hash;
+    uint64_t prev_hash_r;
 
-    for (int i = 0; i < w; i++) {
-        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));   //HASH
+    prev_hash = hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4(seq, 0, 0, power, &first_nuc_val));
+    prev_hash_r = r_hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4_rev(seq, 0, 0, power, &first_nuc_val_r));
+
+    for (uint32_t i = 1; i < w; i++) {
+        prev_hash = hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4(seq, i, prev_hash, power, &first_nuc_val));
+        prev_hash_r = r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, prev_hash_r, power, &first_nuc_val_r));   //HASH
     }
 
     uint32_t min_l_pred = seq_l - w - k + 2;
     uint64_t last_min_hash = UINT64_MAX;
     int64_t last_min_position = -1;
 
-    for (uint32_t i = 0; i < min_l_pred; i++) {
+    for (int32_t i = 0; i < min_l_pred; i++) {
         uint64_t u;
         uint64_t v;
 
-        if(last_min_position != -1 && last_min_position >= i && last_min_position < i + w){
+        if(last_min_position != -1 && abs(last_min_position) >= i){
             u = hash_buffer[(i + w - 1) % w];
             v = r_hash_buffer[(i + w - 1) % w];
 
@@ -235,15 +240,14 @@ void find_minimizers_full
                     it->second.emplace_back((hashMinPair3) {seq_id,-(i + w - 1)});
                 }
                 //printf("%llu -> %u, %u, %s\n", v, seq_id, i + w - 1, "False");
-                last_min_position = i + w - 1;
+                last_min_position = -(i + w - 1);
                 last_min_hash = v;
             }
         }
         else {
             uint64_t m = UINT64_MAX;
 
-            uint32_t *min_positions = new uint32_t[w];
-            bool *min_rev = new bool[w];
+            int32_t *min_positions = new int32_t[w];
             uint16_t min_pos_size = 0;
             for (int j = 0; j < w; j++) {
                 u = hash_buffer[(i + j) % w];
@@ -254,30 +258,25 @@ void find_minimizers_full
                 }
 
                 if(u < m || v <  m){
-                    min_pos_size = 0;
 
                     if(u < v){
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = false;
+                        min_positions[0] = i + j;
                         m = u;
 
                     } else {
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = true;
+                        min_positions[0] = -(i + j);
                         m = v;
                     }
 
-                    min_pos_size++;
+                    min_pos_size = 1;
                 }
 
                 else if(u == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = false;
+                    min_positions[min_pos_size++] = i + j;
                 }
 
                 else if(v == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = true;
+                    min_positions[min_pos_size++] = -(i + j);
                 }
             }
 
@@ -285,15 +284,15 @@ void find_minimizers_full
             last_min_position = min_positions[min_pos_size - 1];
 
             for(uint32_t j = 0; j < min_pos_size; j++) {
-                minimizers.emplace_back((minim) {m, min_rev[j] ? (i + w - 1) : -(i + w - 1)});
+                minimizers.emplace_back((minim) {m, min_positions[j]});
                 occurrences[m]++;
                 auto it = minimizer_hits.find(m);
                 if (it == minimizer_hits.end()) {
                     std::vector<hashMinPair3> vec;
-                    vec.emplace_back((hashMinPair3) {seq_id, min_rev[j] ? min_positions[j] : -min_positions[j]});
+                    vec.emplace_back((hashMinPair3) {seq_id,  min_positions[j]});
                     minimizer_hits.emplace(m, vec);
                 } else {
-                    it->second.emplace_back((hashMinPair3) {seq_id, min_rev[j] ? min_positions[j] : -min_positions[j]});
+                    it->second.emplace_back((hashMinPair3) {seq_id, min_positions[j]});
                 }
 
                 //printf("%llu -> %u, %u, %s\n", m, seq_id, min_positions[j], min_rev[j] ? "True" : "False");
@@ -301,13 +300,12 @@ void find_minimizers_full
 
 
             delete[] min_positions;
-            delete[] min_rev;
         }
 
-        int next_end = i + w;
+        int32_t next_end = i + w;
         if (next_end < kmers_l) {
-            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[next_end]),k));//HASH
-            r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[next_end]),k));   //HASH
+            prev_hash = hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, prev_hash, power, &first_nuc_val));//HASH
+            prev_hash_r = r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, prev_hash_r, power, &first_nuc_val_r)); //HASH
         }
     }
 
@@ -350,7 +348,7 @@ void find_maximizers_full
     uint64_t last_min_hash = 0;
     int64_t last_min_position = -1;
 
-    for (uint32_t i = 0; i < min_l_pred; i++) {
+    for (int32_t i = 0; i < min_l_pred; i++) {
         uint64_t u;
         uint64_t v;
 
@@ -525,21 +523,29 @@ void find_minimizers7
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
+    uint64_t first_nuc_val = 0;
+    uint64_t first_nuc_val_r = 0;
+    uint32_t power = k - 1;
+    uint64_t prev_hash;
+    uint64_t prev_hash_r;
 
-    for (int i = 0; i < w; i++) {
-        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));   //HASH
+    prev_hash = hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4(seq, 0, 0, power, &first_nuc_val));
+    prev_hash_r = r_hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4_rev(seq, 0, 0, power, &first_nuc_val_r));
+
+    for (uint32_t i = 1; i < w; i++) {
+        prev_hash = hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4(seq, i, prev_hash, power, &first_nuc_val));
+        prev_hash_r = r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, prev_hash_r, power, &first_nuc_val_r));   //HASH
     }
 
     uint32_t min_l_pred = seq_l - w - k + 2;
     uint64_t last_min_hash = UINT64_MAX;
     int64_t last_min_position = -1;
 
-    for (uint32_t i = 0; i < min_l_pred; i++) {
+    for (int32_t i = 0; i < min_l_pred; i++) {
         uint64_t u;
         uint64_t v;
 
-        if(last_min_position != -1 && last_min_position >= i && last_min_position < i + w){
+        if(last_min_position != -1 && abs(last_min_position) >= i){
             u = hash_buffer[(i + w - 1) % w];
             v = r_hash_buffer[(i + w - 1) % w];
 
@@ -557,15 +563,14 @@ void find_minimizers7
             else if(u > v && v <= last_min_hash) {
                 minimizers.emplace_back((minim) {v, -(i + w - 1)});
                 //printf("%llu -> %u, %u, %s\n", v, seq_id, i + w - 1, "False");
-                last_min_position = i + w - 1;
+                last_min_position = -(i + w - 1);
                 last_min_hash = v;
             }
         }
         else {
             uint64_t m = UINT64_MAX;
 
-            uint32_t *min_positions = new uint32_t[w];
-            bool *min_rev = new bool[w];
+            int32_t *min_positions = new int32_t[w];
             uint16_t min_pos_size = 0;
             for (int j = 0; j < w; j++) {
                 u = hash_buffer[(i + j) % w];
@@ -576,30 +581,24 @@ void find_minimizers7
                 }
 
                 if(u < m || v <  m){
-                    min_pos_size = 0;
-
                     if(u < v){
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = false;
+                        min_positions[0] = i + j;
                         m = u;
 
                     } else {
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = true;
+                        min_positions[0] = -(i + j);
                         m = v;
                     }
 
-                    min_pos_size++;
+                    min_pos_size = 1;
                 }
 
                 else if(u == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = false;
+                    min_positions[min_pos_size++] = i + j;
                 }
 
                 else if(v == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = true;
+                    min_positions[min_pos_size++] = -(i + j);
                 }
             }
 
@@ -607,20 +606,19 @@ void find_minimizers7
             last_min_position = min_positions[min_pos_size - 1];
 
             for(uint32_t j = 0; j < min_pos_size; j++) {
-                minimizers.emplace_back((minim) {m, min_rev[j] ? min_positions[j] : min_positions[j]});
+                minimizers.emplace_back((minim) {m,  min_positions[j]}); //TREBA NEGATIVNO
 
                 //printf("%llu -> %u, %u, %s\n", m, seq_id, min_positions[j], min_rev[j] ? "True" : "False");
             }
 
 
             delete[] min_positions;
-            delete[] min_rev;
         }
 
         int next_end = i + w;
         if (next_end < kmers_l) {
-            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[next_end]),k));//HASH
-            r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[next_end]),k));   //HASH
+            prev_hash = hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, prev_hash, power, &first_nuc_val));//HASH
+            prev_hash_r = r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, prev_hash_r, power, &first_nuc_val_r));   //HASH
         }
     }
 
@@ -651,10 +649,18 @@ void find_maximizers7
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
+    uint64_t first_nuc_val = 0;
+    uint64_t first_nuc_val_r = 0;
+    uint32_t power = k - 1;
+    uint64_t prev_hash;
+    uint64_t prev_hash_r;
 
-    for (int i = 0; i < w; i++) {
-        hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3(&(seq[i]), k));
-        r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[i]),k));   //HASH
+    prev_hash = hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4(seq, 0, 0, power, &first_nuc_val));
+    prev_hash_r = r_hash_buffer[0] = invertible_minimizer_hash(minimizer_hash4_rev(seq, 0, 0, power, &first_nuc_val_r));
+
+    for (int i = 1; i < w; i++) {
+        prev_hash = hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4(seq, i, prev_hash, power, &first_nuc_val ));
+        prev_hash_r = r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, prev_hash_r, power, &first_nuc_val_r));   //HASH
     }
 
     uint32_t min_l_pred = seq_l - w - k + 2;
@@ -665,7 +671,7 @@ void find_maximizers7
         uint64_t u;
         uint64_t v;
 
-        if(last_min_position != -1 && last_min_position >= i && last_min_position < i + w){
+        if(last_min_position != -1 && abs(last_min_position >= i)){
             u = hash_buffer[(i + w - 1) % w];
             v = r_hash_buffer[(i + w - 1) % w];
 
@@ -690,8 +696,7 @@ void find_maximizers7
         else {
             uint64_t m = UINT64_MAX;
 
-            uint32_t *min_positions = new uint32_t[w];
-            bool *min_rev = new bool[w];
+            int32_t *min_positions = new int32_t[w];
             uint16_t min_pos_size = 0;
             for (int j = 0; j < w; j++) {
                 u = hash_buffer[(i + j) % w];
@@ -702,30 +707,25 @@ void find_maximizers7
                 }
 
                 if(u > m || v >  m){
-                    min_pos_size = 0;
 
                     if(u > v){
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = false;
+                        min_positions[0] = i + j;
                         m = u;
 
                     } else {
-                        min_positions[min_pos_size] = i + j;
-                        min_rev[min_pos_size] = true;
+                        min_positions[0] = -(i + j);
                         m = v;
                     }
 
-                    min_pos_size++;
+                    min_pos_size = 1;
                 }
 
                 else if(u == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = false;
+                    min_positions[min_pos_size++] = i + j;
                 }
 
                 else if(v == m){
-                    min_positions[min_pos_size] = i + j;
-                    min_rev[min_pos_size++] = true;
+                    min_positions[min_pos_size++] = -(i + j);
                 }
             }
 
@@ -733,20 +733,19 @@ void find_maximizers7
             last_min_position = min_positions[min_pos_size - 1];
 
             for(uint32_t j = 0; j < min_pos_size; j++) {
-                minimizers.emplace_back((minim) {m, min_rev[j] ? min_positions[j] : min_positions[j]});
+                minimizers.emplace_back((minim) {m,  min_positions[j] });
 
                 //printf("%llu -> %u, %u, %s\n", m, seq_id, min_positions[j], min_rev[j] ? "True" : "False");
             }
 
 
             delete[] min_positions;
-            delete[] min_rev;
         }
 
         int next_end = i + w;
         if (next_end < kmers_l) {
-            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3(&(seq[next_end]),k));//HASH
-            r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash3_rev(&(seq[next_end]),k));   //HASH
+            prev_hash = hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4(seq, i, prev_hash, power, &first_nuc_val ));//HASH
+            prev_hash_r = r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, prev_hash_r, power, &first_nuc_val_r));   //HASH
         }
     }
 
@@ -849,3 +848,20 @@ bool occurences_comparator(const std::pair<uint64_t,uint32_t>& a, const std::pai
     return a.second > b.second;
 }
 
+uint64_t minimizer_hash4(const char* seq, int32_t index, uint64_t  last_hash, uint32_t power, uint64_t* first_nucleotide_value)
+{
+    uint64_t  hash = 0;
+    uint64_t remove = *first_nucleotide_value * (1 << (power*2));
+    *first_nucleotide_value = find_hash_value(seq[index + power]);
+    hash = (last_hash - remove) * 4 + *first_nucleotide_value;
+    return hash;
+}
+
+uint64_t minimizer_hash4_rev(const char* seq, int32_t index, uint64_t  last_hash, uint32_t power, uint64_t* first_nucleotide_value)
+{
+    uint64_t  hash = 0;
+    uint64_t remove = *first_nucleotide_value ;
+    *first_nucleotide_value = find_hash_value(seq[index + power]);
+    hash = (last_hash - remove) * 4 + (*first_nucleotide_value * (1 << (power*2)));
+    return hash;
+}
