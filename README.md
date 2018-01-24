@@ -13,7 +13,7 @@ $ build/bin/mapper src/resources/lambda_reads.fasta out.paf
 
 Postoji mogućnost ograničenja broja dretvi trećim argumentom. Na primjer, ako se program želi ograničiti na 3 dretve, poziva se ovako:
 ```sh
-$ build/bin/mapper src/resources/ecoli_reads.fasta out_t.paf 3
+$ build/bin/mapper src/resources/ecoli_reads.fasta out.paf 3
 ```  
 
 Detaljnije upute za uporabu mogu se dobiti uz pozivni parametar `-h`:
