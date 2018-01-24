@@ -304,7 +304,7 @@ void find_minimizers_full
 
         int32_t next_end = i + w;
         if (next_end < kmers_l) {
-            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
+            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
             r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash_r, power, &first_nuc_val_r)); //HASH
         }
     }
@@ -376,11 +376,28 @@ void find_minimizers7
     r_hash_buffer[0] = invertible_minimizer_hash(prev_hash_r);
 
     //printf("%4d => %22lu <-> %22lu\n",0,  hash_buffer[0], r_hash_buffer[0]);
+    /*
+    if(hash_buffer[0] > r_hash_buffer[0]){
+        printf("%4d => %22lu\n", 0, r_hash_buffer[0]);
+    } else if(hash_buffer[0] < r_hash_buffer[0]){
+        printf("%4d => %22lu\n", 0 , hash_buffer[0]);
+    } else {
+        printf("%4d => AMBIGIOUS\n", 0);
+    }*/
 
     for (uint32_t i = 1; i < w; i++) {
         hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4(seq, i, &prev_hash, power, &first_nuc_val));
         r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, &prev_hash_r, power, &first_nuc_val_r));   //HASH
-       // printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[i], r_hash_buffer[i]);
+        //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[i], r_hash_buffer[i]);
+        /*
+        if(hash_buffer[i] > r_hash_buffer[i]){
+            printf("%4d => %22lu\n", i, r_hash_buffer[i]);
+        } else if(hash_buffer[i] < r_hash_buffer[i]){
+            printf("%4d => %22lu\n", i , hash_buffer[i]);
+        } else {
+            printf("%4d => AMBIGIOUS\n", i);
+        }
+         */
     }
 
     uint32_t min_l_pred = seq_l - w - k + 2;
@@ -463,9 +480,17 @@ void find_minimizers7
 
         int next_end = i + w;
         if (next_end < kmers_l) {
-            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
+            hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
             r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash_r, power, &first_nuc_val_r));   //HASH
             //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[next_end % w], r_hash_buffer[next_end % w]);
+            /*
+            if(hash_buffer[next_end % w] > r_hash_buffer[next_end % w]){
+                printf("%4d => %22lu\n", next_end, r_hash_buffer[next_end % w]);
+            } else if(hash_buffer[next_end % w] < r_hash_buffer[next_end % w]){
+                printf("%4d => %22lu\n", next_end , hash_buffer[next_end % w]);
+            } else {
+                printf("%4d => AMBIGIOUS\n", next_end);
+            }*/
         }
     }
 
