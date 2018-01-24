@@ -45,4 +45,13 @@ std::vector<std::pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                            int lis_threshold,
                                                            std::unordered_map<uint64_t, uint32_t >& occurrences);
 
+std::vector<std::pair<int, bool>> find_overlaps_by_LIS_maxis(int  query_id,
+                                                   std::vector<minim>& minimizers,
+                                                   std::vector<minim>& maximizers,
+                                                        std::unordered_map<uint64_t, std::vector<hashMinPair3>>&  minimizers_for_hash,
+                                                        std:: unordered_map<uint64_t, std::vector<hashMinPair3>>&  maximizers_for_hash,
+                                                   int lis_threshold,
+                                                        std::unordered_map<uint64_t, uint32_t >& minimizer_occurences,
+                                                        std::unordered_map<uint64_t, uint32_t >& maximizer_occurences);
+
 #endif

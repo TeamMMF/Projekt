@@ -484,14 +484,6 @@ void find_minimizers7
             hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
             r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash_r, power, &first_nuc_val_r));   //HASH
             //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[next_end % w], r_hash_buffer[next_end % w]);
-
-            if(hash_buffer[next_end % w] > r_hash_buffer[next_end % w]){
-                printf("%4d => %22lu\n", next_end, r_hash_buffer[next_end % w]);
-            } else if(hash_buffer[next_end % w] < r_hash_buffer[next_end % w]){
-                printf("%4d => %22lu\n", next_end , hash_buffer[next_end % w]);
-            } else {
-                printf("%4d => AMBIGIOUS\n", next_end);
-            }
         }
     }
 
@@ -543,6 +535,24 @@ uint32_t process_sequence4_id(const char* sequence,
     find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
+    return sequence_id;
+}
+
+uint32_t process_sequence_mins_maxs(const char* sequence,
+                              uint32_t sequence_l,
+                              uint32_t sequence_id,
+                              int32_t w,
+                              uint32_t k,
+                              std::vector<std::vector<minim>>& ordered_minimizers_addr,
+                              std::vector<std::vector<minim>>& ordered_maximizers_addr){
+
+    std::vector<minim> mins;
+    std::vector<minim> maxs;
+    find_mini_and_max(sequence, sequence_l, sequence_id, w, k, mins,maxs);
+    mins.shrink_to_fit();
+    maxs.shrink_to_fit();
+    ordered_minimizers_addr[sequence_id] = mins;
+    ordered_maximizers_addr[sequence_id] = maxs;
     return sequence_id;
 }
 
@@ -660,13 +670,6 @@ void find_mini_and_max
         r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, &prev_hash_r, power, &first_nuc_val_r));   //HASH
         //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[i], r_hash_buffer[i]);
 
-        if(hash_buffer[i] > r_hash_buffer[i]){
-            printf("%4d => %22lu\n", i, r_hash_buffer[i]);
-        } else if(hash_buffer[i] < r_hash_buffer[i]){
-            printf("%4d => %22lu\n", i , hash_buffer[i]);
-        } else {
-            printf("%4d => AMBIGIOUS\n", i);
-        }
 
     }
 
@@ -720,7 +723,7 @@ void find_mini_and_max
                         m = u;
 
                     } else {
-                        min_positions[0] = -(i + j);
+                        min_positions[0] = (i + j);
                         m = v;
                     }
 

@@ -65,6 +65,15 @@ uint32_t process_sequence4_id(const char* sequence,
                               int32_t w,
                               uint32_t k,
                               std::vector<std::vector<minim>>& ordered_minimizers_addr);
+
+uint32_t process_sequence_mins_maxs(const char* sequence,
+                                    uint32_t sequence_l,
+                                    uint32_t sequence_id,
+                                    int32_t w,
+                                    uint32_t k,
+                                    std::vector<std::vector<minim>>& ordered_minimizers_addr,
+                                    std::vector<std::vector<minim>>& ordered_maximizers_addr);
+
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,

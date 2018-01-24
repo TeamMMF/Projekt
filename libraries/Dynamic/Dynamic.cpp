@@ -274,6 +274,49 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
     return overlaps;
 };
 
+vector<pair<int, bool>> find_overlaps_by_LIS_maxis(int  query_id,
+                                                      vector<minim>& minimizers,
+                                                      vector<minim>& maximizers,
+                                                      unordered_map<uint64_t, vector<hashMinPair3>>&  minimizers_for_hash,
+                                                      unordered_map<uint64_t, vector<hashMinPair3>>&  maximizers_for_hash,
+                                                      int lis_threshold,
+                                                      unordered_map<uint64_t, uint32_t >& minimizer_occurences,
+                                                      unordered_map<uint64_t, uint32_t >& maximizer_occurences){
+    unordered_map<uint64_t, vector<int>> same_strand;
+    unordered_map<uint64_t, vector<int>> different_strand;
+    for(auto min : minimizers){
+        if(minimizer_occurences[min.hash]>34)
+            continue;
+        auto matches = minimizers_for_hash.find(min.hash);
+        if(matches == minimizers_for_hash.end())
+            continue;
+        for(auto match : matches->second){
+            if(match.seq_id <= query_id){
+                continue;
+            }
+            int final = abs(match.index);
+            if(match.index * min.index < 0){
+                different_strand[match.seq_id].push_back(-abs(match.index));
+            }else{
+                same_strand[match.seq_id].push_back(final);
+            }
+        }
+    }
+    vector<pair<int, bool>> overlaps;
+    for(auto &entry : same_strand){
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(entry.first,true);
+        }
+    }
+
+    for(auto &entry : different_strand){
+        if(lis(entry.second)>=lis_threshold){
+            overlaps.emplace_back(make_pair(entry.first,false));
+        }
+    }
+    return overlaps;
+};
+
 // Binary search (note boundaries in the caller)
 int cell_index(std::vector<int> &v, int l, int r, int key) {
     while (r-l > 1) {

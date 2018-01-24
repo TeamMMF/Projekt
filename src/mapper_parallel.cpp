@@ -84,14 +84,38 @@ bool lis_threshold(int result, int l1, int l2) {
 
 void lis_overlap_parallelization(int  query_id,
                                  vector<minim>& minimizer_hashes,
-                                 unordered_map<uint64_t, vector<hashMinPair3>>&  lookup_map,
+                                 vector<minim>& maximizer_hashes,
+                                 unordered_map<uint64_t, vector<hashMinPair3>>&  minimizer_lookup_map,
+                                 unordered_map<uint64_t, vector<hashMinPair3>>&  maximizer_lookup_map,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,
-                                 unordered_map<uint64_t,uint32_t >& occurences){
+                                 unordered_map<uint64_t,uint32_t >& minimizer_occurences,
+                                 unordered_map<uint64_t,uint32_t >& maximizer_occurences){
 
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,occurences);
-    for(auto res : result){
+    vector<pair<int, bool>> result_min = find_overlaps_by_LIS_parallel(query_id,
+                                                                   minimizer_hashes,
+                                                                   minimizer_lookup_map,
+                                                                   lis_threshold,
+                                                                   minimizer_occurences);
+    vector<pair<int, bool>> result_max = find_overlaps_by_LIS_parallel(query_id,
+                                                                   maximizer_hashes,
+                                                                       maximizer_lookup_map,
+                                                                   lis_threshold,
+                                                                       maximizer_occurences);
+    for(auto res : result_min){
+        fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
+                fasta_reads[query_id] -> get_name(),
+                fasta_reads[query_id] -> get_data_length(),
+                0,
+                0,
+                res.second ? '+' : '-',
+                fasta_reads[res.first] -> get_name(),
+                fasta_reads[res.first] -> get_data_length()
+        );
+    }
+
+    for(auto res : result_max){
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                 fasta_reads[query_id] -> get_name(),
                 fasta_reads[query_id] -> get_data_length(),
@@ -131,8 +155,10 @@ int main(int argc, char const *argv[]) {
     long number_of_reads = fasta_reads.size();
     printf("Reading file - Done.\n");
 
-    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
+    unordered_map<uint64_t, vector<hashMinPair3>> min_lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
+    unordered_map<uint64_t, vector<hashMinPair3>> max_lookup_map; // hash minimizera -> maximizeri svih sekvenci poredani po indeksu uzlazno
     std::vector<std::vector<minim>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
+    std::vector<std::vector<minim>> maxs_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
@@ -144,29 +170,33 @@ int main(int argc, char const *argv[]) {
     for (int i=0; i<number_of_reads; i++){
             //concurrency?
         thread_futures_data.emplace_back(thread_pool_data->submit_task(
-                process_sequence4_id, fasta_reads[i]->get_data(),
+                process_sequence_mins_maxs, fasta_reads[i]->get_data(),
                 fasta_reads[i]->get_data_length(),
                 i,
                 w,
                 k,
-                std::ref(mins_in_order)
+                std::ref(mins_in_order),
+                std::ref(maxs_in_order)
         ));
     }
     int i = 0;
     unordered_map<uint64_t ,uint32_t > min_occurences;
+    unordered_map<uint64_t ,uint32_t > max_occurences;
     //nogo planvector<uint64_t > nogos;
-    uint32_t  number_of_minimizers=0;
     for (auto& it: thread_futures_data) {
         report_status("Collecting minimizers",i++, number_of_reads);
         it.wait();
         uint32_t id = it.get();
-        number_of_minimizers+=add_to_lookup_table(id, mins_in_order[id], lookup_map, min_occurences);
+        add_to_lookup_table(id, mins_in_order[id], min_lookup_map, min_occurences);
+        add_to_lookup_table(id, maxs_in_order[id], max_lookup_map, max_occurences);
     }
     //nogo plan reduce_minimizers(number_of_minimizers,min_occurences,nogos);
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting minimizers - Finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
-    sort_by_indices(lookup_map);
+    sort_by_indices(min_lookup_map);
+    sort_by_indices(max_lookup_map);printf("Velicina: %d", max_lookup_map.size());
+
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Sorting finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
     fflush(stdout);
@@ -186,11 +216,14 @@ int main(int argc, char const *argv[]) {
                 lis_overlap_parallelization,
                 i,
                 std::ref(mins_in_order[i]),
-                std::ref(lookup_map),
+                std::ref(maxs_in_order[i]),
+                std::ref(min_lookup_map),
+                std::ref(max_lookup_map),
                 4,
                 std::ref(fasta_reads),
                 output,
-                std::ref(min_occurences)));
+                std::ref(min_occurences),
+                std::ref(max_occurences)));
     }
     int j = 0;
     for (auto& it: thread_futures_lis) {
