@@ -8,7 +8,6 @@
 #include "Dynamic.h"
 #include <CustomTypes.h>
 #include <chrono>
-#include <lcskpp.h>
 #include "bioparser/bioparser.hpp"
 #include <algorithm>
 #include <include/thread_pool/thread_pool.hpp>
@@ -124,6 +123,14 @@ int main(int argc, char const *argv[]) {
         show_usage(argv[0]);
         return 1;
     }
+
+    int max_concurrent_threads = argc > 3 ? stoi(argv[3]) : -1;
+    if(max_concurrent_threads < 0){
+        printf("Running on an unlimited number of concurrent threads.\n");
+    }else{
+        printf("Running on %d concurrent threads.\n",max_concurrent_threads);
+    }
+
     // čita datoteku i sprema svako očitanje u poseban objekt razreda FASTARead
     vector<unique_ptr<FASTARead>> fasta_reads;
     auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
@@ -135,7 +142,12 @@ int main(int argc, char const *argv[]) {
     std::vector<std::vector<minim>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
     // create thread pool
-    std::shared_ptr<thread_pool::ThreadPool> thread_pool_data = thread_pool::createThreadPool();
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool_data;
+    if(max_concurrent_threads < 0){
+        thread_pool_data = thread_pool::createThreadPool();
+    }else{
+        thread_pool_data = thread_pool::createThreadPool(max_concurrent_threads);
+    }
     // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<uint32_t >> thread_futures_data;
 
@@ -174,7 +186,12 @@ int main(int argc, char const *argv[]) {
     printf("Comparing sequences [-]");
 
     // create thread pool
-    std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis = thread_pool::createThreadPool();
+    std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis;
+    if(max_concurrent_threads < 0){
+        thread_pool_lis = thread_pool::createThreadPool();
+    }else{
+        thread_pool_lis = thread_pool::createThreadPool(max_concurrent_threads);
+    }
     // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<void>> thread_futures_lis;
 

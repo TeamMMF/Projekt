@@ -449,7 +449,7 @@ void find_minimizers7
                         m = u;
 
                     } else {
-                        min_positions[0] = -(i + j);
+                        min_positions[0] = (i + j);
                         m = v;
                     }
 
