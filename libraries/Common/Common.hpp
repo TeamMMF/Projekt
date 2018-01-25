@@ -68,7 +68,6 @@ uint32_t process_sequence4_id(const char* sequence,
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,
-         uint32_t seq_id,
          int32_t w,
          uint32_t k,
          std::vector<minim>& minimizers);

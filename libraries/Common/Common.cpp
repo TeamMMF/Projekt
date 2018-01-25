@@ -350,7 +350,6 @@ void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair3>>& mi
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,
-         uint32_t seq_id,
          int32_t w,
          uint32_t k,
          std::vector<minim>& minimizers
@@ -362,7 +361,6 @@ void find_minimizers7
     }
 
     const uint32_t kmers_l = seq_l - k + 1;
-    //const uint16_t min_l = seq_l - w - k + 2;
 
     uint64_t *hash_buffer = new uint64_t[w];
     uint64_t *r_hash_buffer = new uint64_t[w];
@@ -375,29 +373,9 @@ void find_minimizers7
     hash_buffer[0] = invertible_minimizer_hash(prev_hash);
     r_hash_buffer[0] = invertible_minimizer_hash(prev_hash_r);
 
-    //printf("%4d => %22lu <-> %22lu\n",0,  hash_buffer[0], r_hash_buffer[0]);
-    /*
-    if(hash_buffer[0] > r_hash_buffer[0]){
-        printf("%4d => %22lu\n", 0, r_hash_buffer[0]);
-    } else if(hash_buffer[0] < r_hash_buffer[0]){
-        printf("%4d => %22lu\n", 0 , hash_buffer[0]);
-    } else {
-        printf("%4d => AMBIGIOUS\n", 0);
-    }*/
-
     for (uint32_t i = 1; i < w; i++) {
         hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4(seq, i, &prev_hash, power, &first_nuc_val));
         r_hash_buffer[i] = invertible_minimizer_hash(minimizer_hash4_rev(seq, i, &prev_hash_r, power, &first_nuc_val_r));   //HASH
-        //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[i], r_hash_buffer[i]);
-        /*
-        if(hash_buffer[i] > r_hash_buffer[i]){
-            printf("%4d => %22lu\n", i, r_hash_buffer[i]);
-        } else if(hash_buffer[i] < r_hash_buffer[i]){
-            printf("%4d => %22lu\n", i , hash_buffer[i]);
-        } else {
-            printf("%4d => AMBIGIOUS\n", i);
-        }
-         */
     }
 
     uint32_t min_l_pred = seq_l - w - k + 2;
@@ -418,14 +396,12 @@ void find_minimizers7
 
             else if(u < v && u <= last_min_hash){
                 minimizers.emplace_back((minim) {u, (i + w - 1)});
-                //printf("%llu -> %u, %u, %s\n", u, seq_id, i + w - 1, "True");
                 last_min_position = i + w - 1;
                 last_min_hash = u;
             }
 
             else if(u > v && v <= last_min_hash) {
                 minimizers.emplace_back((minim) {v, -(i + w - 1)});
-                //printf("%llu -> %u, %u, %s\n", v, seq_id, i + w - 1, "False");
                 last_min_position = -(i + w - 1);
                 last_min_hash = v;
             }
@@ -470,8 +446,6 @@ void find_minimizers7
 
             for(uint32_t j = 0; j < min_pos_size; j++) {
                 minimizers.emplace_back((minim) {m,  min_positions[j]}); //TREBA NEGATIVNO
-
-                //printf("%llu -> %u, %u, %s\n", m, seq_id, min_positions[j], min_rev[j] ? "True" : "False");
             }
 
 
@@ -482,22 +456,11 @@ void find_minimizers7
         if (next_end < kmers_l) {
             hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4(seq, next_end, &prev_hash, power, &first_nuc_val));//HASH
             r_hash_buffer[next_end % w] = invertible_minimizer_hash(minimizer_hash4_rev(seq, next_end, &prev_hash_r, power, &first_nuc_val_r));   //HASH
-            //printf("%4d => %22lu <-> %22lu\n", i, hash_buffer[next_end % w], r_hash_buffer[next_end % w]);
-            /*
-            if(hash_buffer[next_end % w] > r_hash_buffer[next_end % w]){
-                printf("%4d => %22lu\n", next_end, r_hash_buffer[next_end % w]);
-            } else if(hash_buffer[next_end % w] < r_hash_buffer[next_end % w]){
-                printf("%4d => %22lu\n", next_end , hash_buffer[next_end % w]);
-            } else {
-                printf("%4d => AMBIGIOUS\n", next_end);
-            }*/
         }
     }
 
-    //FREE BLOK
     delete[] hash_buffer;
     delete[] r_hash_buffer;
-    //
 
     return;
 }
@@ -511,7 +474,7 @@ void process_sequence4(const char* sequence,
                        std::vector<std::vector<minim>>& ordered_minimizers_addr){
 
     std::vector<minim> mins;
-    find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
+    find_minimizers7(sequence, sequence_l, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
 }
@@ -539,7 +502,7 @@ uint32_t process_sequence4_id(const char* sequence,
                            std::vector<std::vector<minim>>& ordered_minimizers_addr){
 
     std::vector<minim> mins;
-    find_minimizers7(sequence, sequence_l, sequence_id, w, k, mins);
+    find_minimizers7(sequence, sequence_l, w, k, mins);
     mins.shrink_to_fit();
     ordered_minimizers_addr[sequence_id] = mins;
     return sequence_id;

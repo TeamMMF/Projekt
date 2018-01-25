@@ -221,7 +221,7 @@ int main(){
 */
 
     std::vector<minim> minis;
-    find_minimizers7(s.c_str(),s.length(),0,4,5, minis);
+    find_minimizers7(s.c_str(),s.length(),4,5, minis);
     for(int i = 0; i < minis.size(); i++){
         printf("%22llu -> %4d\n", minis[i].hash, minis[i].index);
     }
