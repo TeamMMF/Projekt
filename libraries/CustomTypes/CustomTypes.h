@@ -35,8 +35,7 @@ typedef struct {
 typedef struct {
     uint64_t hash;
     uint32_t seq_id;
-    uint32_t index;
-    bool rev;
+    int32_t index;
 } hashMinPair;
 
 typedef struct {
