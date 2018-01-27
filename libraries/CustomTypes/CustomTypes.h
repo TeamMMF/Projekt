@@ -27,16 +27,15 @@ typedef struct {
 } mapInfo;
 
 typedef struct {
-    uint32_t index;
-    bool rev;
-} hashEntry;
+    uint64_t hash;
+    uint32_t occurrence;
+} hashOccurrence;
 
 
 typedef struct {
     uint64_t hash;
     uint32_t seq_id;
-    uint32_t index;
-    bool rev;
+    int32_t index;
 } hashMinPair;
 
 typedef struct {

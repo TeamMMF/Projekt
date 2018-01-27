@@ -121,4 +121,10 @@ void process_sequence4_max(const char* sequence,
 
 uint64_t minimizer_hash4(const char* seq, int32_t index, uint64_t* last_hash, uint32_t power, uint64_t* first_nucleotide_value);
 uint64_t minimizer_hash4_rev(const char* seq, int32_t index, uint64_t* last_hash, uint32_t power, uint64_t* first_nucleotide_value);
+bool hashOccurrence_comparator(const hashOccurrence &a, const hashOccurrence &b);
+std::vector<hashOccurrence> findOccurenceVector(std::unordered_map<uint64_t,uint32_t>& occurrences);
+void fill_minimizer_hits(
+        std::unordered_map<uint64_t, uint32_t>& occurrences_map,
+        std::unordered_map<uint64_t, std::vector<hashMinPair3>>& lookup_map,
+        vector<hashMinPair3>& minimizer_hits);
 #endif

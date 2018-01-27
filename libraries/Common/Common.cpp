@@ -613,3 +613,43 @@ uint64_t minimizer_hash4_rev(const char* seq, int32_t index, uint64_t*  last_has
     *last_hash = hash;
     return hash;
 }
+
+bool hashOccurrence_comparator(const hashOccurrence &a, const hashOccurrence &b){
+    if(a.occurrence == b.occurrence){
+        return a.hash > b.hash;
+    }
+
+    return  a.occurrence > b.occurrence;
+}
+
+vector<hashOccurrence> findOccurenceVector(std::unordered_map<uint64_t,uint32_t>& occurrences){
+    vector<hashOccurrence> occurr_vector;
+    std::unordered_map<uint64_t, uint32_t>::iterator it;
+    for(it = occurrences.begin(); it != occurrences.end(); it++){
+        occurr_vector.emplace_back((hashOccurrence) {it->first, it->second});
+    }
+
+    sort(occurr_vector.begin(), occurr_vector.end(), hashOccurrence_comparator);
+
+    return occurr_vector;
+}
+
+void fill_minimizer_hits(
+        std::unordered_map<uint64_t, uint32_t>& occurrences_map,
+        std::unordered_map<uint64_t, std::vector<hashMinPair3>>& lookup_map,
+        vector<hashMinPair3>& minimizer_hits)
+{
+
+    std::vector<hashOccurrence> occurrences = findOccurenceVector(occurrences_map);
+
+    for(auto it = occurrences.begin(); it != occurrences.end(); it++){
+        uint32_t index = (uint32_t ) minimizer_hits.size();
+        auto it2 = lookup_map.find(it->hash);
+        if(it2 != lookup_map.end()){
+            for(int i = 0; i  < it2->second.size(); i++){
+                minimizer_hits.emplace_back(it2 ->second[i]);
+            }
+        }
+        occurrences_map[it->hash]= index;
+    }
+}
