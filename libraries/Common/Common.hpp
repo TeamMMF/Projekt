@@ -126,5 +126,6 @@ std::vector<hashOccurrence> findOccurenceVector(std::unordered_map<uint64_t,uint
 void fill_minimizer_hits(
         std::unordered_map<uint64_t, uint32_t>& occurrences_map,
         std::unordered_map<uint64_t, std::vector<hashMinPair3>>& lookup_map,
+        std::unordered_map<uint64_t, uint32_t>& hit_index,
         vector<hashMinPair3>& minimizer_hits);
 #endif

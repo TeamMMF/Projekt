@@ -236,29 +236,32 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
 
 vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                       vector<minim>& minimizers,
-                                                      unordered_map<uint64_t, vector<hashMinPair3>>&  minimizers_for_hash,
+                                                      vector<hashMinPair3>&  minimizer_hits,
+                                                      unordered_map<uint64_t, uint32_t>& hits_index,
                                                       int lis_threshold,
                                                       unordered_map<uint64_t, uint32_t >& occurrences){
     unordered_map<uint64_t, vector<int>> same_strand;
     unordered_map<uint64_t, vector<int>> different_strand;
     for(auto min : minimizers){
-        if(occurrences[min.hash]>34)
+        uint32_t oc = occurrences[min.hash];
+        if(oc>34)
             continue;
-        auto matches = minimizers_for_hash.find(min.hash);
-        if(matches == minimizers_for_hash.end())
-            continue;
-        for(auto match : matches->second){
-            if(match.seq_id <= query_id){
+        uint32_t start = hits_index[min.hash];
+        uint32_t end = start + oc;
+        for(; start < end; start++) {
+            auto match = minimizer_hits[start];
+            if (match.seq_id <= query_id) {
                 continue;
             }
             int final = abs(match.index);
-            if(match.index * min.index < 0){
+            if (match.index * min.index < 0) {
                 different_strand[match.seq_id].push_back(-final);
-            }else{
+            } else {
                 same_strand[match.seq_id].push_back(final);
             }
         }
     }
+
     vector<pair<int, bool>> overlaps;
     for(auto &entry : same_strand){
         if(lis(entry.second)>=lis_threshold){

@@ -18,9 +18,6 @@
 
 const char *progress = "-\\|/";
 
-bool lis_threshold(int result,int l1, int l2);
-
-
 void show_usage(string arg) {
     fprintf(stdout, "%s Version %d.%d\n",
             arg.c_str(),
@@ -31,22 +28,6 @@ void show_usage(string arg) {
     fprintf(stdout, "Available options are:\n");
     fprintf(stdout, "-h, --help\t\t\tshow usage instructions.\n");
 
-}
-
-void reduce_minimizers(uint32_t  number_of_minimizers,
-                       std::unordered_map<uint64_t ,uint32_t>& min_occurences,
-                       vector<uint64_t>& nogos){
-    std::vector<std::pair<uint64_t, uint32_t>> min_occur(min_occurences.begin(), min_occurences.end());
-    sort(min_occur.begin(), min_occur.end(), occurences_comparator);
-    double acc = 0;
-    for(int i = 0, len = min_occur.size(); i < len; i++){
-        acc += min_occur[i].second / (double) number_of_minimizers;
-
-        if(min_occur[i].second <= 34){
-            break;
-        }
-        nogos.emplace_back(min_occur[i].first);
-    }
 }
 
 uint32_t add_to_lookup_table(uint32_t seq_id,
@@ -77,19 +58,17 @@ void report_status(const char* operation, int curr, long total) {
     fflush(stdout);
 }
 
-bool lis_threshold(int result, int l1, int l2) {
-    return result > 9;
-}
 
 void lis_overlap_parallelization(int  query_id,
                                  vector<minim>& minimizer_hashes,
-                                 unordered_map<uint64_t, vector<hashMinPair3>>&  lookup_map,
+                                 vector<hashMinPair3>& minimizer_hits,
+                                 unordered_map<uint64_t, uint32_t>& hits_index,
                                  int lis_threshold,
                                  vector<unique_ptr<FASTARead>>& fasta_reads,
                                  FILE* output,
                                  unordered_map<uint64_t,uint32_t >& occurences){
 
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,occurences);
+    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,minimizer_hits,hits_index,lis_threshold,occurences);
     for(auto res : result){
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                 fasta_reads[query_id] -> get_name(),
@@ -178,13 +157,16 @@ int main(int argc, char const *argv[]) {
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
     printf("\rCollecting minimizers - Finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
 
-    sort_by_indices(lookup_map);
+    //sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
     printf("Sorting finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
     fflush(stdout);
     //nogo plan sort(nogos.begin(),nog  os.end());
     printf("Comparing sequences [-]");
 
+    std::vector<hashMinPair3> minimizer_hits;
+    std::unordered_map<uint64_t, uint32_t> hits_index;
+    fill_minimizer_hits(min_occurences, lookup_map, hits_index, minimizer_hits);
     // create thread pool
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis;
     if(max_concurrent_threads < 0){
@@ -203,7 +185,8 @@ int main(int argc, char const *argv[]) {
                 lis_overlap_parallelization,
                 i,
                 std::ref(mins_in_order[i]),
-                std::ref(lookup_map),
+                std::ref(minimizer_hits),
+                std::ref(hits_index),
                 4,
                 std::ref(fasta_reads),
                 output,

@@ -637,6 +637,7 @@ vector<hashOccurrence> findOccurenceVector(std::unordered_map<uint64_t,uint32_t>
 void fill_minimizer_hits(
         std::unordered_map<uint64_t, uint32_t>& occurrences_map,
         std::unordered_map<uint64_t, std::vector<hashMinPair3>>& lookup_map,
+        std::unordered_map<uint64_t, uint32_t>& hit_index,
         vector<hashMinPair3>& minimizer_hits)
 {
 
@@ -650,6 +651,6 @@ void fill_minimizer_hits(
                 minimizer_hits.emplace_back(it2 ->second[i]);
             }
         }
-        occurrences_map[it->hash]= index;
+        hit_index[it->hash]= index;
     }
 }
