@@ -39,7 +39,7 @@ std::vector<std::pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                                                                 int lis_threshold,
                                                                 std::vector<uint64_t>& nogos);
 
-std::vector<std::pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
+std::vector<std::pair<int, bool>> find_overlaps_by_LIS_parallel2(int  query_id,
                                                       std::vector<minim>& minimizers,
                                                       std::vector<hashMinPair3>&  minimizer_hits,
                                                       std::unordered_map<uint64_t, uint32_t>& hits_index,

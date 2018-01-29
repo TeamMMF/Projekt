@@ -68,7 +68,7 @@ void lis_overlap_parallelization(int  query_id,
                                  FILE* output,
                                  unordered_map<uint64_t,uint32_t >& occurences){
 
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,minimizer_hits,hits_index,lis_threshold,occurences);
+    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel2(query_id,minimizer_hashes,minimizer_hits,hits_index,lis_threshold,occurences);
     for(auto res : result){
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
                 fasta_reads[query_id] -> get_name(),

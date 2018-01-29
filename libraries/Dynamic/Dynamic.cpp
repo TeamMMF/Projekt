@@ -234,7 +234,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
 };
 
 
-vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
+vector<pair<int, bool>> find_overlaps_by_LIS_parallel2(int  query_id,
                                                       vector<minim>& minimizers,
                                                       vector<hashMinPair3>&  minimizer_hits,
                                                       unordered_map<uint64_t, uint32_t>& hits_index,
