@@ -258,7 +258,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
                 same_strand[match.seq_id].push_back(final);
             }
         }
-    y
+    }
     vector<pair<int, bool>> overlaps;
     for(auto &entry : same_strand){
         if(lis(entry.second)>=lis_threshold){
