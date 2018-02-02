@@ -249,7 +249,7 @@ vector<pair<int, bool>> find_overlaps_by_LIS_parallel(int  query_id,
             continue;
         for(auto match : matches->second){
             if(match.seq_id > query_id){
-                continue;
+                break;
             }
             int final = abs(match.index);
             if(match.index * min.index < 0){
