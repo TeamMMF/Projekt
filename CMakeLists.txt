@@ -95,15 +95,6 @@ add_subdirectory(libraries/bioparser EXCLUDE_FROM_ALL)
 
 # add the executable
 
-
-add_executable(mapper_testing ${SOURCES}/mapper_testing.cpp)
-target_link_libraries(mapper_testing Common)
-target_link_libraries(mapper_testing Dynamic)
-target_link_libraries(mapper_testing bioparser)
-target_link_libraries(mapper_testing lcskpp)
-target_link_libraries(mapper_testing FASTARead)
-target_link_libraries(mapper_testing thread_pool pthread)
-
 add_executable(mapper ${SOURCES}/mapper_parallel.cpp)
 target_link_libraries(mapper Common)
 target_link_libraries(mapper Dynamic)
@@ -111,82 +102,3 @@ target_link_libraries(mapper bioparser)
 target_link_libraries(mapper lcskpp)
 target_link_libraries(mapper FASTARead)
 target_link_libraries(mapper thread_pool pthread)
-
-add_executable(mapper_v1 ${SOURCES}/mapper_v1.cpp)
-target_link_libraries(mapper_v1 Common)
-target_link_libraries(mapper_v1 Dynamic)
-target_link_libraries(mapper_v1 bioparser)
-target_link_libraries(mapper_v1 lcskpp)
-target_link_libraries(mapper_v1 FASTARead)
-target_link_libraries(mapper_v1 thread_pool pthread)
-
-add_executable(mapper_v2 ${SOURCES}/mapper_v2.cpp)
-target_link_libraries(mapper_v2 Common)
-target_link_libraries(mapper_v2 Dynamic)
-target_link_libraries(mapper_v2 bioparser)
-target_link_libraries(mapper_v2 lcskpp)
-target_link_libraries(mapper_v2 FASTARead)
-target_link_libraries(mapper_v2 thread_pool pthread)
-
-add_executable(mapper_v3 ${SOURCES}/mapper_v3.cpp)
-target_link_libraries(mapper_v3 Common)
-target_link_libraries(mapper_v3 Dynamic)
-target_link_libraries(mapper_v3 bioparser)
-target_link_libraries(mapper_v3 lcskpp)
-target_link_libraries(mapper_v3 FASTARead)
-target_link_libraries(mapper_v3 thread_pool pthread)
-
-add_executable(mapper_parallel ${SOURCES}/mapper_parallel.cpp)
-target_link_libraries(mapper_parallel Common)
-target_link_libraries(mapper_parallel Dynamic)
-target_link_libraries(mapper_parallel bioparser)
-target_link_libraries(mapper_parallel lcskpp)
-target_link_libraries(mapper_parallel FASTARead)
-target_link_libraries(mapper_parallel thread_pool pthread)
-
-add_executable(mapper_dynamic ${SOURCES}/mapper_dynamic.cpp)
-target_link_libraries(mapper_dynamic Common)
-target_link_libraries(mapper_dynamic Dynamic)
-target_link_libraries(mapper_dynamic bioparser)
-target_link_libraries(mapper_dynamic lcskpp)
-target_link_libraries(mapper_dynamic FASTARead)
-target_link_libraries(mapper_dynamic thread_pool pthread)
-
-#[[
-
-add_executable(sample ${SOURCES}/sample.cpp)
-target_link_libraries(sample Common)
-
-add_executable(vectors ${SOURCES}/vectorSample.cpp)
-
-add_executable(LISSample ${SOURCES}/LISSample.cpp)
-target_link_libraries(LISSample Dynamic)
-]]#
-add_executable(optimizationTest ${SOURCES}/optimizationTest.cpp)
-target_link_libraries(optimizationTest Common)
-target_link_libraries(optimizationTest bioparser)
-target_link_libraries(optimizationTest CustomTypes)
-#[[
-add_executable(fastaSample ${SOURCES}/fastaSample.cpp )
-target_link_libraries(fastaSample bioparser)
-
-add_executable(kmer_finder ${SOURCES}/kmerFinderSample.cpp)
-target_link_libraries(kmer_finder Common)
-target_link_libraries(kmer_finder bioparser)
-target_link_libraries(kmer_finder CustomTypes)
-
-add_executable(dynamicSample ${SOURCES}/dynamicSample.cpp)
-target_link_libraries(dynamicSample Common)
-target_link_libraries(dynamicSample Dynamic)
-
-add_executable(lcskppSample ${SOURCES}/lcskppSample.cpp)
-target_link_libraries(lcskppSample Dynamic)
-target_link_libraries(lcskppSample bioparser)
-target_link_libraries(lcskppSample lcskpp)
-
-add_executable(lcskppSampleMinimizers ${SOURCES}/lcskppMinimizersForMathces.cpp)
-target_link_libraries(lcskppSampleMinimizers Common)
-target_link_libraries(lcskppSampleMinimizers Dynamic)
-target_link_libraries(lcskppSampleMinimizers bioparser)
-target_link_libraries(lcskppSampleMinimizers lcskpp)
-#]]

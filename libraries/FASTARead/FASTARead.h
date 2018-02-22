@@ -9,6 +9,10 @@
 #include <string>
 #include <cstdint>
 
+/**
+ * The class FASTARead encapsulates information about a read taken from a FASTA file.
+ * The class with this format was required by the library bioparser (https://github.com/rvaser/bioparser) used for reading data from FASTA files.
+ */
 class FASTARead {
     uint64_t id_;
     std::string name_;

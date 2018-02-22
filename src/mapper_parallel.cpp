@@ -6,7 +6,6 @@
 #include "Common.hpp"
 #include "FASTARead.h"
 #include "Dynamic.h"
-#include <CustomTypes.h>
 #include <chrono>
 #include "bioparser/bioparser.hpp"
 #include <algorithm>
@@ -14,14 +13,18 @@
 
 #define WINDOW_DEFAULT 5
 #define KMER_DEFAULT 15
+#define LIS_THRESHOLD 4
 
-
+/**
+ * A constant used for denoting progress to the user, simulates a rotating progress bar.
+ */
 const char *progress = "-\\|/";
 
-bool lis_threshold(int result,int l1, int l2);
-
-
-void show_usage(string arg) {
+/**
+ * Shows the program usage instructions to the user.
+ * @param arg The program's name.
+ */
+void show_usage(const string &arg) {
     fprintf(stdout, "%s Version %d.%d\n",
             arg.c_str(),
             SequenceOverlaping_VERSION_MAJOR,
@@ -33,81 +36,85 @@ void show_usage(string arg) {
 
 }
 
-void reduce_minimizers(uint32_t  number_of_minimizers,
-                       std::unordered_map<uint64_t ,uint32_t>& min_occurences,
-                       vector<uint64_t>& nogos){
-    std::vector<std::pair<uint64_t, uint32_t>> min_occur(min_occurences.begin(), min_occurences.end());
-    sort(min_occur.begin(), min_occur.end(), occurences_comparator);
-    double acc = 0;
-    for(int i = 0, len = min_occur.size(); i < len; i++){
-        acc += min_occur[i].second / (double) number_of_minimizers;
-
-        if(min_occur[i].second <= 34){
-            break;
-        }
-        nogos.emplace_back(min_occur[i].first);
-    }
-}
-
-uint32_t add_to_lookup_table(uint32_t seq_id,
-                         std::vector<minim> &minimizers,
-                         std::unordered_map<uint64_t,
-                                 vector<hashMinPair3>>& map,
-                         std::unordered_map<uint64_t ,uint32_t>& min_occurences){
-    uint32_t  len = minimizers.size();
-    for(uint32_t j = 0; j < len; j++){
+/**
+ * Adds all minimizers of one given sequence to a shared lookup map and
+ * tracks how many times a given minimizer appears by using a shared counting map.
+ * @param seq_id The id of the sequence to process.
+ * @param minimizers A vector of all minimizers appearing in the sequence.
+ * @param lookup_map A lookup map shared by all sequences, provides a vector of all minimizers for a particular hash.
+ * @param occurences A shared map used for counting minimizer occurrences.
+ */
+void add_to_lookup_map(uint32_t seq_id,
+                       std::vector<minim> &minimizers,
+                       std::unordered_map<uint64_t, vector<hashMinPair3>> &lookup_map,
+                       std::unordered_map<uint64_t, uint32_t> &occurences) {
+    uint64_t len = minimizers.size();
+    for (uint32_t j = 0; j < len; j++) {
         minim min = minimizers[j];
-        auto it = map.find(min.hash);
-        if (it == map.end()) {
+        auto it = lookup_map.find(min.hash);
+
+        if (it == lookup_map.end()) {
             std::vector<hashMinPair3> vec;
             vec.emplace_back((hashMinPair3) {seq_id, min.index});
-            map.emplace(min.hash, vec);
+            lookup_map.emplace(min.hash, vec);
         } else {
             it->second.emplace_back((hashMinPair3) {seq_id, min.index});
         }
 
-        min_occurences[min.hash]++;
+        occurences[min.hash]++;
     }
-    return len;
 }
 
-void report_status(const char* operation, int curr, long total) {
-    long ratio = 100*curr/total;
-    fprintf(stdout,"\r%s [%c] %ld%c",operation, progress[curr%4],ratio, '%');
+/**
+ * Reports a status of a given operation to the user using a rotating progress bar.
+ * @param operation The operation being executed.
+ * @param curr The current number of processed elements.
+ * @param total The total number of elements to be processed.
+ */
+void report_status(const char *operation, int curr, long total) {
+    long ratio = 100 * curr / total;
+    fprintf(stdout, "\r%s [%c] %ld%c", operation, progress[curr % 4], ratio, '%');
     fflush(stdout);
 }
 
-bool lis_threshold(int result, int l1, int l2) {
-    return result > 9;
-}
+/**
+ * Finds all overlaps for a sequence and outputs them to a specified output stream.
+ * @param query_id The query sequence's id.
+ * @param minimizer_hashes A vector of all minimizers appearing in the query sequence.
+ * @param lookup_map A map mapping a hash to all corresponding minimizers (from all sequences)
+ * @param fasta_reads A vector of FASTARead objects containing data required by the PAF format
+ * @param output The result output stream. This is where all of the found matches are printed (in PAF format)
+ * @param occurences A map denoting the number of occurences for a given minimizer hash (based on all sequences)
+ */
+void find_overlaps(int query_id,
+                   vector<minim> &minimizer_hashes,
+                   unordered_map<uint64_t, vector<hashMinPair3>> &lookup_map,
+                   vector<unique_ptr<FASTARead>> &fasta_reads,
+                   FILE *output,
+                   unordered_map<uint64_t, uint32_t> &occurences) {
 
-void lis_overlap_parallelization(int  query_id,
-                                 vector<minim>& minimizer_hashes,
-                                 unordered_map<uint64_t, vector<hashMinPair3>>&  lookup_map,
-                                 int lis_threshold,
-                                 vector<unique_ptr<FASTARead>>& fasta_reads,
-                                 FILE* output,
-                                 unordered_map<uint64_t,uint32_t >& occurences){
-
-    vector<pair<int, bool>> result = find_overlaps_by_LIS_parallel(query_id,minimizer_hashes,lookup_map,lis_threshold,occurences);
-    for(auto res : result){
+    vector<pair<int, bool>> result = find_overlaps_by_LIS(query_id, minimizer_hashes, lookup_map,
+                                                          LIS_THRESHOLD, occurences);
+    for (auto res : result) {
         fprintf(output, "%s\t%d\t%d\t%d\t%c\t%s\t%d\n",
-                fasta_reads[query_id] -> get_name(),
-                fasta_reads[query_id] -> get_data_length(),
+                fasta_reads[query_id]->get_name(),
+                fasta_reads[query_id]->get_data_length(),
                 0,
                 0,
                 res.second ? '+' : '-',
-                fasta_reads[res.first] -> get_name(),
-                fasta_reads[res.first] -> get_data_length()
+                fasta_reads[res.first]->get_name(),
+                fasta_reads[res.first]->get_data_length()
         );
     }
 }
 
-// Mislio si izvest veceg Matu Paulinovica... Take a seat Skywalker
+/**
+ * Starts the program.
+ * @param argc The number of command line arguments.
+ * @param argv The command line arguments
+ * @return 0 if the execution succeeds, 1 otherwise
+ */
 int main(int argc, char const *argv[]) {
-
-    uint32_t k = KMER_DEFAULT;
-    uint32_t w = WINDOW_DEFAULT;
 
     string read_file_path;
     string result_file_path;
@@ -125,98 +132,101 @@ int main(int argc, char const *argv[]) {
     }
 
     int max_concurrent_threads = argc > 3 ? stoi(argv[3]) : -1;
-    if(max_concurrent_threads < 0){
+    if (max_concurrent_threads < 0) {
         printf("Running on an unlimited number of concurrent threads.\n");
-    }else{
-        printf("Running on %d concurrent threads.\n",max_concurrent_threads);
+    } else {
+        printf("Running on %d concurrent threads.\n", max_concurrent_threads);
     }
 
-    // čita datoteku i sprema svako očitanje u poseban objekt razreda FASTARead
+    // Reads the file and creates a FASTARead object for every read
     vector<unique_ptr<FASTARead>> fasta_reads;
     auto fasta_reader1 = bioparser::createReader<FASTARead, bioparser::FastaReader>(read_file_path);
     fasta_reader1->read_objects(fasta_reads, static_cast<uint64_t>(-1));
-    long number_of_reads = fasta_reads.size();
+    unsigned long number_of_reads = fasta_reads.size();
+
     printf("Reading file - Done.\n");
 
-    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map; // hash minimizera -> minimizeri svih sekvenci poredani po indeksu uzlazno
-    std::vector<std::vector<minim>> mins_in_order(number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
+    // maps a hash to a vector of corresponding minimizers (taken from all available sequences)
+    unordered_map<uint64_t, vector<hashMinPair3>> lookup_map;
+    // maps a sequence id to an ascenging list of its minimizers
+    std::vector<std::vector<minim>> ordered_minimizers(
+            number_of_reads); // id sekvence -> poredani minimizeri sekvence po indeksu
 
-    // create thread pool
+    // create thread pool for collecting minimizers
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_data;
-    if(max_concurrent_threads < 0){
+    if (max_concurrent_threads < 0) {
         thread_pool_data = thread_pool::createThreadPool();
-    }else{
+    } else {
         thread_pool_data = thread_pool::createThreadPool(max_concurrent_threads);
     }
-    // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<uint32_t >> thread_futures_data;
 
     printf("Colecting data [-]");
     chrono::high_resolution_clock::time_point t1 = chrono::high_resolution_clock::now();
-    for (int i=0; i<number_of_reads; i++){
-            //concurrency?
+    for (int i = 0; i < number_of_reads; i++) {
         thread_futures_data.emplace_back(thread_pool_data->submit_task(
                 process_sequence4_id, fasta_reads[i]->get_data(),
                 fasta_reads[i]->get_data_length(),
                 i,
-                w,
-                k,
-                std::ref(mins_in_order)
+                WINDOW_DEFAULT,
+                KMER_DEFAULT,
+                std::ref(ordered_minimizers)
         ));
     }
-    int i = 0;
-    unordered_map<uint64_t ,uint32_t > min_occurences;
-    //nogo planvector<uint64_t > nogos;
-    uint32_t  number_of_minimizers=0;
-    for (auto& it: thread_futures_data) {
-        report_status("Collecting minimizers",i++, number_of_reads);
+
+    unordered_map<uint64_t, uint32_t> minimizer_occurences;
+    int coll_progress = 0;
+    for (auto &it: thread_futures_data) {
+        report_status("Collecting minimizers", coll_progress++, number_of_reads);
         it.wait();
         uint32_t id = it.get();
-        number_of_minimizers+=add_to_lookup_table(id, mins_in_order[id], lookup_map, min_occurences);
+        add_to_lookup_map(id, ordered_minimizers[id], lookup_map, minimizer_occurences);
     }
-    //nogo plan reduce_minimizers(number_of_minimizers,min_occurences,nogos);
+
     chrono::high_resolution_clock::time_point t2 = chrono::high_resolution_clock::now();
-    printf("\rCollecting minimizers - Finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t2 - t1 ).count());
+    printf("\rCollecting minimizers - Finished in %ld seconds.\n",
+           chrono::duration_cast<chrono::seconds>(t2 - t1).count());
 
     sort_by_indices(lookup_map);
     chrono::high_resolution_clock::time_point t4 = chrono::high_resolution_clock::now();
-    printf("Sorting finished in %ld seconds.\n",chrono::duration_cast<chrono::seconds>( t4 - t2 ).count());
+    printf("Sorting finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>(t4 - t2).count());
     fflush(stdout);
-    //nogo plan sort(nogos.begin(),nog  os.end());
+
     printf("Comparing sequences [-]");
 
-    // create thread pool
+    // create thread pool for comparing sequences
     std::shared_ptr<thread_pool::ThreadPool> thread_pool_lis;
-    if(max_concurrent_threads < 0){
+    if (max_concurrent_threads < 0) {
         thread_pool_lis = thread_pool::createThreadPool();
-    }else{
+    } else {
         thread_pool_lis = thread_pool::createThreadPool(max_concurrent_threads);
     }
-    // create storage for return values of find_overlaps_by_LIS
     std::vector<std::future<void>> thread_futures_lis;
 
 
-    FILE* output = fopen(result_file_path.c_str(),"w");
+    FILE *output = fopen(result_file_path.c_str(), "w");
     chrono::high_resolution_clock::time_point t5 = chrono::high_resolution_clock::now();
     for (int i = 0; i < number_of_reads; ++i) {
         thread_futures_lis.emplace_back(thread_pool_lis->submit_task(
-                lis_overlap_parallelization,
+                find_overlaps,
                 i,
-                std::ref(mins_in_order[i]),
+                std::ref(ordered_minimizers[i]),
                 std::ref(lookup_map),
-                4,
                 std::ref(fasta_reads),
                 output,
-                std::ref(min_occurences)));
+                std::ref(minimizer_occurences)));
     }
-    int j = 0;
-    for (auto& it: thread_futures_lis) {
-        report_status("Comparing sequences",j++, number_of_reads);
+
+    int cmp_progress = 0;
+    for (auto &it: thread_futures_lis) {
+        report_status("Comparing sequences", cmp_progress++, number_of_reads);
         it.wait();
     }
 
     chrono::high_resolution_clock::time_point t6 = chrono::high_resolution_clock::now();
-    printf("\rComparing sequences - Finished in %ld seconds.\n", chrono::duration_cast<chrono::seconds>( t6 - t5 ).count());
-    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>( t6 - t1 ).count());
+    printf("\rComparing sequences - Finished in %ld seconds.\n",
+           chrono::duration_cast<chrono::seconds>(t6 - t5).count());
+    printf("Total execution time: %ld seconds\n", chrono::duration_cast<chrono::seconds>(t6 - t1).count());
+
     return 0;
 }
