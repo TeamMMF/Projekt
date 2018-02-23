@@ -64,7 +64,11 @@ uint64_t invertible_minimizer_hash_inverse(uint64_t key) {
 
     return key;
 }
-
+/**
+ * Returns the associated hash value of a given nucleotide
+ * @param c nucleotide representation
+ * @return nucleotide hash value
+ */
 size_t find_hash_value(char c) {
     switch (c) {
         case 'A':
@@ -84,6 +88,7 @@ size_t find_hash_value(char c) {
     }
 }
 
+
 bool hit_comparator(const minimizer_hit a,
                     const minimizer_hit b) {
     if (get<0>(a) < get<0>(b)) return true;
@@ -101,10 +106,6 @@ bool hit_comparator(const minimizer_hit a,
     return true;
 }
 
-
-
-
-/************************************************* NON STL C++ CODE ********************************************************/
 
 /**
  * Returns the complement base
@@ -127,7 +128,13 @@ char complement(char c)
     }
 }
 
-
+/**
+ * Naive implementation of the minimizer hashing function. The kmer hash is calculated based on the position of each
+ * nucleotide in the sequence as well as its hash value.
+ * @param seq  pointer to the start of the nucleotide char sequence
+ * @param seq_l length of the kmer
+ * @return 64-bit hash value
+ */
 uint64_t minimizer_hash3(const char* seq, uint32_t seq_l)
 {
     uint64_t hash = 0;
@@ -139,6 +146,13 @@ uint64_t minimizer_hash3(const char* seq, uint32_t seq_l)
     return hash;
 }
 
+/**
+ * Naive implementation of the minimizer hashing function. The kmer hash is calculated based on the position of each
+ * nucleotide in the reversed sequence as well as its hash value.
+ * @param seq  pointer to the start of the nucleotide char sequence
+ * @param seq_l length of the kmer
+ * @return 64-bit hash value
+ */
 uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l) {
     uint64_t hash = 0;
 
@@ -150,16 +164,40 @@ uint64_t minimizer_hash3_rev(const char* seq, uint32_t seq_l) {
 }
 
 
+/**
+ * Compares two hashMinPair2 structs based on the index.
+ * @param a first hashMinPair2 struct
+ * @param b second hashMinPair2 struct
+ * @return true if first struct index is less than the second struct index
+ */
 bool hashMinPair2_comparator(hashMinPair2 a, hashMinPair2 b){
     return a.index<b.index;
 }
 
+/**
+ * Compares two hashMinPair3 structs based on the index.
+ * @param a first hashMinPair3 struct
+ * @param b second hashMinPair3 struct
+ * @return true if absolute value of the first struct index is less than the absolute value of the second struct index
+ */
 bool hashMinPair3_comparator(hashMinPair3 a, hashMinPair3 b){
     return abs(a.index)<abs(b.index);
 }
 
 
-
+/**
+ * Find all minimizers for a given strand and stores them as a minim struct in a vector. Additionally, it keeps track of
+ * the number of occurences of the specific minimizer hash in the occurrences map. Minimizer hits are also recorded and
+ * added to the minimizer_hits map.
+ * @param seq sequence from which minimizers will be extracted
+ * @param seq_l sequence length
+ * @param seq_id sequence identifier
+ * @param w window size
+ * @param k kmer length
+ * @param minimizers vector reference where minimizers will be stored
+ * @param minimizer_hits unordered_map reference where minimizer hits will be stored
+ * @param occurrences unoredered_map reference where occurences will be counted
+ */
 void find_minimizers_full
         (const char *seq,
          uint32_t seq_l,
@@ -317,7 +355,18 @@ void find_minimizers_full
     return;
 }
 
-
+/**
+ * Wrapper function for finding all minimizers of a sequence and embedding the resulting vector into a vector of vectors
+ * which keeps track of all minimizer vectors for all sequnces.
+ * @param sequence nucleotide sequence from which minimizers should be extracted
+ * @param sequence_l sequence length
+ * @param sequence_id sequence identifier
+ * @param w window size
+ * @param k kmers size
+ * @param ordered_minimizers_addr reference to vector where the reseulting minimizer vector should be stored
+ * @param minimizer_hits reference to unoredered_map where minimizer_hits will be added
+ * @param occurrences reference where occurences will be stored
+ */
 void process_sequence_all(const char* sequence,
                        uint32_t sequence_l,
                        uint32_t sequence_id,
@@ -333,11 +382,19 @@ void process_sequence_all(const char* sequence,
     ordered_minimizers_addr.emplace_back(mins);
 }
 
+/**
+ * Wrapper function which sorts a given vector<hashMinPair2> using the hashMinPair2_comparator
+ * @param begin start iteretor
+ * @param end  end iterator
+ */
 void sort_wrap(vector<hashMinPair2>::iterator  begin, vector<hashMinPair2>::iterator end) {
     sort(begin, end, hashMinPair2_comparator);
 }
 
-
+/**
+ * Sorts each vector using the hahsMinPair3_comparator of the given unoredered_map
+ * @param minimizer_hits reference to unordered_map
+ */
 void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair3>>& minimizer_hits) {
     auto it = minimizer_hits.begin();
     while (it != minimizer_hits.end()) {
@@ -346,7 +403,14 @@ void sort_by_indices(std::unordered_map<uint64_t, std::vector<hashMinPair3>>& mi
     }
 }
 
-
+/**
+ * Find all minimizers for a given strand and stores them as a minim struct in a vector.
+ * @param seq sequence
+ * @param seq_l sequence length
+ * @param w window size
+ * @param k kmer length
+ * @param minimizers  reference to vector where all minimizers will be stored
+ */
 void find_minimizers7
         (const char *seq,
          uint32_t seq_l,
@@ -465,7 +529,17 @@ void find_minimizers7
     return;
 }
 
+/**
+ * Wrapper function for finding all minimizers of a sequence and embedding the resulting vector into a vector of vectors
+ * which keeps track of all minimizer vectors for all sequnces.
+ * @param sequence nucleotide sequence from which minimizers should be extracted
+ * @param sequence_l sequence length
+ * @param sequence_id sequence identifier
+ * @param w window size
+ * @param k kmers size
+ * @param ordered_minimizers_addr reference to vector where the reseulting minimizer vector should be stored
 
+ */
 void process_sequence4(const char* sequence,
                        uint32_t sequence_l,
                        uint32_t sequence_id,
@@ -479,21 +553,17 @@ void process_sequence4(const char* sequence,
     ordered_minimizers_addr[sequence_id] = mins;
 }
 
-/*
-void process_sequence4_max(const char* sequence,
-                       uint32_t sequence_l,
-                       uint32_t sequence_id,
-                       int32_t w,
-                       uint32_t k,
-                       std::vector<std::vector<minim>>& ordered_minimizers_addr){
-
-    std::vector<minim> mins;
-    find_maximizers7(sequence, sequence_l, sequence_id, w, k, mins);
-    mins.shrink_to_fit();
-    ordered_minimizers_addr[sequence_id] = mins;
-}
-*/
-
+/**
+ * Wrapper function for finding all minimizers of a sequence and embedding the resulting vector into a vector of vectors
+ * which keeps track of all minimizer vectors for all sequnces.
+ * @param sequence nucleotide sequence from which minimizers should be extracted
+ * @param sequence_l sequence length
+ * @param sequence_id sequence identifier
+ * @param w window size
+ * @param k kmers size
+ * @param ordered_minimizers_addr reference to vector where the reseulting minimizer vector should be stored
+ * @return sequence id
+ */
 uint32_t process_sequence4_id(const char* sequence,
                            uint32_t sequence_l,
                            uint32_t sequence_id,
@@ -508,7 +578,14 @@ uint32_t process_sequence4_id(const char* sequence,
     return sequence_id;
 }
 
-
+/**
+ * Filters all minimizers based on the number of their occurunces and marks those who exceed the given threshold as no go
+ * minimizers, and places them in the no_gos vector.
+ * @param minimizers  reference to vector of vectors of minimizers
+ * @param map refernce to unordered_map of minimizer hits
+ * @param no_gos reference to vector of hash values which are no gos
+ * @param threshold number of allowed appearances of a single minimzer hash
+ */
 void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minim>>& minimizers,
                                        std::unordered_map<uint64_t,
                                                vector<hashMinPair3>>& map,
@@ -552,11 +629,25 @@ void fill_lookup_table_nogo_minimizers(std::vector<std::vector<minim>>& minimize
 
 }
 
-
+/**
+ * Compares two (hash,occurrence) pairs based on the number of occurences.
+ * @param a first (hash,occurence) pair
+ * @param b second (hash, occurence) pair
+ * @return true if first pair occurence is greater than the second pair occurence
+ */
 bool occurences_comparator(const std::pair<uint64_t,uint32_t>& a, const std::pair<uint64_t,uint32_t>& b){
     return a.second > b.second;
 }
 
+/**
+ * Calculates the minimizer hash of a kmer based on the value of the kmer before it and the last current nucleotide
+ * @param seq sequence
+ * @param index start index of the kmer in the sequence
+ * @param last_hash pointer to last recorded kmer hash valie
+ * @param power power to which values should be raised
+ * @param first_nucleotide_value poitner to the first value of the nucleotide
+ * @return new hash value
+ */
 uint64_t minimizer_hash4(const char* seq, int32_t index, uint64_t*  last_hash, uint32_t power, uint64_t* first_nucleotide_value)
 {
     uint64_t  hash = 0;
@@ -567,6 +658,15 @@ uint64_t minimizer_hash4(const char* seq, int32_t index, uint64_t*  last_hash, u
     return hash;
 }
 
+/**
+ * Calculates the reverse minimizer hash of a kmer based on the value of the kmer before it and the last current nucleotide
+ * @param seq sequence
+ * @param index start index of the kmer in the sequence
+ * @param last_hash pointer to last recorded kmer hash valie
+ * @param power power to which values should be raised
+ * @param first_nucleotide_value poitner to the first value of the nucleotide
+ * @return new hash value
+ */
 uint64_t minimizer_hash4_rev(const char* seq, int32_t index, uint64_t*  last_hash, uint32_t power, uint64_t* first_nucleotide_value)
 {
     uint64_t  hash = 0;
