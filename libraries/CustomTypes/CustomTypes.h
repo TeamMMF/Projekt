@@ -6,24 +6,20 @@
 #define CustomTypes
 
 #include <cstdint>
-
-typedef struct {
-    uint64_t hash;
-    uint32_t index;
-    bool rev;
-} minimizer;
-
+/**
+ * Represents a minimizer tuple (h,i) where
+ * h - hash
+ * i - start index in the sequence (positive if minimizer is not from reversed starnd, negative otherwise)
+ */
 typedef struct {
     uint64_t hash;
     int32_t index;
 } minim;
 
-typedef struct {
-    uint32_t seq_id;
-    uint32_t index;
-    bool rev;
-} hashMinPair2;
-
+/**
+ * Represents a tuple which carries information about the sequece and start index in that seqeunce for a certain minimizer
+ * hash value.
+ */
 typedef struct {
     uint32_t seq_id;
     int32_t index;
